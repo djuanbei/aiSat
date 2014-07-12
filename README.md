@@ -5,7 +5,10 @@ mathemtics optmization and control theorem
 
 like sostool we want present a tool to integrate sdp and semidefinite algebra
 
-need libs: lapack blas gfortan
+system: linux 64 bit system
+
+
+need libs: bison lex  lapack blas gfortan
 
 complie:
 
