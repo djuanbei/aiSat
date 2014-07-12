@@ -12,7 +12,9 @@ need libs: bison lex  lapack blas gfortan
 
 complie:
 
-make 
+make
+
+make
 
 usage:
 ./aisat_release filename
