@@ -53,13 +53,13 @@ COPTIMIZE ?= -O3
 
 CFLAGS    += -I  include -I  ulib/include
 
-LFLAGS    +=  -L lib/   -lpoly -lsdp -lbase -lntl  -lgmp -lm    -llapack -lblas -lgfortran   
+LFLAGS    +=  -L lib/   -lpoly -lsdp -lbase  -lm    -llapack -lblas -lgfortran   
   
 
 
 .PHONY :all s p d r c rs clean 
 
-all: lib r
+all: otherlib  r
 
 
 s:	$(EXEC)
@@ -111,14 +111,13 @@ lib$(LIB)_release.a:	$(filter-out */$(MAINFILE).or, $(RCOBJS))
 	@echo Compiling: $(subst $(WROOT)/,,$@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
-lib:libpoly libcsdp
+otherlib: libpoly libcsdp
 
 libpoly:
-	cd poly;
-	make libr;
+	cd poly; make libr;
+
 libcsdp:
-	cd csdp;
-	make libr
+	cd csdp; make libr
 
          
 

@@ -351,6 +351,7 @@ void SOSP::solve(){
   }
   free(resP);
   clearSOSProblem(problem);
+  left_printMap.clear();
   
 }
 
@@ -361,11 +362,13 @@ void SOSP::findSOS( Poly *poly ){
     cout	<< "SOS" << endl;
   }else
     cout	<< "NO" << endl;
+  left_printMap.clear();
 }
 
 void SOSP::interpolant(SOSProblem *sys, const int sep){
   title();
   inter_sdp(sys,sep, "pro.txt","result.txt" );
+  left_printMap.clear();
 }
 void SOSP::clear(){
   clearSOSProblem(problem);
