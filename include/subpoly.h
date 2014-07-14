@@ -19,7 +19,7 @@
 #ifndef  SUBPOLY_INC
 #define  SUBPOLY_INC
 #include	"polytype.h"
-#include "ulib/crypt_md5.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,7 +30,6 @@ extern "C" {
   void printSubPoly ( const SubPoly * subpoly  );
   void deleteSubPoly(SubPoly * poly);
 
-  //	void getMd5sum(const  SubPoly * subp, md5_ctx_t *);
 
 #ifdef __cplusplus 
 }

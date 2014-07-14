@@ -11,6 +11,8 @@ s2-f3 + 10 == f2
 findsos(f2) #whether f2 can be wtritten as SOS
 f4=x^2+y^2-11
 findsos(f4)
+f5=x^2+y^2+11
+findsos(f5)
 
 s3=sos(M)
 s4=sos(M)

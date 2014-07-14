@@ -53,11 +53,11 @@ COPTIMIZE ?= -O3
 
 CFLAGS    += -I  include -I  ulib/include
 
-LFLAGS    +=  -L lib/   -lpoly -lsdp -lbase  -lm    -llapack -lblas -lgfortran   
+LFLAGS    +=  -L lib/   -lpoly -lsdp   -lm    -llapack -lblas -lgfortran   
   
 
 
-.PHONY :all s p d r c rs clean 
+.PHONY : all s p d r c rs clean 
 
 all: otherlib  r
 
@@ -107,7 +107,7 @@ lib$(LIB)_release.a:	$(filter-out */$(MAINFILE).or, $(RCOBJS))
 
 
 ## Build rule
-%.o %.op %.od %.or :%.$(SRCSUF)    parser
+%.o %.op %.od %.or :%.$(SRCSUF)   
 	@echo Compiling: $(subst $(WROOT)/,,$@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 

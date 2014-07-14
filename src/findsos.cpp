@@ -29,14 +29,14 @@
 #include "subpoly.h"
 #include "sort.h"
 #include "search.h"
-#include <ulib/hash_func.h>
-#include <ulib/hash_open.h>
-#include <ulib/math_rand_prot.h>
+#include <map>
+
 #include "pointlist.h"
 #include "monomial.h"
 #include "iostream"
 
-using namespace ulib;
+
+using std::map;
 using std::cout;
 using std::endl;
 
@@ -92,46 +92,14 @@ static void sosPresent(const SubPoly * subpoly, const PointList *sosList, const 
 }
 
 
+static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const int loc[], const int size, const map<monomial, monomialvalue> &monMap, const int vertex_num, PointList *ans );
 
-
-
-
-static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const int loc[], const int size, const open_hash_map<monomial, int> &monMap, const int vertex_num, PointList *ans );
-
-// static bool separateCheck(indice_t *indices, const int loc[],  const int checkSize, const int check[],  const open_hash_map<monomial, int>  &monMap, const int id){
-//   int i;
-//   monomial curr=monMap.find(indices+loc[check[id]]*DIM).key();
-
-//   for ( i = 0; i < checkSize; i += 1 ) {
-//     monomial temp=monMap.find(indices+loc[check[i]]*DIM).key();
-//     if(!curr.contain(temp) && curr.conjunction(temp)){                /* temp's set does not contain in curr's set */
-//       return false; /* temp's set does not conjunction with curr's set */
-//     }
-//   }
-
-//   return true;
-
-// }
-
-// static bool separateCheck(indice_t *indices,const int loc[],  const int checkSize, const int check[],  const open_hash_map<monomial, int>  &monMap, const uint32_t set[]){
-//   int i;
-
-//   for ( i = 0; i < checkSize; i += 1 ) {
-//     monomial temp=monMap.find(indices+loc[check[i]]*DIM).key();
-//     if(!contain(set,temp) && conjunction(set,temp)){                /* temp's set does not contain in curr's set */
-//       return false; /* temp's set does not conjunction with curr's set */
-//     }
-//   }
-
-//   return true;
-
-
-// }
 
 
 static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &candidateLength, const indice_t * genSet, const int genLength, indice_t **SOSM, int &sosLength, PointList *ans){
 
-  int i,j,k,valueIndex,v, m;
+  int i,j,valueIndex,v, m;
+  uint32_t k;
   int currCandLen=candidateLength;
   int lastre=-1;
   int size=subpoly->size;
@@ -148,7 +116,7 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
   indice_t * key=new indice_t[DIM];
   indice_t * key1=new indice_t[DIM];
 
-  open_hash_map<monomial, int> monMap;
+  map<monomial, monomialvalue> monMap;
   indice_t *indiceValues=new indice_t[candidateLength*candidateLength*DIM];
 
   valueIndex=0;
@@ -157,7 +125,9 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
       key[j]=2*genSet[i*DIM+j];
     }
     memcpy(indiceValues+valueIndex*DIM,key,node_size);
-    monMap[monomial(indiceValues+valueIndex*DIM,DIM)]=1;
+    monomialvalue dummy;
+    dummy.value=1;
+    monMap[monomial(indiceValues+valueIndex*DIM,DIM)]=dummy;
     valueIndex++;
   }
 
@@ -168,11 +138,14 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
       for ( k = 0; k < DIM; k += 1 ) {
         key[k]=candidateSet[i*DIM+k]+candidateSet[j*DIM+k];
       }
-      if(monMap.contain(monomial(key,DIM))){
-        monMap[monomial(key,DIM)]=monMap[monomial(key,DIM)]+1;
+      if(monMap.find(monomial(key,DIM))!=monMap.end()){
+        monMap[monomial(key,DIM)].value++;
+        //=monMap[key,DIM)]+1;
       }else{
         memcpy(indiceValues+valueIndex*DIM,key,node_size);
-        monMap[monomial(indiceValues+valueIndex*DIM,DIM)]=1;
+        monomialvalue dummy;
+        dummy.value=1;
+        monMap[monomial(indiceValues+valueIndex*DIM,DIM)]=dummy;
         valueIndex++;
       }
 
@@ -196,13 +169,14 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
       for ( j = 0; j < DIM; j += 1 ) {
         key[j]=2*candidateSet[i*DIM+j];
       }
-      if(monMap[monomial(key,DIM)]==1){                 /* expect 2*candidateSet[i*DIM+j], no other combines
+      if(monMap[monomial(key,DIM)].value==1){                 /* expect 2*candidateSet[i*DIM+j], no other combines
                                              of monomial has value key*/
         for ( j = 0; j < currCandLen; j += 1 ) {
           for ( k = 0; k < DIM; k += 1 ) {
             key1[k]=candidateSet[i*DIM+k]+candidateSet[j*DIM+k];
           }
-          monMap[monomial(key1,DIM)]=monMap[monomial(key1,DIM)]-1;
+          monMap[monomial(key1,DIM)].value--;
+          
 
         }
         monMap.erase(monomial(key,DIM));
@@ -223,8 +197,8 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
   sosLength=0;
 
 
-  for(open_hash_map<monomial,int>::const_iterator it=monMap.begin();it!=monMap.end();++it){
-    if(it.value()>0) sosLength++;
+  for(map<monomial,monomialvalue>::const_iterator it=monMap.begin();it!=monMap.end();++it){
+    if(it->second.value>0) sosLength++;
   }
 
   //  open_hash_map<monomial,int>::const_iterator it=monMap.begin();
@@ -232,8 +206,8 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
   //   if(it.value()==0)it= monMap.erase(it.key());
   //   else it++;
   // }
-  for(open_hash_map<monomial,int>::const_iterator it=monMap.begin();it!=monMap.end();++it){
-    if(it.value()==0) monMap.erase(it.key());
+  for(map<monomial,monomialvalue>::iterator it=monMap.begin();it!=monMap.end();++it){
+    if(it->second.value==0) monMap.erase(it);
     if(it==monMap.end()) break;
   }
 
@@ -242,7 +216,8 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
     for ( j = 0; j < DIM; j += 1 ) {
       key[j]=2*genSet[i*DIM+j];
     }
-    monMap[monomial(key,DIM)]=monMap[monomial(key,DIM)]-1;
+    monMap[monomial(key,DIM)].value--;
+    
   }
 
   k=0;
@@ -252,7 +227,7 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
     for ( i = 0; i < DIM; i += 1 ) {
       key[i]=2*genSet[j*DIM+i];
     }
-    v=monMap[monomial(key,DIM)];
+    v=monMap[monomial(key,DIM)].value;
 
     if(v==1) {
       for ( i = 0; i < currCandLen; i += 1 ) {
@@ -260,12 +235,15 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
         for ( m = 0; m < DIM; m += 1 ) {
           key1[m]=key[m]/2+candidateSet[i*DIM+m];
         }
-        monMap.find(monomial(key1,DIM)).key().add(k);
+        map<monomial,monomialvalue>::iterator it=monMap.find(monomial(key1,DIM));
+        
+        it->second.add(k);
+                                                   
       }
-      monomial::add(vertexSet,k);
+
 
       k++;
-      monMap.find(monomial(key,DIM)).key().change=false;
+      monMap.find(monomial(key,DIM))->second.change=false;
     }
 
   }
@@ -282,16 +260,16 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
       for ( j = 0; j < DIM; j += 1 ) {
         key[j]=2*candidateSet[i*DIM+j];
       }
-      if(monMap.find(monomial(key,DIM)).key().change){
-        monMap.find(monomial(key,DIM)).key().change=false;
+      if(monMap.find(monomial(key,DIM))->second.change){
+        monMap.find(monomial(key,DIM))->second.change=false;
 
         for ( j = 0; j < currCandLen; j += 1 ) {
 
           for ( m = 0; m < DIM; m += 1 ) {
             key1[m]=key[m]/2+candidateSet[j*DIM+m];
           }
-          if(!(monMap.find(monomial(key1,DIM)).key().contain((monMap.find(monomial(key,DIM)).key())))){
-            monMap.find(monomial(key1,DIM)).key().add(monMap.find(monomial(key,DIM)).key());
+          if(!(monMap.find(monomial(key1,DIM))->second.contain(monMap.find(monomial(key,DIM))->second))){
+            monMap.find(monomial(key1,DIM))->second.add(monMap.find(monomial(key,DIM))->second);
             run=true;
           }
         }
@@ -307,7 +285,7 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
   /*-----------------------------------------------------------------------------
    *  necessary check
    *-----------------------------------------------------------------------------*/
-  if(!monMap.contain(monomial( indices+loc[0]*DIM,DIM))){
+  if(monMap.find(monomial( indices+loc[0]*DIM,DIM))!=monMap.end()){
     if(NULL!=ans)
       cout<<  "Corollary 3" <<endl;
     delete[] indiceValues;
@@ -316,7 +294,7 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
 
   for ( i = 1; i < size; i += 1 ) {
 
-    if(!monMap.contain(monomial(indices+loc[i]*DIM,DIM))){
+    if(monMap.find(monomial(indices+loc[i]*DIM,DIM))!=monMap.end()){
       if(NULL!=ans)
         cout<< "Corollary 3"<<endl;
       delete[] indiceValues;
@@ -338,9 +316,9 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
 
   i=0;
 
-  for(open_hash_map<monomial,int>::const_iterator it=monMap.begin();it!=monMap.end();++it){
-    if(it.value()>0) {
-      memcpy((*SOSM)+i*DIM, it.key().indice ,node_size);
+  for(map<monomial,monomialvalue>::const_iterator it=monMap.begin();it!=monMap.end();++it){
+    if(it->second.value>0) {
+      memcpy((*SOSM)+i*DIM, it->first.indice ,node_size);
       i++;
     }
   }
@@ -364,8 +342,7 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
  *  <b>: is the array of coefs of poly.
  *-----------------------------------------------------------------------------*/
 
-static Constraintmatrix *
-createConstraintMatrix(const SubPoly *subpoly, const int sosId,  double ** b, const  indice_t* SOSM, const int sosLength,  const int gLength ){
+static Constraintmatrix * createConstraintMatrix(const SubPoly *subpoly, const int sosId,  double ** b, const  indice_t* SOSM, const int sosLength,  const int gLength ){
 
   int i,k,tempI;
   const int varNum=getvarNum(subpoly->poly->varId);
@@ -467,7 +444,7 @@ createConstraintMatrix(const SubPoly *subpoly, const int sosId,  double ** b, co
 }
 
 
-static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const int loc[], const int size, const open_hash_map<monomial, int> &monMap, const int vertex_num, PointList *ans){
+static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const int loc[], const int size, const map<monomial, monomialvalue> &monMap, const int vertex_num, PointList *ans){
 
   //			printSubPoly(tempSub);
   int i,j,num,k;
@@ -492,9 +469,9 @@ static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const 
       set[2]=0u;
       set[3]=0u;
       memset(choose,0, checkSize*sizeof(int));
-      monomial curr=monMap.find(monomial(indices+loc[check[i]]*DIM,DIM)).key();
+      monomialvalue curr=monMap.find(monomial(indices+loc[check[i]]*DIM,DIM))->second;
       num=0;
-      monomial::add(set,curr);
+      monomialvalue::add(set,curr);
       checked[check[i]]=1;
       tempLoc[num++]=loc[check[i]];
       choose[i]=1;
@@ -502,9 +479,9 @@ static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const 
       while(tempNum!=num){
         tempNum=num;
         for ( j = 0; j < checkSize; j += 1 ) {
-          monomial temp=monMap.find(monomial( indices+loc[check[j]]*DIM,DIM)).key();
-          if(monomial::conjunction(set,temp)&& !choose[j]){
-            monomial::add(set,temp);
+          monomialvalue temp=monMap.find(monomial( indices+loc[check[j]]*DIM,DIM))->second;
+          if(monomialvalue::conjunction(set,temp)&& !choose[j]){
+            monomialvalue::add(set,temp);
             checked[check[j]]=1;
             tempLoc[num++]=loc[check[j]];
             choose[j]=1;
@@ -548,51 +525,7 @@ static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const 
   }
 
 
-  //	for ( i = 0; i < checkSize; i += 1 ) {
-  //
-  //		if((monMap.find(indices+loc[check[i]]*DIM).key().size())<vertex_num && separateCheck(indices, loc, checkSize, check, monMap, i)){
-  //			if(NULL!=ans)
-  //			  cout	<< "found a split poly" << endl;
-  //
-  //			memset(choose,0, checkSize*sizeof(int));
-  //			monomial curr=monMap.find(indices+loc[check[i]]*DIM).key();
-  //
-  //			num=0;
-  //			for ( j = 0; j < checkSize; j += 1 ) {
-  //				monomial temp=monMap.find(indices+loc[check[j]]*DIM).key();
-  //				if(curr.contain(temp)){
-  //					tempLoc[num++]=loc[check[j]];
-  //					choose[j]=1;
-  //				}
-  //			}
-  //			SubPoly * tempSub=createSubPoly1(subpoly->poly,  num, tempLoc);
-  //			int preAnsLength=0;
-  //			if(NULL!=ans)
-  //			  preAnsLength=size_L(ans);
-  //			if(!polyIsSOS(tempSub, ans)){            /* necessary condition */
-  //				if(NULL!=ans)
-  //				  delListStart(ans, preAnsLength);
-  //				delete [] check;
-  //				delete [] choose;
-  //				delete [] dummyInd;
-  //				delete [] tempLoc;
-  //				deleteSubPoly(tempSub);
-  //				return FAILURE;
-  //			}
-  //
-  //			deleteSubPoly(tempSub);
-  //
-  //			k=0;
-  //
-  //			for ( j = 0; j < checkSize; j += 1 ) {
-  //				if(0==choose[j]){
-  //					check[k++]=check[j];
-  //				}
-  //			}
-  //			checkSize=k;
-  //			i=0;
-  //		}
-  //	}
+
   if(0==checkSize) {
     delete [] check;
     delete [] checked;
@@ -629,33 +562,6 @@ static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const 
 
     }
   }
-  //
-  //	for ( i = 0; i < randTime; i += 1 ) {
-  //
-  //		dummMon.clear();
-  //		for ( j = 0; j < vertex_num/2; j += 1 ) {
-  //			dummMon.add(rand()%vertex_num);
-  //		}
-  //		num=0;
-  //		for ( j = 0; j < size; j += 1 ) {
-  //			monomial temp=monMap.find(indices+loc[j]*DIM).key();
-  //			if(dummMon.contain(temp)){
-  //				tempLoc[num++]=loc[j];
-  //			}
-  //		}
-  //		SubPoly * tempSub=createSubPoly1(subpoly->poly,  num, tempLoc);
-  //		if(!polyIsSOS(tempSub, NULL)){            /* necessary condition */
-  //			delete [] dummyInd;
-  //			delete [] check;
-  //			delete [] choose;
-  //			delete [] tempLoc;
-  //			deleteSubPoly(tempSub);
-  //			return FAILURE;
-  //		}
-  //		deleteSubPoly(tempSub);
-  //
-  //	}
-
 
   delete [] check;
   delete [] choose;
@@ -815,83 +721,6 @@ bool polyIsSOS (SubPoly * subpoly, PointList * ans, const int verbose ){
 }
 
 
-// bool easychecksos(const CanonicalForm &p){
-//   //
-//   //	int nVar=getNumVars(p);
-//   //	CanonicalForm allvars=getVars(p);
-//   //	int maxV=p.mvar();
-//   //	ASSERT(maxV>=0,"");
-//   //
-//   //	/*-----------------------------------------------------------------------------
-//   //	 *  obtain all the variables which occor in p
-//   //	 *-----------------------------------------------------------------------------*/
-//   //	int vars[nVar];
-//   //	char *varName;
-//   //	int i=nVar-1;
-//   //	while(i>=0){
-//   //		int currVar=allvars.mvar();
-//   //		if(currVar>maxV) maxV=currVar;
-//   //		vars[i]=currVar;
-//   //		CFMap mapp(currVar,CanonicalForm(1));
-//   //		allvars=mapp(allvars);
-//   //		i--;
-//   //	}
-//   //	initvarTable(maxV);
-//   //
-//   //	allvars=getVars(p);
-//   //	int i=nVar-1;
-//   //	while(i>=0){
-//   //		varName=(char*)malloc_d(2*sizeof(char));
-//   //		varName[1]='\0';
-//   //		int currVar=allvars.mvar();
-//   //		ASSERT(currVar>=0,"");
-//   //		vars[i]=currVar;
-//   //		varName[0]=name(currVar);
-//   //		setvarName(currVar,varName);
-//   //		CFMap mapp(currVar,CanonicalForm(1));
-//   //		allvars=mapp(allvars);
-//   //		i--;
-//   //	}
-//   //	if(p.level()<0)
-//   if(p.degree()<=0){
-//     if(p.isZero() ||p>CanonicalForm(0)) return true;
-//     else return false;
-//   }
-
-//   DIM=getNumVars(p);
-//   Poly *poly=convertCanonToPoly(p);
-//   SubPoly * subp=createSubPoly(poly);
-
-//   PointList *ans=createList(delpoly);
-//   bool re=polyIsSOS(subp,ans,1);
-
-//   if(re){
-//     sosPresent(subp, ans, par.printMinValue);
-//   }
-//   delList(ans);
-
-//   deleteSubPoly(subp);
-//   //	printPoly(poly);
-//   //	bool re=polyIsSOS(poly);
-//   //	int check[poly->size];
-//   //
-//   //	for ( i = 0; i < poly->size; i += 1 ) {
-//   //		check[i]=i;
-//   //	}
-//   //	indice_t rep[poly->size];
-//   //	int same=onSameSurf(poly,check,poly->size, rep,40);
-//   //	printf ( "size %d, %d\n",poly->size, same );
-//   //
-//   //	int re=easyCheck(poly);
-//   //	if(re==NOSOS) return false;
-//   //	else if(CONVEX_POLY==re){
-//   //		printf ( " convex poly%d\n",re );
-//   //	}
-//   deletePoly(poly);
-//   clearSupportTable();
-//   //	clearvarTable();
-//   return re;
-// }
 
 bool easychecksos( Poly *p){
 

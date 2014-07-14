@@ -4,14 +4,13 @@
 #include "search.h"
 #include "monomial.h"
 #include "convexhull.h"
-#include <ulib/hash_func.h>
-#include <ulib/hash_open.h>
-#include <ulib/math_rand_prot.h>
+#include <map>
 #include <iostream>
 
 using std::cout;
 using std::endl;
-using  ulib::open_hash_map;
+using std::map;
+
 
 static int delRepeat(indice_t * indices, const int length, const int varNum ){
   ASSERT(length>0,"length must be a positive number ");
@@ -51,7 +50,7 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
   indice_t * key=new indice_t[DIM];
   indice_t * key1=new indice_t[DIM];
 
-  open_hash_map<monomial, int> monMap;
+  map<monomial, monomialvalue> monMap;
   
   indice_t *indiceValues=new indice_t[candidateLength*candidateLength*DIM];
 
@@ -63,9 +62,10 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
     
     run=false;
     
-    for(open_hash_map<monomial,int>::iterator it=monMap.begin();it!=monMap.end();++it){
-      it.key().clear();
-      monMap[it.key()]=0;
+    for(map<monomial,monomialvalue>::iterator it=monMap.begin();it!=monMap.end();++it){
+      it->second.clear();
+      it->second.value=0;
+
     }
 
     valueIndex=0;
@@ -75,11 +75,14 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
         for( k=0; k< DIM; k++){
           key[k]=candidateSet[i*DIM+k]+candidateSet[j*DIM+k];
         }
-        if(monMap.contain(monomial(key, DIM))){
-          monMap[monomial(key,DIM)]=monMap[monomial(key,DIM)]+1;
+        if(monMap.find(monomial(key, DIM))!=monMap.end()){
+          monMap[monomial(key,DIM)].value++;
+          
         }else{
           memcpy(indiceValues+valueIndex*DIM,key,node_size);
-          monMap[monomial(indiceValues+valueIndex*DIM,DIM)]=1;
+          monomialvalue dummy;
+          dummy.value=1;
+          monMap[monomial(indiceValues+valueIndex*DIM,DIM)]=dummy;
           valueIndex++;
         }
       }
@@ -90,17 +93,17 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
       for(i=0; i<DIM;  i++){
         key[i]=2*candidateSet[j*DIM+i];
       }
-      v=monMap[monomial(key,DIM)];
+      v=monMap[monomial(key,DIM)].value;
       if(v==1){
         for(i=0; i<candidateLength; i++){
           for( m=0; m<DIM; m++){
             key1[m]=key[m]/2+candidateSet[i*DIM+m];
           }
-          monMap.find(monomial(key1,DIM)).key().add(k);
+          monMap.find(monomial(key1,DIM))->second.add(k);
         }
 
         k++;
-        monMap.find(monomial(key,DIM)).key().change=false;
+        monMap.find(monomial(key,DIM))->second.change=false;
       }
     }
     ASSERT(k<=VERTEX_BOUND,"");
@@ -111,15 +114,15 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
         key[i]=2*candidateSet[j*DIM+i];
       }
 
-      if(monMap.find(monomial(key,DIM)).key().size()==1 && findIndex(key,indices, size, DIM )<0){
+      if(monMap.find(monomial(key,DIM))->second.size()==1 && findIndex(key,indices, size, DIM )<0){
           
         del=true;
         for(i=0; i<candidateLength; i++){
           for( m=0; m<DIM; m++){
             key1[m]=key[m]/2+candidateSet[i*DIM+m];
           }
-          if(monMap.find(monomial(key1,DIM)).key().size()>1 &&
-             monMap.find(monomial(key,DIM)).key().conjunction(monMap.find(monomial(key1,DIM)).key())){
+          if(monMap.find(monomial(key1,DIM))->second.size()>1 &&
+             monMap.find(monomial(key,DIM))->second.conjunction(monMap.find(monomial(key1,DIM))->second)){
               
             del=false;
             break;
@@ -139,14 +142,14 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
   }
   
   sosLength=0;
-  for(open_hash_map<monomial,int>::const_iterator it=monMap.begin();it!=monMap.end();++it){
-    if(it.key().size()>0) sosLength++;
+  for(map<monomial,monomialvalue>::const_iterator it=monMap.begin();it!=monMap.end();++it){
+    if(it->second.size()>0) sosLength++;
   }
   *SOSM=(indice_t*)malloc_d(sosLength*node_size);
 
-    for(open_hash_map<monomial,int>::const_iterator it=monMap.begin();it!=monMap.end();++it){
-      if(it.key().size()>0) {
-      memcpy((*SOSM)+i*DIM, it.key().indice ,node_size);
+    for(map<monomial,monomialvalue>::const_iterator it=monMap.begin();it!=monMap.end();++it){
+      if(it->second.size()>0) {
+        memcpy((*SOSM)+i*DIM, it->first.indice ,node_size);
       i++;
     }
   }

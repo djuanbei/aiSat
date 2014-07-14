@@ -26,7 +26,7 @@
 #include "sort.h"
 #include "search.h"
 #include  <math.h>
-#include  "ulib/crypt_md5.h"
+#include  "crypt_md5.h"
 
 SOSProblem * createSOSProblem(void){
   SOSProblem* re;

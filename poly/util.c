@@ -510,4 +510,45 @@ Poly* sosConvertPoly (Blockmatrix *const X,  const int blockIndex, const int blo
   }
 
   return re ;
-}	
+}
+
+uint64_t hash_fast64(const void *buf, size_t len, uint64_t seed)
+{
+  const uint64_t	 m = 0x880355f21e6d1965ULL;
+  const uint64_t *pos = (const uint64_t *)buf;
+  const uint64_t *end = pos + (len >> 3);
+  const unsigned char *pc;
+  uint64_t h = len * m ^ seed;
+  uint64_t v;
+
+  while (pos != end) {
+    v  = *pos++;
+    v ^= v >> 23;
+    v *= 0x2127599bf4325c37ULL;
+    h ^= v ^ (v >> 47);
+    h *= m;
+  }
+
+  pc = (const unsigned char*)pos;
+  v = 0;
+
+  switch (len & 7) {
+    case 7: v ^= (uint64_t)pc[6] << 48;
+    case 6: v ^= (uint64_t)pc[5] << 40;
+    case 5: v ^= (uint64_t)pc[4] << 32;
+    case 4: v ^= (uint64_t)pc[3] << 24;
+    case 3: v ^= (uint64_t)pc[2] << 16;
+    case 2: v ^= (uint64_t)pc[1] << 8;
+    case 1: v ^= (uint64_t)pc[0];
+      v ^= v >> 23;
+      v *= 0x2127599bf4325c37ULL;
+      h ^= v ^ (v >> 47);
+      h *= m;
+  }
+
+  h ^= h >> 23;
+  h *= 0x2127599bf4325c37ULL;
+  h ^= h >> 47;
+
+  return h;
+}

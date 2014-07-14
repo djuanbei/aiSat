@@ -91,7 +91,8 @@ extern "C" {
   void config(void);
 
   Poly * sosConvertPoly(Blockmatrix *const X, const int blockId, const int  blockSize, const int sosmId);
-
+  
+  uint64_t hash_fast64(const void *buf, size_t len, uint64_t seed);
 
 #ifdef __cplusplus 
 }

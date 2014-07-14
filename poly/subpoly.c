@@ -21,7 +21,7 @@
 #include	"selfassert.h"
 #include	"poly.h"
 #include	"vartable.h"
-
+#include  "crypt_md5.h"
 
 static void getMd5sum(const  SubPoly * subp, md5_ctx_t * ctx){
   int i;

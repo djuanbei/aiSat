@@ -7,50 +7,60 @@ const uint32_t valueMap[]={1u,2u,4u,8u,16u,32u,64u,128u,256u,512u,1024u,2048u,40
                         1u<<26,1u<<27,1u<<28,1u<<29,1u<<30,1u<<31};
 struct monomial{
   const indice_t  *indice;
-  uint32_t relation[4];
-  bool change;
   int dim;
 
   /*-----------------------------------------------------------------------------
    *  at most 128 vertex
    *-----------------------------------------------------------------------------*/
-  monomial(const indice_t *m, const int d):indice(m), dim(d) {
+  monomial(const indice_t *m,const int d ):indice(m), dim(d) {
+
+  }
+  operator size_t() const;
+
+  bool operator==(const monomial &other) const;
+  
+};
+
+struct monomialvalue{
+  uint32_t relation[4];
+  bool change;
+
+  int value;
+  
+  monomialvalue( ):change(false),value(0){
     relation[0]=0u;
     relation[1]=0u;
     relation[2]=0u;
     relation[3]=0u;
-    change=false;
   }
   static void add(uint32_t set[], const int v);
   
-  static void add(uint32_t set[], const monomial & other);
+  static void add(uint32_t set[], const monomialvalue & other);
 
-  static bool contain(const uint32_t set[], const monomial & other);
+  static bool contain(const uint32_t set[], const monomialvalue & other);
 
-  static bool conjunction(const uint32_t set[], const monomial & other);
+  static bool conjunction(const uint32_t set[], const monomialvalue & other);
   
   
   void add(const int k);
   
   void clear(void);
   
-  void add(const  monomial &other);
+  void add(const  monomialvalue &other);
 
-  bool contain(const monomial &other) const ;
+  bool contain(const monomialvalue &other) const ;
   
   bool contain(const int k)const ; 
   
-  bool conjunction(const monomial &other) const;
+  bool conjunction(const monomialvalue &other) const;
   
   bool conjunction(const uint32_t set[]) const;
 
-  void remove(const monomial &other );
+  void remove(const monomialvalue &other );
   
   int size()const ;
   
-  operator size_t() const;
 
-  bool operator==(const monomial &other) const;
 
 };
 

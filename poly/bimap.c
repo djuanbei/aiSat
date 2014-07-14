@@ -16,10 +16,10 @@
  * =====================================================================================
  */
 
-#include	"bimap.h"
+#include "bimap.h"
 #include "search.h"
 
-#include	"selfmemutil.h"
+#include "selfmemutil.h"
 
 Bimap * createBimap(void){
   Bimap *re=malloc_d(sizeof(Bimap));
