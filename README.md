@@ -1,7 +1,7 @@
 aiSat
 =====
 
-mathemtics optmization and control theorem
+mathemtics optmization and control theorem lib
 
 like sostool we want present a tool to integrate sdp and semidefinite algebra
 
@@ -12,7 +12,9 @@ need libs: bison lex  lapack blas gfortan
 
 complie:
 
-make 
+make
+
+make
 
 usage:
 ./aisat_release filename
