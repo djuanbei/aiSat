@@ -12,6 +12,8 @@ need libs:   lapack blas gfortan
 
 complie:
 
+mkdir lib
+
 make
 
 make
