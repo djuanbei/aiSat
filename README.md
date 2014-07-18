@@ -8,7 +8,7 @@ like sostool we want present a tool to integrate sdp and semidefinite algebra
 system: linux  system
 
 
-need libs:   lapack blas gfortan
+need libs:   lapack blas gfortran
 
 complie:
 
