@@ -426,7 +426,7 @@ updatePoly (Poly * const poly   ){
     return ;
 
   const int n=getvarNum(poly->varId);
-  qsortT(poly->coef,poly->indices,n, 0,poly->size-1,compare);
+  qsortT(poly->coef, poly->indices, n, 0, poly->size-1, compare);
 
   j=0;
 
@@ -1342,6 +1342,7 @@ Support* createSupBySup(const int varId, const indice_t * indices, const int siz
   Support *re;
   
   re	=(Support*) malloc_d ( sizeof(Support) );
+  re->type=INDICE;
   md5sumbyIndice(re->md5sum, varId,  indices, size);
   re->varId=varId;
   return re;

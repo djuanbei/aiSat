@@ -119,7 +119,7 @@ libpoly:
 libcsdp:
 	cd csdp; make libr
 
-         
+
 
 parser: LEX YACC
 

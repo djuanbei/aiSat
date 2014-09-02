@@ -381,7 +381,7 @@ struct yy_trans_info
 static yyconst flex_int16_t yy_accept[79] =
     {   0,
         0,    0,   33,   31,    1,    2,   30,   14,   15,    4,
-        3,    8,    5,   27,   27,   26,   13,    7,   12,   28,
+        3,    8,    5,   27,   26,   26,   13,    7,   12,   28,
        16,   17,    6,   28,   28,   28,   28,   28,   28,   18,
        19,   29,   27,    0,   27,   27,    0,   26,   11,    9,
        10,   28,   28,   28,   28,   28,   28,   28,    0,    0,
@@ -904,32 +904,32 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 50 "src/sosproblemscan.l"
+#line 51 "src/sosproblemscan.l"
 { return EQPOLY;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 52 "src/sosproblemscan.l"
+#line 53 "src/sosproblemscan.l"
 {return TOTAL;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 53 "src/sosproblemscan.l"
-{return MONO;}
+#line 55 "src/sosproblemscan.l"
+{  return MONO;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 56 "src/sosproblemscan.l"
-{ yylval.dilVal=atoi(yytext); return INTEGER; };
+#line 58 "src/sosproblemscan.l"
+{  yylval.dilVal=atoi(yytext);  return INTEGER; };
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 58 "src/sosproblemscan.l"
-{ yylval.dblVal=atof(yytext) ; return NUM;  }
+#line 60 "src/sosproblemscan.l"
+{  yylval.dblVal=atof(yytext) ; return NUM;  }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 60 "src/sosproblemscan.l"
+#line 62 "src/sosproblemscan.l"
 { 
 
 
@@ -953,8 +953,11 @@ YY_RULE_SETUP
     yylval.dilVal=findVarIndex(yytext);
     return VAR;
   }else if (problem.varMap.find(string(yytext))!=problem.varMap.end() ){
+
+
+
     yylval.iVec=problem.varMap[string(yytext)];
-    return MONO_LIST;
+    return VAR_LIST;
   }
   
 
@@ -965,12 +968,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 93 "src/sosproblemscan.l"
+#line 98 "src/sosproblemscan.l"
 
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 95 "src/sosproblemscan.l"
+#line 100 "src/sosproblemscan.l"
 {
   /* Comment line */
   int c;
@@ -988,15 +991,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 110 "src/sosproblemscan.l"
+#line 115 "src/sosproblemscan.l"
 { printf("Unknown Character in line %d : %s -- Ignored\n", lineNum, yytext); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 113 "src/sosproblemscan.l"
+#line 118 "src/sosproblemscan.l"
 ECHO;
 	YY_BREAK
-#line 1000 "include/sosproblemscan.h"
+#line 1003 "include/sosproblemscan.h"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1994,7 +1997,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 113 "src/sosproblemscan.l"
+#line 118 "src/sosproblemscan.l"
 
 
 

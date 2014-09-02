@@ -97,7 +97,7 @@ extern "C" {
   deleteAllIndices ( indice_t ** all, const int length );
 
 
-  Constraintmatrix* createConstraintmatrx(SOSProblem * const sys,int * consSize , int sosMId[], int sosMap[], int  blockSize[], int blockMap[], int * bnum ,int * constIndex, double **); 
+  Constraintmatrix* createConstraintmatrx(SOSProblem * const sys,int * consSize , int sosMId[], int sosMap[], int  blockSize[], int blockMap[], int * bnum , double **); 
 
 
   int inter_sdp( SOSProblem *const sys,const int sep, const char* fproname,const  char* fsolname );

@@ -79,8 +79,6 @@ struct SOSP
   map<string, PolyConstraint*> polyConsMap;
   map<int, string> left_printMap;
   map<int, string> right_printMap;
-
- 
   
 
   static int addsosSup( vector<Monomial*> * vindices );

@@ -425,7 +425,7 @@ int getvarNum ( const int id ){
   return (int)table.values[table.locMap[id]] ;
 } 
 
-int getallvarNum (void  ){
+int getAllVarNum (void  ){
   return table.varNum;
 }   
 

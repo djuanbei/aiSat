@@ -59,7 +59,7 @@ BOOL isSameLine(const indice_t points[], const int * loc, const int n , const in
  * =====================================================================================
  */
 int 
-nchoosek (const  int n,const int blockIndex )
+nchoosek (const  int n ,const int blockIndex )
 {
   if(n<blockIndex) return 0;
 
@@ -225,23 +225,30 @@ getAllMonByTd (const  int supportId, int *const length )
 
 
 void getAllMonHomoTd(const int varNum, const int deg, const int length, indice_t* indices ){
+  
   ASSERT(varNum>0,"variable number must be positive number");
+  
   if(varNum==1){
     indices[0]=deg;
     return;
   }
+  
   int n=varNum-1;
 
-  indice_t *Z=malloc_d(length*n*sizeof(indice_t));
+  indice_t *Z=malloc_d((length+1)*n*sizeof(indice_t));
+  
   int sum=1;
   int i,j,blockIndex;
-  for(i=0;i<n;i++){
-    Z[i]=0;
-    Z[n+i]=0;
+  
+  for(i=0; i<n; i++){
+    Z[i]= Z[n+i]=0;
   }
+  
   Z[2*n-1]=1;
   i=2;
+  
   while (i<length) {
+    
     for (j=0; j<n; j++) {
       Z[i*n+j]=Z[(i-1)*n+j];
     }
@@ -252,13 +259,16 @@ void getAllMonHomoTd(const int varNum, const int deg, const int length, indice_t
       
       blockIndex=n-1;
       while (Z[i*n+blockIndex]==0 )blockIndex--;
+      
       sum-=(Z[i*n+blockIndex]-1);
       Z[i*n+blockIndex]=0;
       Z[i*n+blockIndex-1]++;
     }
     i++;
   }
-  for(i=0;i<length;i++){
+  
+  
+  for(i=0; i<length; i++){
     sum=0;
     for (j=0; j<n; j++) {
       indices[i*varNum+j]=Z[i*n+j];
@@ -266,6 +276,7 @@ void getAllMonHomoTd(const int varNum, const int deg, const int length, indice_t
     }
     indices[i*varNum+j]=deg-sum;//homogenous
   }
+  
   free( Z);
 }
 
@@ -391,7 +402,7 @@ createArrangeM(const int supportId, indice_t const *SOSM ,  int *const blockSize
 
   ArrangeMatrix **re=(ArrangeMatrix **) malloc_d(lengthM*sizeof(ArrangeMatrix *));
 
-  for ( i=0;i<lengthM;i++ ) {
+  for ( i=0;i<lengthM; i++ ) {
     re[i]=createSparse(*blockSize);
   }
 
@@ -402,12 +413,12 @@ createArrangeM(const int supportId, indice_t const *SOSM ,  int *const blockSize
    *  As (Z^T) Z is a systematic matrix, we only need to compute the lower triangle 
    *  of it.
    *-----------------------------------------------------------------------------*/
-  for ( i=0;i<(*blockSize) ;i++ ) {
+  for ( i=0; i<(*blockSize) ;i++ ) {
     for ( j = 0; j <= i; j += 1 ) {
       for ( blockIndex = 0; blockIndex < n; blockIndex += 1 ) {
         temp[blockIndex]=Z[i*n+blockIndex]+Z[j*n+blockIndex];      /* monomial add */
       }
-      index=findIndex(temp,SOSM,lengthM,n);  
+      index=findIndex(temp, SOSM, lengthM, n);  
       ASSERT(index>=0,"some thing wrong");
       addSparseElem(re[index],i,j);
     }

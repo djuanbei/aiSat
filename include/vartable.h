@@ -67,7 +67,7 @@ extern "C" {
   
   int getvarNum(const int id);
 
-  int getallvarNum(void);
+  int getAllVarNum(void);
 
   int  mergeVar(const int id1, const int id2);
   

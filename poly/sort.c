@@ -46,19 +46,19 @@ void qsortM ( indice_t *Z, const int n,const  int left, const int right , int (*
     return;
   }
 
-  swap(Z,left, (left+right)/2,n);
+  swap(Z, left, (left+right)/2, n );
 
   last=left;
   for ( i = left+1; i <= right; i += 1 ) {
 
-    if(comp(Z+i*n,Z+left*n,n)<0){
-      swap(Z,++last,i,n);
+    if(comp(Z+i*n, Z+left*n, n)<0){
+      swap(Z,++last, i, n);
     }
   }
 
-  swap(Z,left,last,n);
-  qsortM( Z,n,left,last-1,comp);
-  qsortM( Z,n,last+1,right,comp);
+  swap(Z, left, last, n);
+  qsortM( Z, n, left, last-1, comp);
+  qsortM( Z, n, last+1, right, comp);
 
 
 }		

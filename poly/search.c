@@ -40,7 +40,7 @@ findIndex (const indice_t key[],const  indice_t * map, const int length, const i
 
     mid=(end+start)/2;
 
-    comp=compare(key, map+mid*n,n);
+    comp=compare(key, map+mid*n, n);
 
     if(comp<0){
       end=mid-1;
@@ -54,11 +54,11 @@ findIndex (const indice_t key[],const  indice_t * map, const int length, const i
 
   }
 
-  if( length==start) return -1;
+  // if( length==start) return -1;
 
-  if ( compare(map+start*n,key,n)==0 ) {
-    return start;
-  }
+   if (start <length&& start==end&& compare(map+start*n, key, n)==0 ) {
+     return 0;
+   }
   return -1;
 
 }	
@@ -98,7 +98,7 @@ findLocation (const indice_t  key[], const indice_t *map , const int length, con
   //  return -1;
   
   
-  if(start==length) return start;
+    if(start==length) return start;
 
   if ( compare(map+start*size,key,size)>0 ) {
     return start;

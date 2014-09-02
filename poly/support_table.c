@@ -145,7 +145,7 @@ static int findSupElemByIndice(const int varId, const indice_t * indices, const 
   uint8_t md5sum[DIGEST_SIZE];
   md5sumbyIndice(md5sum,varId, indices, size);
   for(i=0; i<table.size;i++){
-    if(table.values[i]->type==INDICE && 0==memcmp(table.values[i]->md5sum,md5sum,DIGEST_SIZE )){
+    if(table.values[i]->type==INDICE && 0==memcmp(table.values[i]->md5sum, md5sum,DIGEST_SIZE )){
       return findMapElemByValue(table.loc,i);
       
     }
@@ -231,6 +231,7 @@ indice_t* getsosSup ( const int id , int *length ){
 indice_t* getGsup ( const int id, int *length ){
   int index=findMapElemByKey(table.loc, id);
   if(index<0) return NULL;
+  
   *length=table.gLength[index];
   return table.Gsup[index];
 }		

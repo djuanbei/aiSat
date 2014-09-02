@@ -92,25 +92,25 @@ static void sosPresent(const SubPoly * subpoly, const PointList *sosList, const 
 }
 
 
-static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const int loc[], const int size, const map<monomial, monomialvalue> &monMap, const int vertex_num, PointList *ans );
+static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const int loc[], const int size, const map<monomial, monomialvalue> &monMap,  PointList *ans );
 
 
 
 static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &candidateLength, const indice_t * genSet, const int genLength, indice_t **SOSM, int &sosLength, PointList *ans){
 
   int i,j,valueIndex,v, m;
-  uint32_t k;
+  int k;
   int currCandLen=candidateLength;
   int lastre=-1;
   int size=subpoly->size;
   int *loc=subpoly->locs;
   indice_t* indices=subpoly->poly->indices;
 
-  uint32_t vertexSet[4];
-  vertexSet[0]=0;
-  vertexSet[1]=0;
-  vertexSet[2]=0;
-  vertexSet[3]=0;
+  // uint32_t vertexSet[4];
+  // vertexSet[0]=0;
+  // vertexSet[1]=0;
+  // vertexSet[2]=0;
+  // vertexSet[3]=0;
   size_t node_size=DIM*sizeof(indice_t);
 
   indice_t * key=new indice_t[DIM];
@@ -248,7 +248,7 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
 
   }
   ASSERT(k<=VERTEX_BOUND,"");
-  int vertex_num=k;/* the number of vertex */
+  //  int vertex_num=k;/* the number of vertex */
 
   bool run=true;
 
@@ -301,7 +301,7 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
       return FAILURE;
     }
   }
-  int dummy=overConvexChecking(subpoly, indices, loc, size, monMap, vertex_num, ans);
+  int dummy=overConvexChecking(subpoly, indices, loc, size, monMap, ans);
   if(SUCCESS==dummy){
     delete[] indiceValues;
     return SUCCESS;
@@ -444,7 +444,7 @@ static Constraintmatrix * createConstraintMatrix(const SubPoly *subpoly, const i
 }
 
 
-static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const int loc[], const int size, const map<monomial, monomialvalue> &monMap, const int vertex_num, PointList *ans){
+static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const int loc[], const int size, const map<monomial, monomialvalue> &monMap, PointList *ans){
 
   //			printSubPoly(tempSub);
   int i,j,num,k;

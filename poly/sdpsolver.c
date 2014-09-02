@@ -79,14 +79,17 @@ void wellform (SOSProblem *const sys, const int sep,  const int sosMId[], const 
 
   Poly *check=createPoly();
   Poly *mult;
-  Poly *interpolant=createPoly();
-  p_add_cons_assign(interpolant,1.0/2);
+  Poly *interpolant=copyPoly(sys->rhs);
+  
+  p_mult_cons_assign(interpolant,-1.0/2);
+  
+  //  p_add_cons_assign(interpolant,1.0/2);
 
   k=0;
 
   for ( i = 0; i <sys->size; i += 1 ) {
 
-    printf ( "%d...............................%d \n",i+1,i+1 );
+    printf ( "\n%d...............................%d \n",i+1,i+1 );
     printf ( ".....................................\n" );
     if(sys->polyConstraints[i]->type==EQ){
 
@@ -142,7 +145,12 @@ void wellform (SOSProblem *const sys, const int sep,  const int sosMId[], const 
     k++;
   }
   printf ( "\n" );
-  printf ( "check sum_i(fi*si)=-1:::::::::::::::::;\n" );
+  printf ( "check sum_i(fi*si)=0:::::::::::::::::;\n" );
+  
+  Poly *dummy=copyPoly(sys->rhs);
+  p_mult_cons_assign(dummy, -1);
+  p_add_Poly_assign_del(check, dummy);
+  
   printPoly(check);
   printf ( "\n" );
   printf ( " Intepolant polynomial is :\n" );
@@ -364,13 +372,13 @@ indice_t **
 createAllIndices ( SOSProblem *const sys, int *const sosmMap ,indice_t **const SOSM,
                    int const *lengthM, int   reSize[], indice_t *  varMap[], indice_t *  polyVarMap[], indice_t * sosVarMap[] ){
 
-  int i,k,p, pi,si;
+  int i, k, p, pi, si;
   int choose;
   int psize;
   int polyVarSize;
   int sosVarSize;
 
-  const int n=getallvarNum();                   /* all the variables */
+  const int n=getAllVarNum();                   /* all the variables */
 
   indice_t temp1[n];
   indice_t temp2[n];
@@ -414,6 +422,7 @@ createAllIndices ( SOSProblem *const sys, int *const sosmMap ,indice_t **const S
   for ( p = 0; p < sys->size; p += 1 ) {      /* polynomial index */
 
     psize=sys->polys[p]->size;              /* psize polynomial term size */
+    
     int index[psize];
     int jump[psize];
 
@@ -429,7 +438,7 @@ createAllIndices ( SOSProblem *const sys, int *const sosmMap ,indice_t **const S
 
       for ( k = 0; k < psize; k += 1 ) {  /* polynomial term size */
 
-        if ( index[k]<lengthM[sosmMap[p]] ) {
+        if ( index[k] < lengthM[sosmMap[p]] ) {
 
           polyVarSize=(int)polyVarMap[p][0];
           sosVarSize=(int)sosVarMap[p][0];
@@ -437,14 +446,14 @@ createAllIndices ( SOSProblem *const sys, int *const sosmMap ,indice_t **const S
           pi=0;
           si=0;
 
-          if ( choose==0 ) {
+          if ( 0==choose ) {
 
             choose=1;
             jump[k]=1;
 
             for ( i = 0; i < varSize[p]; i += 1 ) {
 
-              if(pi <polyVarSize && si < sosVarSize && polyVarMap[p][pi+1]==varMap[p][i+1]&&
+              if(pi <polyVarSize && si < sosVarSize && polyVarMap[p][pi+1]==varMap[p][i+1] &&
                  sosVarMap[p][si+1]==varMap[p][i+1]){
 
                 temp1[i]=sys->polys[p]->indices[polyVarSize*k+pi]+
@@ -457,10 +466,12 @@ createAllIndices ( SOSProblem *const sys, int *const sosmMap ,indice_t **const S
 
                 temp1[i]= sys->polys[p]->indices[polyVarSize*k+pi];
                 pi++;
-              }else{
+              }else if(si< sosVarSize && sosVarMap[p][si+1] == varMap[p][i+1]  )  {
 
                 temp1[i]=SOSM[sosmMap[p]][sosVarSize*index[k]+si];
                 si++;
+              }else {
+                ASSERT(0,"this case never been consider");
               }
             }
 
@@ -470,7 +481,7 @@ createAllIndices ( SOSProblem *const sys, int *const sosmMap ,indice_t **const S
 
             for ( i = 0; i < varSize[p]; i += 1 ) {
 
-              if(pi < polyVarSize && si< sosVarSize&& polyVarMap[p][pi+1]==varMap[p][i+1]&&
+              if(pi < polyVarSize && si< sosVarSize && polyVarMap[p][pi+1]==varMap[p][i+1] &&
                  sosVarMap[p][si+1]==varMap[p][i+1]){
 
                 temp2[i]=sys->polys[p]->indices[polyVarSize*k+pi]+
@@ -479,7 +490,7 @@ createAllIndices ( SOSProblem *const sys, int *const sosmMap ,indice_t **const S
                 si++;
                 pi++;
 
-              }else if(pi<polyVarSize&& polyVarMap[p][pi+1]==varMap[p][i+1]){
+              }else if(pi<polyVarSize && polyVarMap[p][pi+1] == varMap[p][i+1]){
 
                 temp2[i]= sys->polys[p]->indices[polyVarSize*k+pi];
                 pi++;
@@ -489,10 +500,9 @@ createAllIndices ( SOSProblem *const sys, int *const sosmMap ,indice_t **const S
                 si++;
               }
 
-
             }
 
-            int com=compare(temp2,temp1,varSize[p]);
+            int com=compare(temp2, temp1,varSize[p]);
 
             if(com==-1){            /* temp2 < temp1  instead temp1 by temp2*/
 
@@ -507,7 +517,7 @@ createAllIndices ( SOSProblem *const sys, int *const sosmMap ,indice_t **const S
               jump[k]=1;
 
             }
-            else if(com==0){        /* temp1==temp1 */
+            else if(com==0){        /* temp1==temp2 */
               jump[k]=1;
             }
 
@@ -520,7 +530,7 @@ createAllIndices ( SOSProblem *const sys, int *const sosmMap ,indice_t **const S
 
         for ( i = 0; i < p; i += 1 ) {
 
-          if(findlocation(re[i],reSize[i], temp1,varMap[i], varMap[p])>-1) break;
+          if(findlocation(re[i], reSize[i], temp1, varMap[i], varMap[p])>-1) break; //check whether have added
 
         }
         if(i==p){
@@ -621,17 +631,17 @@ addMonomial ( indice_t** const  array, const  indice_t *element, int *const capa
  * =====================================================================================
  */
 Constraintmatrix*
-createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int sosMId[], int sosmMap[],  int  blockSize[] , int blockMap[], int * bnum ,int * constIndex, double **b )
+createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int sosMId[], int sosmMap[],  int  blockSize[] , int blockMap[], int * bnum,  double **b )
 {
   int i,j,k,h,p,pi,si,sum,tempI;
   int pSize,sSize,mSize;
   int index,tempIndex;
-  indice_t key[getallvarNum()];
+  indice_t key[getAllVarNum()];
   Sparseblock *blockptr;
   /*    int sosMId[sys->size];
    */
   int sosMIdSize;
-  int everyconstraintSize[sys->size];
+  int everyConstraintSize[sys->size];
   indice_t *varMap[sys->size];
   indice_t *polyVarMap[sys->size];
   indice_t *sosVarMap[sys->size];
@@ -699,12 +709,12 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
   /*
    * find all the monomials occur in this polynomial system when  w.r.t  multiplied sos polynomials. delete repeat
    */
-  indice_t **allM=createAllIndices(sys,sosmMap ,SOSM, lengthM, everyconstraintSize, varMap, polyVarMap, sosVarMap);
+  indice_t **allM=createAllIndices(sys, sosmMap ,SOSM, lengthM, everyConstraintSize, varMap, polyVarMap, sosVarMap);
 
   (*allConstraintSize)=0;
 
   for ( i = 0; i < sys->size; i += 1 ) {
-    (*allConstraintSize)+=everyconstraintSize[i];
+    (*allConstraintSize)+=everyConstraintSize[i];
   }
   
 
@@ -722,13 +732,13 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
       k=0;
       while(k<sys->size){
 
-        tempIndex=findlocation(allM[k],everyconstraintSize[k], rhs->indices+i*rhsVars[0] , varMap[k],rhsVars);
+        tempIndex=findlocation(allM[k],everyConstraintSize[k], rhs->indices+i*rhsVars[0] , varMap[k], rhsVars);
         if (tempIndex>-1){
           index+=tempIndex;
           break;
         }
         else
-          index+=everyconstraintSize[k];
+          index+=everyConstraintSize[k];
 
         k++;
 
@@ -739,25 +749,25 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
     }
   }
 
-  (*constIndex)=0;
-  for ( j = 0; j < getallvarNum() ; j += 1 ) {
-    key[j]=0;
-  }
+  // //  (*constantIndex)=0;
+  // for ( j = 0; j < getAllVarNum() ; j += 1 ) {
+  //   key[j]=0;
+  // }
 
-  for ( i = 0; i < sys->size; i += 1 ) {
+  // for ( i = 0; i < sys->size; i += 1 ) {
 
-    k=(int)(varMap[i][0]);
+  //   k=(int)(varMap[i][0]);
 
-    h= findIndex(key, allM[i], everyconstraintSize[i], k);
+  //   h= findIndex(key, allM[i], everyConstraintSize[i], k);
 
-    if(h>-1){
-      (*constIndex)+=h;
-      break;
-    }else{
-      (*constIndex)+=everyconstraintSize[i];
-    }
+  //   if(h>-1){
+  //     (*constantIndex)+=h;
+  //     break;
+  //   }else{
+  //     (*constantIndex)+=everyConstraintSize[i];
+  //   }
 
-  }
+  // }
 
   Constraintmatrix *re=createNconstraintmatrix(*allConstraintSize); /* every monomial w.r.t. to a constraint */
 
@@ -822,13 +832,13 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
         k=0;
         while(k<sys->size){
 
-          tempIndex=findlocation(allM[k],everyconstraintSize[k], key, varMap[k],varMap[p]);
+          tempIndex=findlocation(allM[k], everyConstraintSize[k], key, varMap[k], varMap[p]);
           if (tempIndex>-1){
             index+=tempIndex;
             break;
           }
           else
-            index+=everyconstraintSize[k];
+            index+=everyConstraintSize[k];
 
           k++;
 
@@ -924,7 +934,7 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
  *  sys has no solution in another word the system
  *  is unsatisfied. By real algebra  theorem  (Putiner's positivtellensatz Theorem)
  *  and semidefinite programming mostly we find
- *  a set of sos polynomials which satisfy -1=sos_0+sos_1f_1+...+sos_{sep}f_{sep}+...
+ *  a set of sos polynomials which satisfy sys->rhs=sos_0+sos_1f_1+...+sos_{sep}f_{sep}+...
  *  . We can easily find 1/2+sos_1f_1+...+sos_{sep}f_{sep} is a Craig interpolation
  *  12/02/2012 12:53:27 PM modify
  * =====================================================================================
@@ -932,6 +942,7 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
 int
 inter_sdp ( SOSProblem * const sys, const int sep, char const * fprobname , char const * fsolname  )
 {
+
   int ret=0;
   int numofCons;
 
@@ -951,7 +962,7 @@ inter_sdp ( SOSProblem * const sys, const int sep, char const * fprobname , char
    *      X>=0 is a semidefinite matrix.
    *
    *      And there C is a zero block matrix.
-   *      b is a vector first value is -1 all other value is zero.
+   *      b is a vector with respect to sys->rhs.
    *      Main work we will do is working out the number of blocks C need and the
    *      block size. and the length of b.
    *      Construct constraints.
@@ -964,24 +975,25 @@ inter_sdp ( SOSProblem * const sys, const int sep, char const * fprobname , char
   Blockmatrix X,Z;
   double *y;
   double pobj, dobj;
-  int constIndex;
+  // int constantIndex;
 
-  double *b;
-  b=(double*) malloc_d(sizeof(double) );
+  double *b=NULL;
+
+  //(double*) malloc_d(sizeof(double) );
   //  free(b);
   
-  constraints=createConstraintmatrx(sys, &numofCons, sosMId, sosMap, blockSize,blockMap, &bnum, &constIndex, &b ); /* this place has some problem */
+  constraints=createConstraintmatrx(sys, &numofCons, sosMId, sosMap, blockSize, blockMap, &bnum,  &b ); /* this place has some problem */
 
   C=*createBlockMatrixC(blockSize, bnum);    /* 1 is a default polynomial we want to notice  */
 
   //  double *b=malloc_d((numofCons+1)*sizeof(double));;
 
-  for ( i = 0; i < numofCons+1; i += 1 ) {
-    b[i]=0;
-  }
+  // for ( i = 0; i < numofCons+1; i += 1 ) {
+  //   b[i]=0;
+  // }
 
-  printf ( "const in index %d\n",constIndex+1 ); /* index start from 1 */
-  b[constIndex+1]=-1; /*  the sum of the mult polynomials with sos polynomial equal to -1*/
+  // printf ( "const in index %d\n",constantIndex+1 ); /* index start from 1 */
+  // b[constantIndex+1]=-1; /*  the sum of the mult polynomials with sos polynomial equal to -1*/
 
   /* index start from 1 not 0 */
 
@@ -992,14 +1004,16 @@ inter_sdp ( SOSProblem * const sys, const int sep, char const * fprobname , char
     numofblock+=blockSize[i];
   }
 
-  write_prob(fprobname,numofblock,numofCons,C,b,constraints); /* write of the problem in fprobname file */
-  initsoln(numofblock,numofCons,C,b,constraints,&X,&y,&Z);
-  ret=easy_sdp(numofblock,  numofCons, C, b, constraints, 0.0, &X,&y,&Z,&pobj,&dobj );
-
-  wellform(sys , sep , sosMId, sosMap, blockSize, blockMap ,&X);
+  write_prob(fprobname, numofblock, numofCons, C, b, constraints); /* write of the problem in fprobname file */
+  
+  initsoln(numofblock, numofCons, C, b, constraints, &X, &y, &Z);
+  
+  ret=easy_sdp(numofblock,  numofCons, C, b, constraints, 0.0, &X, &y, &Z, &pobj, &dobj );
+  
   if (ret < 2){
-    /*      wellform(sys , sep , sosMId, sosMap, blockSize, bnum, blockMap ,&X);
-     */
+    
+    wellform(sys , sep , sosMId, sosMap, blockSize, blockMap ,&X);
+
 
   }
   else{
@@ -1092,11 +1106,11 @@ int sdp_solver( SOSProblem *const sys, Poly** resP,   char const * fprobname , c
   Blockmatrix X,Z;
   double *y;
   double pobj, dobj;
-  int constIndex;
+  //  int constantIndex;
 
   double *b=NULL;
   
-  constraints=createConstraintmatrx(sys, &numofCons, sosMId, sosMap, blockSize,blockMap, &bnum, &constIndex, &b ); /* this place has some problem */
+  constraints=createConstraintmatrx(sys, &numofCons, sosMId, sosMap, blockSize,blockMap, &bnum,  &b ); /* this place has some problem */
 
   C=*createBlockMatrixC(blockSize, bnum);    /* 1 is a default polynomial we want to notice  */
 
