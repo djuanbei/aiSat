@@ -285,7 +285,7 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
   /*-----------------------------------------------------------------------------
    *  necessary check
    *-----------------------------------------------------------------------------*/
-  if(monMap.find(monomial( indices+loc[0]*DIM,DIM))!=monMap.end()){
+  if(monMap.find(monomial( indices+loc[0]*DIM,DIM))==monMap.end()){
     if(NULL!=ans)
       cout<<  "Corollary 3" <<endl;
     delete[] indiceValues;
@@ -294,7 +294,7 @@ static int exactConvHull(const SubPoly *subpoly, indice_t * candidateSet, int &c
 
   for ( i = 1; i < size; i += 1 ) {
 
-    if(monMap.find(monomial(indices+loc[i]*DIM,DIM))!=monMap.end()){
+    if(monMap.find(monomial(indices+loc[i]*DIM,DIM))==monMap.end()){
       if(NULL!=ans)
         cout<< "Corollary 3"<<endl;
       delete[] indiceValues;
