@@ -825,7 +825,7 @@ YY_RULE_SETUP
 case 7:
 YY_RULE_SETUP
 #line 28 "src/sosproblemscan.l"
-{return '=';}
+{ return '=';}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
@@ -835,7 +835,7 @@ YY_RULE_SETUP
 case 9:
 YY_RULE_SETUP
 #line 31 "src/sosproblemscan.l"
-{return SOSEQ;}
+{ return SOSEQ;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
