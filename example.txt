@@ -1,28 +1,25 @@
+#example 17
 A = [x y ] # variables
-M= { 1 x y x^2 x*y y^2 x^3 x^6} # monomial used in sos unkown polynomial definite
-s1=sos(M)  # a unkown sos polynomial use M as support
+f=x^6+y^6-2*x^2*y^2+x^4+y^4
+findsos(f) # find sos decomposition of polynomial f
+
+#example 18
+M= { 1 x y x^2 x*y y^2 } # monomial used in sos unkown polynomial
+
+f1=4*x^2-y^2
+g=x-y
+s=sos(M) # an unknown sos polynomial whose support is M
+cg=poly(M)# an unknown polynomial whose suppport is M
+f1 == g*cg +s
+
+#example 19
+f2=1-x^2-y^2
+f3=x^2+4*y^2-10
 s2=sos(M)
-f1=x^2+y^2+1 # constant polynomail
-f2=x^2+y
-f3= x^2+y^2-100*x^4+x^6+2100
-s1*f1-f3 - 1 == f2 #constraint, find  polynomial s1 satisfies this formula if there exsits
-s2-f3 + 10 == f2
-
-findsos(f2) #whether f2 can be wtritten as SOS
-f4=x^2+y^2-11
-findsos(f4)
-f5=x^2+y^2+11
-findsos(f5)
-
 s3=sos(M)
 s4=sos(M)
-f11=1-x^2-y^2
-f22= x^2+y^2+10
+s2*f2+s3*f3+s4+1==0
 
-interp( s3*(10-x^2-y^2), s4*(x^2+y^2-100) ) # find interpolant which divides  10-x^2-y^2>=0 and  x^2+y^2-100
 
-s1*f22+s3*f11 ==f11
 
-ff=poly(M)
 
-ff==x^2-12
