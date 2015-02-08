@@ -30,7 +30,6 @@ void sosrepresent(PointList * sosList, double * X, const int  blockSize , const 
 
   const  int varNum=getvarNum(getSupElem(sosMid)->varId);
 
-
   indice_t * Z=getGsup(sosMid, &l);
 
   //	for ( i = 0; i < blockSize; i += 1 ) {

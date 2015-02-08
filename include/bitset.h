@@ -1,20 +1,14 @@
-/*
- * =====================================================================================
- *
- *       Filename:  bitset.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  05/05/2013 05:01:36 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+/**
+ * @file   bitset.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:24:40 2015
+ * 
+ * @brief  use unset int to encapsulation bit function
+ * 
+ * 
  */
+
 
 #ifndef  BITSET_INC
 #define  BITSET_INC

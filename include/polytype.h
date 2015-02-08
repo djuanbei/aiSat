@@ -1,30 +1,28 @@
-/*
- * =====================================================================================
- *
- *       Filename:  polyType.h
- *
- *    Description:
- *
- *        Version:  1.0
- *        Created:  12/02/2012 07:56:36 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:
- *
- * =====================================================================================
+
+/**
+ * @file   polytype.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 11:45:01 2015
+ * 
+ * @brief  the basic type 
+ * 
+ * 
  */
 
 #ifndef  POLYTYPE_INC
 #define  POLYTYPE_INC
-
 #include    <stdint.h>
 #include    <stdlib.h>
-#include	"pointlist.h"
+#include    "pointlist.h"
+#include "config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+  /**
+   * An array of spare two dimension coordinate
+   * 
+   */
 
   struct sparseRowCol {
     uint32_t row: 16;
@@ -75,13 +73,14 @@ extern "C" {
 
   typedef enum polyConstraintType PolyConstraintType;
 
+
   struct poly {
-    int varId;
+    int varId; /// the variables id of this polynomial
     int id;
     int capacity;
     int size;                                   /* Current terms length */
-    indice_t *indices;
-    coef_t *coef;
+    indice_t *indices;/// exponents of this polynomial
+    coef_t *coef;/// the coefficient of this polynomial
 
   };    
 
@@ -89,9 +88,10 @@ extern "C" {
 
 
   struct subPoly {
-    Poly* poly;
-    uint64_t md5sum[16];
-    int size;
+    Poly* poly;/// the reference polynomial
+    uint8_t md5sum[DIGEST_SIZE]; ///the md5sum of this subpolynomial, when test whether the two polynomials equal first test 
+    /// the two mds5sum equal
+    int size; /// the size of monomials
     int *locs;
   };	
 
@@ -101,15 +101,15 @@ extern "C" {
   struct polyConstraint {
     PolyConstraintType type;    int supportId;
   };
-  
+  typedef struct polyConstraint PolyConstraint;
+
+
   enum supportType{
     NORMAL,
     SUB_POLY,
     INDICE
   };
   typedef enum supportType SupportType;
-
-  typedef struct polyConstraint PolyConstraint;
 
   struct support {
     
@@ -118,7 +118,7 @@ extern "C" {
     
     SubPoly* subp;
 
-    uint8_t md5sum[16];
+    uint8_t md5sum[DIGEST_SIZE];
  
     int deg;
     int varId;
@@ -128,6 +128,8 @@ extern "C" {
   };    
   typedef struct support Support;
 
+
+
   /*
     sum_{i=0}^{size-1} polys[i]*polyConstraints[i]=rhs
   */
@@ -135,7 +137,6 @@ extern "C" {
     int cap;
     int size;
     Poly** polys;
-
     Poly* rhs;
     PolyConstraint ** polyConstraints;
   };    

@@ -1,25 +1,20 @@
-/*
- * =====================================================================================
- *
- *       Filename:  rootvector.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  01/05/2013 09:51:29 AM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+/**
+ * @file   pointvector.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:53:03 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
 
-#include	"config.h"
-#include	"polytype.h"
+
+
 #ifndef  POINTVECTOR_INC
 #define  POINTVECTOR_INC
+#include	"config.h"
+#include	"polytype.h"
 
 struct pointVector {
 

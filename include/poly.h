@@ -1,19 +1,13 @@
-/*
- * =====================================================================================
- *
- *       Filename:  poly.h
- *
- *    Description:  Term  
- *
- *        Version:  1.0
- *        Created:  2012年05月15日 14时51分31秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+
+/**
+ * @file   poly.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 11:42:38 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
 
 #ifndef  POLY_INC
@@ -26,12 +20,12 @@
 extern "C" {
 #endif
 
-
   SOSProblem * createSOSProblem(void);
   
   /*-----------------------------------------------------------------------------
    *  12/02/2012 12:25:10 PM
    *-----------------------------------------------------------------------------*/
+
 
   SOSProblem * createSOSProblemN(int size);
 

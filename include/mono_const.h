@@ -1,20 +1,14 @@
-/*
- * =====================================================================================
- *
- *       Filename:  constraint.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  12/03/2012 09:50:35 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+/**
+ * @file   mono_const.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:41:44 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
+
 
 #ifndef  MONO_CONST_INC
 #define  MONO_CONST_INC

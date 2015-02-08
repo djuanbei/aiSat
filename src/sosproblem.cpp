@@ -163,7 +163,7 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
    
 }
 
-int SOSP::addsosSup( vector<Monomial*> * indices_vec )
+int SOSP::addSOSsup( vector<Monomial*> * indices_vec )
 {
     
   int varNum=getvarNum(1);//all num of vaiable
@@ -210,7 +210,7 @@ int SOSP::addsosSup( vector<Monomial*> * indices_vec )
     j++;
   }
     
-  int supportId=addsosSupByIndice(varId, indices, length);
+  int supportId=addSOSsupByIndice(varId, indices, length);
   
   
 
@@ -240,7 +240,7 @@ int SOSP::addsosSup( vector<Monomial*> * indices_vec )
   qsortM(SOSM, exactVarNum, 0,sosLength-1, compare);
   
   setGsup(supportId, gLength, GSUP);
-  setsosSup(supportId,sosLength, SOSM  );
+  setSOSsup(supportId,sosLength, SOSM  );
     
   
   int AMlength=0;
@@ -255,7 +255,7 @@ int SOSP::addsosSup( vector<Monomial*> * indices_vec )
 }
 
 
-int SOSP::addsosSup(vector<int> *varVec, vector<int> *degVec  ){
+int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec  ){
       
   std::sort(varVec->begin(),varVec->end() );
   std::sort(degVec->begin(),degVec->end() );
@@ -300,7 +300,7 @@ int SOSP::addsosSup(vector<int> *varVec, vector<int> *degVec  ){
     }
   }
   
-  int supportId=addsosSupByIndice(varId, indices, length);
+  int supportId=addSOSsupByIndice(varId, indices, length);
   
   
 
@@ -330,7 +330,7 @@ int SOSP::addsosSup(vector<int> *varVec, vector<int> *degVec  ){
 
   
   setGsup(supportId,gLength, GSUP );
-  setsosSup(supportId,sosLength, SOSM  );
+  setSOSsup(supportId,sosLength, SOSM  );
   
   int AMlength=0;
   ArrangeMatrix **AM=  createArrangeM( supportId,  SOSM,  &AMlength, sosLength);

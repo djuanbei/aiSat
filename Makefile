@@ -1,4 +1,3 @@
-
 ##
 ##  Template makefile for Standard, Profile, Debug, Release, and Release-static versions
 ##
@@ -119,7 +118,8 @@ libpoly:
 libcsdp:
 	cd csdp; make libr
 
-
+etags:
+	find . -name '*.[ch]' -o -name "*.cpp" | xargs etags
 
 parser: LEX YACC
 

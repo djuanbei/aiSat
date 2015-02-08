@@ -801,7 +801,7 @@ p_add_Term_assign ( Poly *const poly, indice_t const key[], const coef_t cf )
   }
   else{
 
-    location=findLocation(key,poly->indices, poly->size, varSize);
+    location=findLocationBettwen(key,poly->indices, poly->size, varSize);
 
     if(poly->size==poly->capacity)
       enlargePoly(poly);
@@ -879,7 +879,6 @@ p_mult_cons_assign ( Poly * const poly, const coef_t cf ){
 
   }
 }	
-
 
 /* 
  * ===  FUNCTION  ======================================================================
@@ -1375,7 +1374,7 @@ printSupport(const int id ){
 
   int length;
 
-  indice_t *indices=getsosSup(id,&length );
+  indice_t *indices=getSOSsup(id,&length );
 
   if(indices==NULL){
     printf ( "unknow\n" );

@@ -1,19 +1,13 @@
-/*
- * =====================================================================================
- *
- *       Filename:  task.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  06/30/2013 09:03:01 AM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+
+/**
+ * @file   task.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 13:54:58 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
 
 #include	"bitset.h"
@@ -27,18 +21,18 @@ typedef struct {
 
 class Task{
 
-	int mode;
+  int mode;
 
-	public:
-		virtual Membership_result  membership(BitSet *bs){
-			return false;
+public:
+  virtual Membership_result  membership(BitSet *bs){
+    return false;
 
-		}
+  }
 
-		virtual equivalence_result_t* equivalence(BitSet *bs){
-			return NULL;
+  virtual equivalence_result_t* equivalence(BitSet *bs){
+    return NULL;
 
-		}
+  }
 
 };
 

@@ -1,26 +1,25 @@
-/*
- * =====================================================================================
- *
- *       Filename:  config.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  12/06/2012 08:31:16 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+/**
+ * @file   config.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:22:14 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
+
 
 
 #ifndef  CONFIG_INC
 #define  CONFIG_INC
 
 #include	<stdio.h>
+/**
+ * the declare of dynamic interface in windows is a little complex
+ * 
+ */
+
 #ifdef _WIN32
 #  ifdef CLOGLIB_EXPORT
 #    define CLOGLIB __declspec(dllexport)
@@ -72,13 +71,7 @@ enum  {
 
 
 
-
-
-
-
 #define	OUTPUT_MINVALUE	 (10/OUTPUT_TIME)		/*  */
-
-
 
 
 

@@ -1,27 +1,20 @@
-/*
- * =====================================================================================
- *
- *       Filename:  bridgez3.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  06/30/2013 08:54:39 AM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+/**
+ * @file   bridgez3.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:28:07 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
 
-#include	"z3++.h"
-#include	"polytype.h"
+
+
 #ifndef  BRIDGEZ3_INC
 #define  BRIDGEZ3_INC
-
-
+#include	"z3++.h"
+#include	"polytype.h"
 
 bool membership();
 

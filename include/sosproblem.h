@@ -1,19 +1,13 @@
-/*
- * =====================================================================================
- *
- *       Filename:  sosproblem.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  07/06/2014 02:25:10 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+
+/**
+ * @file   sosproblem.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 13:53:32 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
 
 #ifndef  SOSPROBLEM_INC
@@ -81,9 +75,9 @@ struct SOSP
   map<int, string> right_printMap;
   
 
-  static int addsosSup( vector<Monomial*> * vindices );
+  static int addSOSsup( vector<Monomial*> * vindices );
   
-  static int addsosSup(vector<int> *varVec, vector<int> *degVec  );
+  static int addSOSsup(vector<int> *varVec, vector<int> *degVec  );
   
 
   void solve();

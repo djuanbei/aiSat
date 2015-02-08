@@ -1586,7 +1586,7 @@ yyreduce:
 #line 123 "src/sosproblemparser.y"
     {
 
-  problem.monoMap[*((yyvsp[(1) - (5)].identifier))]=SOSP::addsosSup( (yyvsp[(4) - (5)].mVec));
+  problem.monoMap[*((yyvsp[(1) - (5)].identifier))]=SOSP::addSOSsup( (yyvsp[(4) - (5)].mVec));
   delete (yyvsp[(1) - (5)].identifier);
   
   vector<Monomial*>::iterator it=(yyvsp[(4) - (5)].mVec)->begin();
@@ -1604,7 +1604,7 @@ yyreduce:
 #line 137 "src/sosproblemparser.y"
     {
 
-  problem.monoMap[*((yyvsp[(1) - (10)].identifier))]=SOSP::addsosSup( (yyvsp[(5) - (10)].iVec), (yyvsp[(8) - (10)].iVec));
+  problem.monoMap[*((yyvsp[(1) - (10)].identifier))]=SOSP::addSOSsup( (yyvsp[(5) - (10)].iVec), (yyvsp[(8) - (10)].iVec));
   
   delete (yyvsp[(1) - (10)].identifier);
 
@@ -2582,7 +2582,6 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 888 "src/sosproblemparser.y"
     {
-  std::cout<<"ooooook"<<std::endl;
   (yyval.prob) =createSOSProblem();
   
   Poly *poly=createPoly();
@@ -2597,7 +2596,7 @@ yyreduce:
 
 
 /* Line 1806 of yacc.c  */
-#line 2601 "src/sosproblemparser.cpp"
+#line 2600 "src/sosproblemparser.cpp"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2828,7 +2827,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 902 "src/sosproblemparser.y"
+#line 901 "src/sosproblemparser.y"
 
 #include "sosproblemscan.h"
 

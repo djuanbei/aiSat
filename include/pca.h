@@ -1,19 +1,13 @@
-/*
- * =====================================================================================
- *
- *       Filename:  pca.h
- *
- *    Description:   Principal component analysis
- *
- *        Version:  1.0
- *        Created:  12/26/2013 07:45:27 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+
+/**
+ * @file   pca.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:50:43 2015
+ * 
+ * @brief  Principal component analysis (PCA) 
+ * 
+ * 
  */
 
 #ifndef  PCA_INC
@@ -23,7 +17,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-int lpca(double * A,  const int n, const int m,  double *VT, BOOL needCenter);
+  int lpca(double * A,  const int n, const int m,  double *VT, BOOL needCenter);
 
 #ifdef __cplusplus 
 }

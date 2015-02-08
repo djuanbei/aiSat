@@ -1,26 +1,27 @@
-/*
- * =====================================================================================
- *
- *       Filename:  sort.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  12/26/2013 01:40:34 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+/**
+ * @file   sort.c
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 15:12:57 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
 
 #include	"sort.h"
+/** 
+ * swap the content of loc i and j in array Z
+ * 
+ * @param Z an array
+ * @param i 
+ * @param j 
+ * @param n size of one element in Z
+ */
 void swap ( indice_t * Z, const int i, const int j, const int n  )
 {
   int k;
-  int temp;
+  indice_t temp;
   int iindex=i*n;
   int jindex=j*n;
 
@@ -32,9 +33,17 @@ void swap ( indice_t * Z, const int i, const int j, const int n  )
   }
 }
 
-/*
-  [ left, right ]
-*/
+
+
+/** 
+ * sort tht elements in [ left, right ] array Z by ascending order
+ * 
+ * @param Z an array 
+ * @param n the size of one element in Z
+ * @param left 
+ * @param right 
+ * @param comp comparat funtion
+ */
 void qsortM ( indice_t *Z, const int n,const  int left, const int right , int (*comp)(const  indice_t *, const indice_t *,const  int)  )
 {
   int i ,last;
@@ -60,16 +69,19 @@ void qsortM ( indice_t *Z, const int n,const  int left, const int right , int (*
   qsortM( Z, n, left, last-1, comp);
   qsortM( Z, n, last+1, right, comp);
 
-
 }		
 
 
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  qsort compate term by the indice
- *  Description:  Using comp to sort Z from left to right
- *  sort [left, right] Z[right] with C is in the array 
- * =====================================================================================
+/** 
+ * 
+ * sort an array Z[ left,right ] sort by ascending order. Be care that the element between C and Z is one by one. Thus, after sort the location relation
+ * between   C and Z shold keep.
+ * @param C 
+ * @param Z an array sort by ascending order.
+ * @param n the size of one element in Z
+ * @param left 
+ * @param right 
+ * @param comp the comparable function
  */
 void
 qsortT (coef_t * C, indice_t *Z, const int n, const  int left, const int right , int (*comp)(const  indice_t *, const indice_t *,const  int)  )
@@ -113,15 +125,16 @@ qsortT (coef_t * C, indice_t *Z, const int n, const  int left, const int right ,
 
 }	
 
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  sortVar
- *  Description:  ascending order
- * =====================================================================================
+/** 
+ * sort arrary vars by ascending order
+ * 
+ * @param vars 
+ * @param n 
  */
 void
 sortVar ( indice_t * const  vars, const  int n ){
-  int i,j,temp;
+  int i,j;
+  indice_t temp;
 
   for ( i = 0; i < n-1; i += 1 ) {
     for ( j = i+1; j < n; j += 1 ) {
@@ -132,15 +145,27 @@ sortVar ( indice_t * const  vars, const  int n ){
         vars[i]=temp;
       }
     }
-
   }
 }		
+
+/** 
+ * 
+ * 
+ * @param key1 an exponent of one monomial
+ * @param varMap1 the variables corresponding key1
+ * @param key2 an exponent of one monomial
+ * @param varMap2 the variables corresponding key1
+ * 
+ * @return 1 if key1> key2 by alphabeta order
+           -1 if key1< key2 by alphabeta order
+           0 otherwise
+ */
+
 int
-compareM ( const indice_t *  key1 , const indice_t *varMap1,
-           const  indice_t * key2, const indice_t *varMap2 ){
+compareM ( const indice_t *  key1 , const indice_t *varMap1,   const  indice_t * key2, const indice_t *varMap2 ){
 
   int i,j,s1,s2;
-  s1=(int)varMap1[0];
+  s1=(int)varMap1[0];//varibales size
   s2=(int)varMap2[0];
   i=j=0;
   while(i<s1&&j<s2){

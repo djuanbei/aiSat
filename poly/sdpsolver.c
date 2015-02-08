@@ -1,21 +1,13 @@
-/*
- * =====================================================================================
- *
- *       Filename:  csdpinter.c
- *
- *    Description:
- *
- *        Version:  1.0
- *        Created:  2012年05月14日 21时07分24秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:
- *
- * =====================================================================================
- */
 
+/**
+ * @file   sdpsolver.c
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 15:28:21 2015
+ * 
+ * @brief  
+ * 
+ * 
+ */
 
 #include    "sdpsolver.h"
 #include    "util.h"
@@ -239,7 +231,7 @@ addSparse ( SparseSOSblock *const block , const int index, const coef_t value )
 
 
 Sparseblock *
-createblock ( const int bnum, const int consnum,ArrangeMatrix const *s )
+createblock ( const int blockNum, const int consnum,ArrangeMatrix const *s )
 {
   int i;
   Sparseblock *re;
@@ -247,7 +239,7 @@ createblock ( const int bnum, const int consnum,ArrangeMatrix const *s )
   re    =(Sparseblock *) malloc_d ( sizeof(Sparseblock) );
 
 
-  re->blocknum=bnum;
+  re->blocknum=blockNum;
   re->blocksize=s->rowLength  ;
   re->constraintnum=consnum;
   re->next=NULL;
@@ -269,16 +261,16 @@ createblock ( const int bnum, const int consnum,ArrangeMatrix const *s )
  *         Name:  createSparseblock
  *         dailiyun
  *2012年05月09日
- *bnum block number
+ *blockNum block number
  *  Description:
  * =====================================================================================
  */
 
 Sparseblock *
-createSparseblock (const int bnum, const int bsize, const int consnum, const int nument ){
+createSparseblock (const int blockNum, const int bsize, const int consnum, const int nument ){
 
   Sparseblock * re=(Sparseblock *) malloc_d (sizeof (Sparseblock));
-  re->blocknum=bnum;
+  re->blocknum=blockNum;
   re->blocksize=bsize;
   re->constraintnum=consnum;
   re->next=NULL;
@@ -313,26 +305,26 @@ void frontInsertBlock(Constraintmatrix *matrix, Sparseblock *block){
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  createBlockMatrixC
- *  Description:  construct sdp's matrix  C. bnum is the number of block of matrix C. n
+ *  Description:  construct sdp's matrix  C. blockNum is the number of block of matrix C. n
  *  is the respect to polynomial's number of variables and d is the total degree of
  *  respect with polynomial . We need d is a even number. blockSize every block matrix
  *  size
  * =====================================================================================
  */
 Blockmatrix *
-createBlockMatrixC ( int blockSize[] , int const bnum)
+createBlockMatrixC ( int blockSize[] , int const blockNum)
 {
   int i;
   Blockmatrix *C;
 
   C =(Blockmatrix *) malloc_d ( sizeof(Blockmatrix) );
 
-  C->nblocks=bnum;
+  C->nblocks=blockNum;
 
-  C->blocks =(Blockrec *) malloc_d ((bnum+1)* sizeof(Blockrec) ); /* index all start from 1 */
+  C->blocks =(Blockrec *) malloc_d ((blockNum+1)* sizeof(Blockrec) ); /* index all start from 1 */
 
 
-  for ( i = 0; i < bnum; i += 1 ) {
+  for ( i = 0; i < blockNum; i += 1 ) {
     C->blocks[i+1].blockcategory=MATRIX;
     C->blocks[i+1].blocksize=blockSize[i];
     C->blocks[i+1].data.mat =(double *) calloc( (size_t)(blockSize[i]*blockSize[i]), sizeof(double) );
@@ -620,18 +612,27 @@ addMonomial ( indice_t** const  array, const  indice_t *element, int *const capa
 
 
 }       /* -----  end of function addMonomial  ----- */
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  createConstraintmatrix
- *  Description:  sys is a polynomials system. allM is the set of all the monomials in
- *  the sys. numV is the number of variables in sys. deg is the total degree   of sos
+
+
+/** 
+ *  sys  allM is the set of all the monomials in
+ *  the sys. numofCons numV is the number of variables in sys. deg is the total degree   of sos
  *  polynomial consSize is the length of allM . blocksize is the number of coefficients occor
  *  in the polynomial system
- *  return  the sdp problem need constraints.
- * =====================================================================================
+ * 
+ * @param sys is a polynomials constraints system.
+ * @param numofCons in semideinite prigramming the number of constraint <A_i,X>=b_i
+ * @param sosMId 
+ * @param sosmMap 
+ * @param blockSize 
+ * @param blockMap 
+ * @param blockNum 
+ * @param b 
+ * 
+ * @return 
  */
 Constraintmatrix*
-createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int sosMId[], int sosmMap[],  int  blockSize[] , int blockMap[], int * bnum,  double **b )
+createConstraintmatrx(SOSProblem *const sys ,int *const numofCons, int sosMId[], int sosmMap[],  int  blockSize[] , int blockMap[], int * blockNum,  double **b )
 {
   int i,j,k,h,p,pi,si,sum,tempI;
   int pSize,sSize,mSize;
@@ -640,7 +641,7 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
   Sparseblock *blockptr;
   /*    int sosMId[sys->size];
    */
-  int sosMIdSize;
+  int diffSOSMIdSize;
   int everyConstraintSize[sys->size];
   indice_t *varMap[sys->size];
   indice_t *polyVarMap[sys->size];
@@ -652,21 +653,21 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
    *12/03/2012 04:34:54 PM
    *-----------------------------------------------------------------------------*/
 
-  sosMIdSize= getSOSMsize(sys, sosmMap , sosMId );
+  diffSOSMIdSize= getSOSMsize(sys, sosmMap , sosMId);
 
-  indice_t *SOSM[sosMIdSize];
+  indice_t *SOSM[diffSOSMIdSize];
 
-  int tempblockSize[sosMIdSize];
+  int tempblockSize[diffSOSMIdSize];
 
-  int lengthM[sosMIdSize];
+  int lengthM[diffSOSMIdSize];
 
 
-  for ( i = 0; i < sosMIdSize; i += 1 ) {
+  for ( i = 0; i < diffSOSMIdSize; i += 1 ) {
 
-    SOSM[i]=getsosSup(sosMId[i],lengthM+i );
+    SOSM[i]=getSOSsup(sosMId[i],lengthM+i );
     if(NULL==SOSM[i]){
       SOSM[i]=getAllMonByTd( sosMId[i] , lengthM+i );        /* all monomial has  occured in SOS polynomial */
-      setsosSup( sosMId[i], lengthM[i], SOSM[i] );
+      setSOSsup( sosMId[i], lengthM[i], SOSM[i] );
     }
   }
 
@@ -677,32 +678,32 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
    *  Every Monomial in SOSM has some combined methods
    *-----------------------------------------------------------------------------*/
 
-  ArrangeMatrix **AM[sosMIdSize];
+  ArrangeMatrix **AM[diffSOSMIdSize];
 
-  for ( i = 0; i < sosMIdSize; i += 1 ) {
+  for ( i = 0; i < diffSOSMIdSize; i += 1 ) {
     AM[i]=getAMIndex(sosMId[i], tempblockSize+i);
     if(NULL==AM[i]){
-      AM[i]=createArrangeM(sosMId[i] ,SOSM[i] , tempblockSize+i, lengthM[i] ); /* (Z^T * Z)_c =AM */
-      setArrangeM(sosMId[i], AM[i], tempblockSize[i]);
+      AM[i]=createArrangeM(sosMId[i] , SOSM[i], tempblockSize+i, lengthM[i] ); /* (Z^T * Z)_c =AM */
+      //      setArrangeM(sosMId[i], AM[i], tempblockSize[i]);
     }
   }
 
-  *bnum=0;
+  *blockNum=0;
   for ( i = 0; i < sys->size; i += 1 ) {
 
     if (sys->polyConstraints[i]->type==EQ){
 
-      blockSize[*bnum]= tempblockSize[sosmMap[i]];
-      blockMap[*bnum]=i+1;                /* more attention on +1 */
-      blockSize[*bnum+1]= tempblockSize[sosmMap[i]];
-      blockMap[*bnum+1]=-(i+1);
-      (*bnum)+=2; /* EQ coef equivalent GT or GE */
+      blockSize[*blockNum]= tempblockSize[sosmMap[i]];
+      blockMap[*blockNum]=i+1;                /* more attention on +1 */
+      blockSize[*blockNum+1]= tempblockSize[sosmMap[i]];
+      blockMap[*blockNum+1]=-(i+1);
+      (*blockNum)+=2; /* EQ coef equivalent GT or GE */
 
     }else{
 
-      blockSize[*bnum]= tempblockSize[sosmMap[i]];
-      blockMap[*bnum]=i+1;
-      (*bnum)++;
+      blockSize[*blockNum]= tempblockSize[sosmMap[i]];
+      blockMap[*blockNum]=i+1;
+      (*blockNum)++;
     }
   }
 
@@ -711,14 +712,14 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
    */
   indice_t **allM=createAllIndices(sys, sosmMap ,SOSM, lengthM, everyConstraintSize, varMap, polyVarMap, sosVarMap);
 
-  (*allConstraintSize)=0;
+  (*numofCons)=0;
 
   for ( i = 0; i < sys->size; i += 1 ) {
-    (*allConstraintSize)+=everyConstraintSize[i];
+    (*numofCons)+=everyConstraintSize[i];
   }
   
 
-  *b= (double*)calloc_d(((*allConstraintSize)+1), sizeof(double) );
+  *b= (double*)calloc_d(((*numofCons)+1), sizeof(double) );
   
   if(NULL!=sys->rhs){
     
@@ -769,17 +770,17 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
 
   // }
 
-  Constraintmatrix *re=createNconstraintmatrix(*allConstraintSize); /* every monomial w.r.t. to a constraint */
+  Constraintmatrix *re=createNconstraintmatrix(*numofCons); /* every monomial w.r.t. to a constraint */
 
-  block =(SparseSOSblock***) malloc_d ( (*allConstraintSize)*sizeof(SparseSOSblock **) );
-
-
-  for ( i = 0; i < *allConstraintSize; i += 1 ) {
-
-    block[i]    =(SparseSOSblock **) malloc_d ( (*bnum)*sizeof(SparseSOSblock*) );
+  block =(SparseSOSblock***) malloc_d ( (*numofCons)*sizeof(SparseSOSblock **) );
 
 
-    for ( j = 0; j < *bnum; j += 1 ) {
+  for ( i = 0; i < *numofCons; i += 1 ) {
+
+    block[i]    =(SparseSOSblock **) malloc_d ( (*blockNum)*sizeof(SparseSOSblock*) );
+
+
+    for ( j = 0; j < *blockNum; j += 1 ) {
 
       /*-----------------------------------------------------------------------------
        *  i is the number of constraint j is the number of block, and every block has a
@@ -790,7 +791,7 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
   }
 
 
-  for ( i = 0; i < *bnum; i += 1 ) {
+  for ( i = 0; i < *blockNum; i += 1 ) {
 
     p=blockMap[i];
     if(p<0) p=-p;
@@ -859,9 +860,9 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
   /*-----------------------------------------------------------------------------
    *  use block to  construct  constraints
    *-----------------------------------------------------------------------------*/
-  for ( i = 0; i < *allConstraintSize; i += 1 ) {
+  for ( i = 0; i < *numofCons; i += 1 ) {
 
-    for ( j = *bnum-1; j >= 0; j -= 1 ) { /* notice the order of polynomial is reverse  */
+    for ( j = *blockNum-1; j >= 0; j -= 1 ) { /* notice the order of polynomial is reverse  */
 
       sum=0;                              /* sum  the respect to block size */
 
@@ -904,9 +905,9 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
   }
 
 
-  for ( i = 0; i < *allConstraintSize; i += 1 ) {
+  for ( i = 0; i < *numofCons; i += 1 ) {
 
-    for ( j = 0; j < *bnum; j += 1 ) {
+    for ( j = 0; j < *blockNum; j += 1 ) {
       deleteSparseSOSblock(block[i][j]);
     }
     free(block[i]);
@@ -914,7 +915,7 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
   free(block);
 
 
-  /*    deleteW(W, sosMIdSize, lengthM );
+  /*    deleteW(W, diffSOSMIdSize, lengthM );
    */
 
   deleteAllIndices(allM,sys->size);
@@ -922,11 +923,11 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
   return re;
 }       /* -----  end of function createConstraintmatrix  ----- */
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  init_sdp
- *         From Putiner's positivtellensatz Theorem
- *  Description:  The main function we use.
+
+
+/** 
+ *   From Putiner's positivtellensatz Theorem
+ *  The main function we use.
  *  num is a label of whether output the problem solution in a file. sys is the
  *  polynomials . The sys is a constrain system where all the constraints are
  *  inequalities(>=). sys contains two subsystem. >= sep is the first system the other
@@ -934,10 +935,16 @@ createConstraintmatrx(SOSProblem *const sys ,int *const allConstraintSize, int s
  *  sys has no solution in another word the system
  *  is unsatisfied. By real algebra  theorem  (Putiner's positivtellensatz Theorem)
  *  and semidefinite programming mostly we find
- *  a set of sos polynomials which satisfy sys->rhs=sos_0+sos_1f_1+...+sos_{sep}f_{sep}+...
- *  . We can easily find 1/2+sos_1f_1+...+sos_{sep}f_{sep} is a Craig interpolation
- *  12/02/2012 12:53:27 PM modify
- * =====================================================================================
+ *  a set of sos polynomials which satisfy sys->rhs=sos_0+sos_1f_1+...+sos_{sep}f_{sep}+sos_{sep+1}f_{sep+1}...
+ *  . We can easily find 1/2sos_0+sos_1f_1+...+sos_{sep}f_{sep} is a Craig interpolation
+ * 
+ * @param sys contain all the consraint equality and inequality and the rhs polynomial
+ * @param sep  the location of interoplant 
+ * @param fprobname the file name of write matix problem which convert from the original  polynomials.
+ * @param fsolname the file name of output
+ * 
+ * @return 0 if success
+ *   otherwise failure
  */
 int
 inter_sdp ( SOSProblem * const sys, const int sep, char const * fprobname , char const * fsolname  )
@@ -945,28 +952,28 @@ inter_sdp ( SOSProblem * const sys, const int sep, char const * fprobname , char
 
   int ret=0;
   int numofCons;
-
   int blockSize[2*(sys->size)];               /* the blockmatrix size */
   int blockMap[2*(sys->size)];                /* block -> poly map */
   int sosMId[sys->size];                      /* sosMId: coefPoly-> sosMid*/
   int sosMap[sys->size];                      /* every coefpoly has a sosM */
-  int bnum=0;
+  int blockNum=0;
   int i;
-  /*
+  /**
+   * 
    * The semidefinite programming need data.
    *
-   *
-   *
-   *max : trace (CX)
-   *     s.t. (*constraints)*X = b
+   * max : trace (CX) i.e. <C,X>
+   *      s.t. (*constraints)*X = b
    *      X>=0 is a semidefinite matrix.
    *
    *      And there C is a zero block matrix.
+   *      The matrix X with respect to the monomial will used in Putiner's positivtellensatz Theorem
    *      b is a vector with respect to sys->rhs.
    *      Main work we will do is working out the number of blocks C need and the
    *      block size. and the length of b.
    *      Construct constraints.
    */
+
 
   Blockmatrix C;
 
@@ -981,10 +988,13 @@ inter_sdp ( SOSProblem * const sys, const int sep, char const * fprobname , char
 
   //(double*) malloc_d(sizeof(double) );
   //  free(b);
-  
-  constraints=createConstraintmatrx(sys, &numofCons, sosMId, sosMap, blockSize, blockMap, &bnum,  &b ); /* this place has some problem */
+  /**
+   * the key step for me
+   * 
+   */
+  constraints=createConstraintmatrx(sys, &numofCons, sosMId, sosMap, blockSize, blockMap, &blockNum,  &b ); /* this place has some problem */
 
-  C=*createBlockMatrixC(blockSize, bnum);    /* 1 is a default polynomial we want to notice  */
+  C=*createBlockMatrixC(blockSize, blockNum);    /* 1 is a default polynomial we want to notice  */
 
   //  double *b=malloc_d((numofCons+1)*sizeof(double));;
 
@@ -999,7 +1009,7 @@ inter_sdp ( SOSProblem * const sys, const int sep, char const * fprobname , char
 
   int numofblock=0;
 
-  for ( i = 0; i < bnum; i += 1 ) {
+  for ( i = 0; i < blockNum; i += 1 ) {
 
     numofblock+=blockSize[i];
   }
@@ -1013,7 +1023,6 @@ inter_sdp ( SOSProblem * const sys, const int sep, char const * fprobname , char
   if (ret < 2){
     
     wellform(sys , sep , sosMId, sosMap, blockSize, blockMap ,&X);
-
 
   }
   else{
@@ -1081,7 +1090,7 @@ int sdp_solver( SOSProblem *const sys, Poly** resP,   char const * fprobname , c
   int blockMap[2*(sys->size)];                /* block -> poly map */
   int sosMId[sys->size];                      /* sosMId: coefPoly-> sosMid*/
   int sosMap[sys->size];                      /* every coefpoly has a sosM */
-  int bnum=0;
+  int blockNum=0;
   int i;
   /*
    * The semidefinite programming need data.
@@ -1110,16 +1119,16 @@ int sdp_solver( SOSProblem *const sys, Poly** resP,   char const * fprobname , c
 
   double *b=NULL;
   
-  constraints=createConstraintmatrx(sys, &numofCons, sosMId, sosMap, blockSize,blockMap, &bnum,  &b ); /* this place has some problem */
+  constraints=createConstraintmatrx(sys, &numofCons, sosMId, sosMap, blockSize,blockMap, &blockNum,  &b ); /* this place has some problem */
 
-  C=*createBlockMatrixC(blockSize, bnum);    /* 1 is a default polynomial we want to notice  */
+  C=*createBlockMatrixC(blockSize, blockNum);    /* 1 is a default polynomial we want to notice  */
 
 
   /* index start from 1 not 0 */
 
   int numofblock=0;
 
-  for ( i = 0; i < bnum; i += 1 ) {
+  for ( i = 0; i < blockNum; i += 1 ) {
 
     numofblock+=blockSize[i];
   }
@@ -1130,13 +1139,13 @@ int sdp_solver( SOSProblem *const sys, Poly** resP,   char const * fprobname , c
   
   ret=easy_sdp(numofblock,  numofCons, C, b, constraints, 0.0, &X,&y,&Z,&pobj,&dobj );
 
-  //  wellform(sys , sep , sosMId, sosMap, blockSize, bnum, blockMap ,&X);
+  //  wellform(sys , sep , sosMId, sosMap, blockSize, blockNum, blockMap ,&X);
   if (ret ==0){
     for (i = 0; i < sys->size; i++) {
       resP[i]=getConstraintPoly (sys  , i, sosMId, sosMap, blockSize, blockMap ,&X );
     }
     
-    /*      wellform(sys , sep , sosMId, sosMap, blockSize, bnum, blockMap ,&X);
+    /*      wellform(sys , sep , sosMId, sosMap, blockSize, blockNum, blockMap ,&X);
      */
 
   }
@@ -1164,8 +1173,17 @@ int sdp_solver( SOSProblem *const sys, Poly** resP,   char const * fprobname , c
 }
 
 
-int getSOSMsize (SOSProblem * const sys, int sosmMap[], int sosMId[]  ){
 
+/** 
+ * 
+ * 
+ * @param sys all the constraits polynomials
+ * @param sosmMap the location of polynomial->support in array sosMId
+ * @param sosMId the array of  support id 
+ * @return the different support if accour in sys
+ */
+
+int getSOSMsize (SOSProblem * const sys, int sosmMap[], int sosMId[]  ){
   int re =0;
   int i=0;
   int j=0;
@@ -1174,9 +1192,13 @@ int getSOSMsize (SOSProblem * const sys, int sosmMap[], int sosMId[]  ){
     j=0;
 
     while ( j<re ) {
-      if(sosMId[j]==sys->polyConstraints[i]->supportId ) break;
+      
+      ///different  sys->polyConstraints[i] may use sosMId[j]==sys->polyConstraints[i]->supportId.
+      /// Since the same monomial bases will definite different constrains such as c_00+c_10x+c_01y==0 and 
+      /// b_00+b_10x+b_01y >=0 
+      // This stretegy avoid repeat computing
+      if(sosMId[j]==sys->polyConstraints[i]->supportId) break;
       j++;
-
     }
 
     sosmMap[i]=j;

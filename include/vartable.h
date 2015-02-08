@@ -1,20 +1,13 @@
-/*
- * =====================================================================================
- *
- *       Filename:  vartable.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  12/05/2012 08:09:44 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+/**
+ * @file   vartable.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 13:55:37 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
+
 
 #ifndef  VARTABLE_INC
 #define  VARTABLE_INC
@@ -22,6 +15,7 @@
 #include	"polytype.h"
 #include	<assert.h>
 #include	"config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

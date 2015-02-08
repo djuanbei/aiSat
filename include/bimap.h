@@ -1,21 +1,13 @@
-/*
- * =====================================================================================
- *
- *       Filename:  table.h
- *
- *    Description:   bisearch map key<->value 
- *
- *        Version:  1.0
- *        Created:  12/22/2013 07:25:17 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
- */
 
+/**
+ * @file   bimap.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:21:47 2015
+ * 
+ * @brief  a map which can search by both key and value
+ * 
+ * 
+ */
 
 #ifndef  BIMAP_INC
 #define  BIMAP_INC
@@ -23,22 +15,23 @@
 
 #include	"config.h"
 struct bimap {
-	int capacity;
-	int size;
-	int *values;
-	int *keys;
+  int capacity;
+  int size;
+  int *values;// values[ 2*k ]=value; values[ 2*k+1 ]= key
+  int *keys;//keys[ 2*i ]=key; keys[ 2*i+1 ]=value
 
-};				/* ----------  end of struct table  ---------- */
+};		
 
 typedef struct bimap Bimap;
 
 Bimap * createBimap(void);
 
-int addMapElemValue(Bimap * , int value);
 
-int findMapElemByKey(Bimap *, const int key);
+int addBimapElem(Bimap * , int value);
 
-int findMapElemByValue(Bimap *, const int value);
+int findBimapByKey(Bimap *, const int key);
+
+int findBimapByValue(Bimap *, const int value);
 
 void deleteBimap(Bimap *);
 

@@ -13,7 +13,7 @@
 
 /* 
    Packed indexing.
- */
+*/
 
 #define ijtokp(iii,jjj,lda) ((iii+jjj*(jjj-1)/2)-1)
 
@@ -34,7 +34,7 @@
 
 /* 
    Packed indexing.
- */
+*/
 
 #define ijtokp(iii,jjj,lda) (((long int)iii+(long int)jjj*(jjj-1L)/2-1L))
 

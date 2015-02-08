@@ -1,19 +1,12 @@
-/*
- * =====================================================================================
- *
- *       Filename:  table.c
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  12/22/2013 07:29:51 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+/**
+ * @file   bimap.c
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 13:56:30 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
 
 #include "bimap.h"
@@ -29,90 +22,105 @@ Bimap * createBimap(void){
   re->size=0;
   return re;
 }
-static int compfun( const void* lhs, const void*rhs){
+
+static int compfun( const void* lhs, const void* rhs){
   return ((int *) lhs)[0] -((int *) rhs)[0];
 }
 
-static void enlargeBimap(Bimap * table){
-  table->capacity= table->capacity*ENLARGE_RAT+1;
-  table->values=(int*) realloc_d(table->values,2*table->capacity* sizeof(int));
+static void enlargeBimap(Bimap * map){
+  map->capacity= map->capacity*ENLARGE_RAT+1;
+  map->values=(int*) realloc_d(map->values,2*map->capacity* sizeof(int));
+  map->values=(int*) realloc_d(map->keys,2*map->capacity* sizeof(int));
 }
 
-int addMapElemValue(Bimap *table , int value){
 
+/** 
+ *  have bugs
+ * 
+ * @param map 
+ * @param value 
+ * 
+ * @return 
+ */
+int addBimapElem(Bimap *map , int value){
 
-  if(table->size+2>=table->capacity)
-    enlargeBimap(table);
+  if(map->size+2>=map->capacity)
+    enlargeBimap(map);
 
-
-  if(0==table->size){
-    table->values[0]=value;
-    table->values[1]=table->size;
-    table->keys[0]=0;
-    table->keys[1]=value;
-    table->size++;
+  if(0==map->size){
+    map->values[0]=value;
+    map->values[1]=0;
+    map->keys[0]=0;
+    map->keys[1]=value;
+    map->size++;
     return 0;
 
   }
-  int loc=bisearchLoc(table->values, &value,table->size,2,compfun);
+  int loc=bisearchLocBettwen(map->values, &value, map->size, 2, compfun);
+  // can not find 
   if(loc<0){
-
-    if(table->values[0]>value){
-      memmove(table->values+2,table->values,2*table->size*sizeof(int));
-      table->values[0]=value;
-      table->values[1]=table->size;
-
+    if(map->values[0]>value){
+      memmove(map->values+2,map->values,2*map->size*sizeof(int));
+      map->values[0]=value;
+      map->values[1]=map->size;
+      
     }else{
-      table->values[2*table->size]=value;
-      table->values[2*table->size+1]=table->size;
+      map->values[2*map->size]=value;
+      map->values[2*map->size+1]=map->size;
     }
 
-  }else if (table->values[2*loc]==value){
-    return table->values[2*loc+1];
+  }else if (map->values[2*loc]==value){
+    return map->values[2*loc+1];
   }else{
-    memmove(table->values+2*loc+2,table->values+2*loc,2*(table->size-loc)*sizeof(int));
-    table->values[2*loc]=value;
-    table->values[2*loc+1]=table->size;
+    memmove(map->values+2*loc+2,map->values+2*loc,2*(map->size-loc)*sizeof(int));
+    map->values[2*loc]=value;
+    map->values[2*loc+1]=map->size;
 
   }
 
-  table->keys[2*table->size]=table->size;
-  table->keys[2*table->size+1]=value;
-  table->size++;
-  return table->size-1;
+  map->keys[2*map->size]=map->size;
+  map->keys[2*map->size+1]=value;
+  map->size++;
+  return map->size-1;
 
 }
-/*
- * find return >=0
+
+/** 
+ * 
+ * 
+ * @param map 
+ * @param key 
+ * 
+ * @return loc >=0 if find key in map
  * otherwise -1
  */
 
-int findMapElemByKey(Bimap *table, const int key){
-  int loc=bisearchLoc(table->keys, &key,table->size,2,compfun);
+int findMapElemByKey(Bimap *map, const int key){
+  int loc=bisearchLocBettwen(map->keys, &key,map->size,2,compfun);
   if(loc<0) return -1;
-  if(table->keys[2*loc]!=key) return -1;
-  return table->keys[2*loc];
+  if(map->keys[2*loc]!=key) return -1;
+  return map->keys[2*loc];
 
 }
 
-int findMapElemByValue(Bimap *table, const int value){
+int findBimapByValue(Bimap *map, const int value){
 
-  int loc=bisearchLoc(table->values, &value,table->size,2,compfun);
-  if(loc<0 || table->values[2*loc]!=value) return -1;
-  return table->values[2*loc+1];
+  int loc=bisearchLocBettwen(map->values, &value,map->size,2,compfun);
+  if(loc<0 || map->values[2*loc]!=value) return -1;
+  return map->values[2*loc+1];
 
 }
 
 
-void deleteBimap(Bimap *table){
-  if(NULL!=table){
-    free(table->values);
-    free(table->keys);
-    free(table);
-    table=NULL;
+void deleteBimap(Bimap *map){
+  if(NULL!=map){
+    free(map->values);
+    free(map->keys);
+    free(map);
+    map=NULL;
   }
 }
-void clearBimap(Bimap *table){
-  table->size=0;
+void clearBimap(Bimap *map){
+  map->size=0;
 }
 

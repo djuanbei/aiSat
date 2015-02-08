@@ -1,10 +1,20 @@
+/**
+ * @file   monomial.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:42:42 2015
+ * 
+ * @brief  a struct monomial 
+ * 
+ * 
+ */
+
 #ifndef MONOMIAL_INC
 #define MONOMIAL_INC
 #include "polytype.h"
 
 const uint32_t valueMap[]={1u,2u,4u,8u,16u,32u,64u,128u,256u,512u,1024u,2048u,4096u,8192u,
-                        16384u,32768u,1u<<16,1u<<17,1u<<18,1u<<19,1u<<20,1u<<21,1u<<22,1u<<23,1u<<24,1u<<25,
-                        1u<<26,1u<<27,1u<<28,1u<<29,1u<<30,1u<<31};
+                           16384u,32768u,1u<<16,1u<<17,1u<<18,1u<<19,1u<<20,1u<<21,1u<<22,1u<<23,1u<<24,1u<<25,
+                           1u<<26,1u<<27,1u<<28,1u<<29,1u<<30,1u<<31};
 struct monomial{
   const indice_t  *indice;
   int dim;
@@ -59,7 +69,6 @@ struct monomialvalue{
   void remove(const monomialvalue &other );
   
   int size()const ;
-  
 
 
 };

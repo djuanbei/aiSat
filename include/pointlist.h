@@ -1,20 +1,13 @@
-/*
- * =====================================================================================
- *
- *       Filename:  rootlist.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  01/04/2013 08:18:59 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+/**
+ * @file   pointlist.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:20:48 2015
+ * 
+ * @brief  point list containt 
+ * 
+ * 
  */
+
 
 #ifndef  POINTLIST_INC
 #define  POINTLIST_INC

@@ -1,20 +1,31 @@
-/*
- * =====================================================================================
+
+/**
+ * @file   support_table.c
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 15:35:45 2015
+ * 
+ * @brief   Since every polynomial constrain is parametric polynomial
+ * when the coefficients of the template constraint is concrete the 
+ * constraint is definited. And there are different polynomial contraints may share monomial base such as polynomial contraints c00+c01x+c10y+c11xy+c02x^2+c20y^2 >=0  and b00+b01x+b10y+b11xy+b02x^2+b20y^2 >=0
+ * where c**, b** are unknown parameters and set {1, x, y, xy, x^2, y^2 } is the monomial base.
+ * 
  *
- *       Filename:  table.c
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  12/07/2012 10:10:52 AM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+ * f= G^T M G=<G G^T,M > = \sum_{i=1}^s g_i^2
+ * G called half monomial set 
+ * all the elements occouring in GG^T called all monomial set
+ * we define an ArrangeMatrix by the location   x^a  occurring in  for every element x^a
+ * in  GG^T. For example G=[ 1 x y z ] 
+ * G G^T=[ 1  x    y    z ]
+ *       [ x  x^2  xy   xz]
+ *       [ y  xy   y^2  yz]
+ *       [ z  xz   yz  z^2], then the ArrangeMatrix corresponding monomial xy is
+ *  [0  0  0  0]
+ *  [0  0  1  0]
+ *  [0  1  0  0]                                                     
+ *  [0  0  0  0]
+ * 
  */
+
 
 #include  "support_table.h"
 #include  "poly.h"
@@ -34,7 +45,7 @@ enlargetable (void  ){
     table.values=(Support** )calloc_d (
         table.capacity,sizeof(Support*) );
 
-    table.sosSup	= (indice_t**)calloc_d (table.capacity, sizeof(indice_t*) );
+    table.SOSsup	= (indice_t**)calloc_d (table.capacity, sizeof(indice_t*) );
     table.Gsup= (indice_t**)calloc_d (table.capacity, sizeof(indice_t*) );
     table.sosLength	=(int* ) malloc_d (table.capacity* sizeof(int) );
 
@@ -47,10 +58,10 @@ enlargetable (void  ){
                                      table.capacity*sizeof(Support*));
     memset(table.values+table.size, 0, (table.capacity-table.size)*sizeof(Support*));
 
-    table.sosSup=(indice_t**) realloc_d(table.sosSup,
+    table.SOSsup=(indice_t**) realloc_d(table.SOSsup,
 					table.capacity*sizeof(indice_t*));
 
-    memset(table.sosSup+table.size,0, (table.capacity-table.size)*sizeof(indice_t*));
+    memset(table.SOSsup+table.size,0, (table.capacity-table.size)*sizeof(indice_t*));
     table.Gsup=(indice_t**) realloc_d(table.Gsup,
                                       table.capacity*sizeof(indice_t*));
 
@@ -77,7 +88,7 @@ enlargetable (void  ){
 //	table.loc=createTable();
 //	table.values	= (Support**)   malloc_d (table.capacity* sizeof(Support* ) );
 //
-//	table.sosSup	= (indice_t**)malloc_d (table.capacity*  sizeof(indice_t*) );
+//	table..SOSsup	= (indice_t**)malloc_d (table.capacity*  sizeof(indice_t*) );
 //	table.Gsup=(indice_t**)malloc_d (table.capacity*  sizeof(indice_t*) );
 //
 //
@@ -90,7 +101,7 @@ enlargetable (void  ){
 //	for ( i = 0; i < MAX_DEGREE+1; i += 1 ) {
 //		table.values[i]=createSupport(i,1,0,NULL);
 //		table.values[i]->id=i;
-//		table.sosSup[i]=NULL;
+//		table..SOSsup[i]=NULL;
 //		table.Gsup[i]=NULL;
 //		table.arrangeM[i]=NULL;
 //
@@ -118,7 +129,7 @@ static int findSupElem ( const int deg,  const int varId,const int consNum, cons
           j++;
         }
         if(j==consNum){
-          return findMapElemByValue(table.loc, i);
+          return findBimapByValue(table.loc, i);
         }
       }
     }
@@ -133,7 +144,7 @@ int findSupByPoly(const SubPoly * subpoly){
   for ( i = 0; i < table.size; i += 1 ) {
     if(table.values[i]->type==SUB_POLY){
       if(0== memcmp(table.values[i]->md5sum,subpoly->md5sum,DIGEST_SIZE))
-        return findMapElemByValue(table.loc,i);
+        return findBimapByValue(table.loc,i);
     }
   }
   return -1;
@@ -146,7 +157,7 @@ static int findSupElemByIndice(const int varId, const indice_t * indices, const 
   md5sumbyIndice(md5sum,varId, indices, size);
   for(i=0; i<table.size;i++){
     if(table.values[i]->type==INDICE && 0==memcmp(table.values[i]->md5sum, md5sum,DIGEST_SIZE )){
-      return findMapElemByValue(table.loc,i);
+      return findBimapByValue(table.loc,i);
       
     }
   }
@@ -154,7 +165,7 @@ static int findSupElemByIndice(const int varId, const indice_t * indices, const 
   
 }
 
-int addsosSup ( const int deg,  const int varId, const int consNum,  int * consIds ){
+int addSOSup ( const int deg,  const int varId, const int consNum,  int * consIds ){
 
   int re=findSupElem(deg,  varId, consNum, consIds);
 
@@ -165,16 +176,16 @@ int addsosSup ( const int deg,  const int varId, const int consNum,  int * consI
 
   table.values[table.size]=createSupport(deg, varId, consNum, consIds);
 
-  table.sosSup[table.size]=NULL;
+  table.SOSsup[table.size]=NULL;
   table.Gsup[table.size]=NULL;
   table.arrangeM[table.size]=NULL;
   re= table.size;
 
   table.size++;
-  return addMapElemValue(table.loc, re);
+  return addBimapElem(table.loc, re);
 }
 
-int addsosSupByIndice(const int varId, indice_t * indices, const int size){
+int addSOSsupByIndice(const int varId, indice_t * indices, const int size){
 
   qsortM(indices, getvarNum(varId) ,0 , size-1, compare);
   
@@ -186,10 +197,10 @@ int addsosSupByIndice(const int varId, indice_t * indices, const int size){
   table.values[table.size]=createSupBySup(varId, indices, size);
   //  int varNum=getvarNum(varId);
   
-  table.sosSup[table.size]=NULL;
+  table.SOSsup[table.size]=NULL;
   // (indice_t*)malloc_d(size*varNum*sizeof(indice_t) );
   
-  // memcpy(table.sosSup[table.size], indices,size*varNum*sizeof(indice_t));
+  // memcpy(table..SOSsup[table.size], indices,size*varNum*sizeof(indice_t));
   
   table.Gsup[table.size]=NULL;
 
@@ -197,11 +208,11 @@ int addsosSupByIndice(const int varId, indice_t * indices, const int size){
   re=table.size;
   table.size++;
     
-  return addMapElemValue(table.loc, re);
+  return addBimapElem(table.loc, re);
   
   // int glength=0;
   
-  // ArrangeMatrix **AM=createArrangeM(re, table.sosSup[table.size], &glength ,size);
+  // ArrangeMatrix **AM=createArrangeM(re, table..SOSsup[table.size], &glength ,size);
   
   // setArrangeM(re,AM,glength );
   
@@ -212,24 +223,25 @@ int addsosSupByIndice(const int varId, indice_t * indices, const int size){
 
 Support* getSupElem (  const int id ){
 
-  int  index=findMapElemByKey(table.loc,id);
+  int  index=findBimapByKey(table.loc,id);
 
   if(index<0) return NULL;
   return table.values[index];
 
 }
 
-indice_t* getsosSup ( const int id , int *length ){
+indice_t* getSOSsup ( const int id , int *length ){
 
-  int index =findMapElemByKey(table.loc, id);
+  int index =findBimapByKey(table.loc, id);
   if(index<0) return NULL;
   *length=table.sosLength[index];
-  return table.sosSup[index];
+
+  return table.SOSsup[index];
 
 }	
 
 indice_t* getGsup ( const int id, int *length ){
-  int index=findMapElemByKey(table.loc, id);
+  int index=findBimapByKey(table.loc, id);
   if(index<0) return NULL;
   
   *length=table.gLength[index];
@@ -238,20 +250,20 @@ indice_t* getGsup ( const int id, int *length ){
 
 
 
-void setsosSup (const int id,const int len, indice_t *value  ){
+void setSOSsup (const int id,const int len, indice_t *value  ){
 
-  int index=findMapElemByKey(table.loc, id);
+  int index=findBimapByKey(table.loc, id);
 
   ASSERT(index>-1,"There are some bugs");
   if(index<0) return ;
   table.sosLength[index]=len;
-  table.sosSup[index]=value;
+  table.SOSsup[index]=value;
 
 }	
 
 void setGsup ( const int id, const int len, indice_t * value ){
 
-  int index=findMapElemByKey(table.loc,id);
+  int index=findBimapByKey(table.loc,id);
   ASSERT(index>-1,"There are some bugs");
   if(index<0) return;
   table.gLength[index]=len;
@@ -270,24 +282,24 @@ int addconvexsosSup( SubPoly * poly ){
   table.values[table.size]=createSupByPoly(poly);
   
   
-  table.sosSup[table.size]=NULL;
+  table.SOSsup[table.size]=NULL;
   table.Gsup[table.size]=NULL;
   table.arrangeM[table.size]=NULL;
   re= table.size;
   table.size++;
-  return  addMapElemValue(table.loc, re);
+  return  addBimapElem(table.loc, re);
 }
 
 int
 getsosSLength ( const int id ){
-  int index=findMapElemByKey(table.loc, id);
+  int index=findBimapByKey(table.loc, id);
   if(index<0) return -1;
   return table.sosLength[index];
 }	
 void
 setArrangeM( const int id, ArrangeMatrix **value, const int gLength ){
 
-  int index= findMapElemByKey(table.loc, id);
+  int index= findBimapByKey(table.loc, id);
   ASSERT(index>-1,"There are some bugs");
   if(index<0) return;
   table.gLength[index]=gLength;
@@ -296,7 +308,7 @@ setArrangeM( const int id, ArrangeMatrix **value, const int gLength ){
 
 ArrangeMatrix**
 getAMIndex ( const int id,int *gLength  ){
-  int index=findMapElemByKey(table.loc,id);
+  int index=findBimapByKey(table.loc,id);
   if(index<0) return NULL;
 
   *gLength=table.gLength[index];
@@ -310,8 +322,8 @@ void clearSupportTable(void){
     int i;
     for ( i = 0; i < table.size; i += 1 ) {
       deleteSupport(table.values[i]);
-      if(table.sosSup[i]!=NULL) 
-        free(table.sosSup[i]);
+      if(table.SOSsup[i]!=NULL) 
+        free(table.SOSsup[i]);
       if(table.Gsup[i]!=NULL)
         free(table.Gsup[i]);
       if(table.arrangeM[i]!=NULL){
@@ -331,8 +343,8 @@ deleteSupportTable(void  ){
   int i;
   for ( i = 0; i < table.size; i += 1 ) {
     deleteSupport(table.values[i]);
-    if(table.sosSup[i]!=NULL) 
-      free(table.sosSup[i]);
+    if(table.SOSsup[i]!=NULL) 
+      free(table.SOSsup[i]);
     if(table.Gsup[i]!=NULL)
       free(table.Gsup[i]);
     if(table.arrangeM[i]!=NULL){
@@ -342,7 +354,7 @@ deleteSupportTable(void  ){
   }
 
   deleteBimap(table.loc);
-  free(table.sosSup);
+  free(table.SOSsup);
   free(table.Gsup);
   free(table.arrangeM);
   free(table.sosLength);

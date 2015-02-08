@@ -1,23 +1,14 @@
-/*
- * =====================================================================================
- *
- *       Filename:  coeftable.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  12/06/2012 02:59:57 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+
+/**
+ * @file   pconst_table.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:52:04 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
-
-
-
 
 #ifndef  PCONST_TABLE_INC
 #define  PCONST_TABLE_INC
@@ -28,20 +19,20 @@
 extern "C" {
 #endif
 
-struct polyConstraintTable {
-	int capacity;
-	int last;
-	PolyConstraint ** values;
+  struct polyConstraintTable {
+    int capacity;
+    int last;
+    PolyConstraint ** values;
 
-};				/* ----------  end of struct coefTable  ---------- */
+  };				/* ----------  end of struct coefTable  ---------- */
 
-typedef struct polyConstraintTable PolyConstraintTable;
+  typedef struct polyConstraintTable PolyConstraintTable;
 
-void initcoefTable(void);
+  void initcoefTable(void);
 
-int addcoefElem(const PolyConstraintType type , const int mId );   
+  int addcoefElem(const PolyConstraintType type , const int mId );   
 
-int findcoefElem(const PolyConstraintType type , const int mId );
+  int findcoefElem(const PolyConstraintType type , const int mId );
 
 
 

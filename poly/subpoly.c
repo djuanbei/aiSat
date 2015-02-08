@@ -42,7 +42,7 @@ static void getMd5sum(const  SubPoly * subp, md5_ctx_t * ctx){
   md5_finalize(ctx);
 }
 
-SubPoly *createSubPoly(Poly * poly){
+SubPoly *createSubPolyByPoly(Poly * poly){
 
   SubPoly* re=malloc_d(sizeof(SubPoly));
   re->poly=poly;
@@ -59,7 +59,7 @@ SubPoly *createSubPoly(Poly * poly){
   return re;
 }
 
-SubPoly * createSubPoly1(Poly *poly, const int size, int *loc){
+SubPoly * createSubPoly(Poly *poly, const int size, int *loc){
   SubPoly* re=malloc_d(sizeof(SubPoly));
   re->poly=poly;
   re->size=size;

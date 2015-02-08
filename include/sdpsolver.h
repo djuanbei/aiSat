@@ -1,37 +1,27 @@
-/*
- * =====================================================================================
- *
- *       Filename:  csdpinter.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  2012年05月14日 21时07分57秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+/**
+ * @file   sdpsolver.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 11:41:55 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
 
+
+
+#ifndef  CSDPINTER_INC
+#define  CSDPINTER_INC
 #include	<stdio.h>
-
 #include	<stdlib.h>
-
 #include	"poly.h"
-
 #include	"polytype.h"
-
 #include	"sparse.h"
-
 #include	"support_table.h"
 #include	"vartable.h"
 #include	"config.h"
 #include "declarations.h"
-#ifndef  CSDPINTER_INC
-#define  CSDPINTER_INC
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -103,7 +93,6 @@ extern "C" {
   int inter_sdp( SOSProblem *const sys,const int sep, const char* fproname,const  char* fsolname );
 
   int sdp_solver( SOSProblem *const sys, Poly** resP,  const char* fproname,const  char* fsolname );
-
 
   int getSOSMsize(SOSProblem * const sys , int sosmMap[] , int sosMId[]);
 

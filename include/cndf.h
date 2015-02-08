@@ -1,21 +1,14 @@
-/*
- * =====================================================================================
- *
- *       Filename:  cndf.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  06/30/2013 01:44:22 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
- */
 
+
+/**
+ * @file   cndf.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:35:30 2015
+ * 
+ * @brief  
+ * 
+ * 
+ */
 
 #ifndef  CNDF_INC
 #define  CNDF_INC

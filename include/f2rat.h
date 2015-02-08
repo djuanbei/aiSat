@@ -1,20 +1,14 @@
-/*
- * =====================================================================================
- *
- *       Filename:  f2rat.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  12/23/2013 06:37:45 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+/**
+ * @file   f2rat.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:38:34 2015
+ * 
+ * @brief  convert a float number to the closest rational number whos den is bounded by bound
+ * 
+ * 
  */
+
 
 #ifndef  F2RAT_INC
 #define  F2RAT_INC

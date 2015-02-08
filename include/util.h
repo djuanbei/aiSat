@@ -1,20 +1,9 @@
-/*
- * =====================================================================================
- *
- *       Filename:  util.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  2012年05月11日 17时17分56秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  dai liyun (pku), dailiyun2009@163.com
- *        Company:  
- *
- * =====================================================================================
- */
+
+
+
+#ifndef  UTIL_INC
+#define  UTIL_INC
+
 #include <signal.h>
 #include "sparse.h"
 #include "selfmemutil.h"
@@ -23,8 +12,6 @@
 #include "declarations.h"
 #include "polytype.h"
 
-#ifndef  UTIL_INC
-#define  UTIL_INC
 #ifdef __cplusplus
 extern "C" {
 #endif

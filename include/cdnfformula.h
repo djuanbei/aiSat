@@ -1,19 +1,13 @@
-/*
- * =====================================================================================
- *
- *       Filename:  cdnfformula.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  06/30/2013 01:57:57 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+
+/**
+ * @file   cdnfformula.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:30:42 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
 
 #ifndef  CDNFFORMULA_INC

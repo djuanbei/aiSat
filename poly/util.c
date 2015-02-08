@@ -1,20 +1,14 @@
-/*
- * =====================================================================================
- *
- *       Filename:  util.c
- *
- *    Description:  
- *
- *        Version:  1.0    
- *        Created:  2012年05月11日 17时19分58秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  dai liyun (pku), dailiyun2009@163.com
- *        Company:  
- *
- * =====================================================================================
+
+ /**
+ * @file   util.c
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 16:24:30 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
+
 
 
 #include	<stdlib.h>
@@ -36,34 +30,38 @@ extern void qsortM( indice_t *, const int n ,const  int left, const int right, i
 BOOL isSameLine(const indice_t points[], const int * loc, const int n , const int dim ){
 
   if(dim==1||n<3) return TRUE;
-  int i,j,blockIndex;
+  int i,j,k;
   int base[dim];
   int current,next;
   for ( i = 0; i < dim; i += 1 ) {
     base[i]=points[loc[1]*dim+i]-points[loc[0]*dim+i];
-    if(base[i]!=0) blockIndex=i;
+    if(base[i]!=0) k=i;
   }
   for ( i = 2; i < n; i += 1 ) {
-    current=points[loc[i]*dim+blockIndex]-points[loc[0]*dim+blockIndex];
+    current=points[loc[i]*dim+k]-points[loc[0]*dim+k];
     for ( j = 1; j < dim-1; j += 1 ) {
       next=points[loc[i]*dim+j]-points[loc[0]*dim+j];
-      if(current*base[j]!=next*base[blockIndex]) return FALSE;
+      if(current*base[j]!=next*base[k]) return FALSE;
     }
   }
   return TRUE;
 }
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  nchoosek
- *  Description:  n and d can not too large
- * =====================================================================================
+
+
+/** 
+ * the number of different group of choice k elements in n elements
+ * 
+ * @param n 
+ * @param k 
+ * 
+ * @return 
  */
 int 
-nchoosek (const  int n ,const int blockIndex )
+nchoosek (const  int n ,const int k )
 {
-  if(n<blockIndex) return 0;
+  if(n<k) return 0;
 
-  if ( n<blockIndex||n<0||blockIndex<0 ) {
+  if ( n<k||n<0||k<0 ) {
     printf ( "input error\n" );
     exit(1);
   }
@@ -72,23 +70,26 @@ nchoosek (const  int n ,const int blockIndex )
   int i=0;
   long double re;
   re=1;
-  for(i=0;i<blockIndex;i++){
+  for(i=0;i<k;i++){
     re*=(n-i);
-    re/=(blockIndex-i);
+    re/=(k-i);
   }
 
   return (int) (re+0.5);
-}		/* -----  end of function nchoosek  ----- */
+}
 
 
 
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  enLargeZ
- *  Description:  enlarge the capacity of Z, [0,start) has elements  
- * =====================================================================================
+
+
+/** 
+ * enlarge the capacity of Z to cap and keep the orignal data 
+ * 
+ * @param Z 
+ * @param n 
+ * @param cap 
  */
-void enLargeZ (indice_t *Z,const int n , int *const cap  )
+void enLargeZ (indice_t *Z, const int n , int *const cap  )
 {
 
   *cap=(*cap)+(*cap)*ENLARGE_RAT+1;
@@ -96,23 +97,26 @@ void enLargeZ (indice_t *Z,const int n , int *const cap  )
 
 
 
-}		/* -----  end of function enLargeZ  ----- */
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  getAllMonByTd
- *  Description: n (n>=1) is the number of variables of polynomial and d is the degree of polynomial  
- * enumerate all monomials whos total degree less or equal than d.
+}	
+
+
+/** 
+ * enumerate all monomials who belong to support whose id is supportId
  * Useing Lexicographic Order x1>x2>..>xn
  * restraintNum is the number of restraints 
  * output all the monomials which satsfy these restraints
- *
- * =====================================================================================
+ * 
+ * @param supportId the support id
+ * @param length the length of all monomials
+ * 
+ * @return all monomials who belong to support whose id is supportId if success
+ * false otherwise.
  */
 
 indice_t *
 getAllMonByTd (const  int supportId, int *const length )
 {
-  int i,j,blockIndex;
+  int i,j,k;
   int sum=1;
   int size=0;
   int cap;
@@ -126,7 +130,7 @@ getAllMonByTd (const  int supportId, int *const length )
 
   n=getvarNum(sup->varId);
   if(0==n){
-    Z=malloc_d(1*sizeof(indice_t));
+    Z=malloc_d(sizeof(indice_t));
     Z[0]=0;
     *length=1;
     return Z;
@@ -163,11 +167,11 @@ getAllMonByTd (const  int supportId, int *const length )
       }
       else{
 
-        blockIndex=n-1;
-        while (Z[i*n+blockIndex]==0 )blockIndex--;
-        sum-=(Z[i*n+blockIndex]-1);
-        Z[i*n+blockIndex]=0;
-        Z[i*n+blockIndex-1]++;
+        k=n-1;
+        while (Z[i*n+k]==0 )k--;
+        sum-=(Z[i*n+k]-1);
+        Z[i*n+k]=0;
+        Z[i*n+k-1]++;
       }
       i++;
     }
@@ -205,11 +209,11 @@ getAllMonByTd (const  int supportId, int *const length )
         sum++;
       }
       else{
-        blockIndex=n-1;
-        while(temp[blockIndex]==0) blockIndex--;
-        sum-=(temp[blockIndex]-1);
-        temp[blockIndex]=0;
-        temp[blockIndex-1]++;
+        k=n-1;
+        while(temp[k]==0) k--;
+        sum-=(temp[k]-1);
+        temp[k]=0;
+        temp[k-1]++;
       }
       if(criteria(sup, temp)) {
         addZ(Z,&cap,&size,n,temp);
@@ -238,7 +242,7 @@ void getAllMonHomoTd(const int varNum, const int deg, const int length, indice_t
   indice_t *Z=malloc_d((length+1)*n*sizeof(indice_t));
   
   int sum=1;
-  int i,j,blockIndex;
+  int i,j,k;
   
   for(i=0; i<n; i++){
     Z[i]= Z[n+i]=0;
@@ -257,12 +261,12 @@ void getAllMonHomoTd(const int varNum, const int deg, const int length, indice_t
       sum++;
     }else{
       
-      blockIndex=n-1;
-      while (Z[i*n+blockIndex]==0 )blockIndex--;
+      k=n-1;
+      while (Z[i*n+k]==0 )k--;
       
-      sum-=(Z[i*n+blockIndex]-1);
-      Z[i*n+blockIndex]=0;
-      Z[i*n+blockIndex-1]++;
+      sum-=(Z[i*n+k]-1);
+      Z[i*n+k]=0;
+      Z[i*n+k-1]++;
     }
     i++;
   }
@@ -311,7 +315,7 @@ criteria (const Support * S,  indice_t * key  )
   }
 
   return TRUE;
-}		/* -----  end of function criteria  ----- */
+}	
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  getZ
@@ -333,7 +337,7 @@ criteria (const Support * S,  indice_t * key  )
 //   qsortM(Z,n,0,(*length)-1,comp);
 
 //   return Z;
-// }		/* -----  end of function getZ  ----- */
+// }	
 
 
 
@@ -346,11 +350,11 @@ deleteZ ( indice_t **Z, const int length )
     free(Z[i]);
   }
   free(Z);
-}		/* -----  end of function deleteZ  ----- */
+}		
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  compare ">"
- *  Description: x>y is and only if exists blockIndex x(blockIndex)>y(blockIndex) and when i<blockIndex x(i)=y(i) 
+ *  Description: x>y is and only if exists k x(k)>y(k) and when i<k x(i)=y(i) 
  *  return 1 if key1> key2
  *  if key1==key2 return 0
  *  otherwise -1 
@@ -369,25 +373,27 @@ compare (const  indice_t * key1, const indice_t* key2,const int size )
   }
 
   return 0;
-
 }
 
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  getW
- *  Description:
+
+/** 
  *  For every monomial c of SOSM  W_c is  a  nchoosek(n+d/2,d/2) * nchoosek(n+d/2,d/2) size symmetric matrix
  *  all element of W_c is one identity or zero. It means the location of c occurs in Z^T * Z 
  *  where Z=[1,x_1,...,x_n,x_1x_2,...,x_n^(d/2)]
  *  n is the number of variable and d is the max total degree of SOSM.
- *  d is a even integer
- *  return is a lengthM (usually nchoosek(n+d,d)) length array of matrix of size nchoosek(n+d/2,d/2) * nchoosek(n+d/2,d/2) 
- * =====================================================================================
+ *  d is a even integer 
+ * 
+ * @param supportId 
+ * @param SOSM 
+ * @param blockSize 
+ * @param lengthM the number of different element in SOSM
+ * 
+ * @return A array of ArrangeMatrix with nchoosek(n+d/2,d/2) * nchoosek(n+d/2,d/2)  for every element in SOSM 
  */
 ArrangeMatrix**
 createArrangeM(const int supportId, indice_t const *SOSM ,  int *const blockSize ,int const lengthM)
 {
-  int i,j,blockIndex,index;
+  int i,j,k,index;
   Support *sup=getSupElem(supportId);
   const int n=getvarNum(sup->varId);
 
@@ -415,8 +421,8 @@ createArrangeM(const int supportId, indice_t const *SOSM ,  int *const blockSize
    *-----------------------------------------------------------------------------*/
   for ( i=0; i<(*blockSize) ;i++ ) {
     for ( j = 0; j <= i; j += 1 ) {
-      for ( blockIndex = 0; blockIndex < n; blockIndex += 1 ) {
-        temp[blockIndex]=Z[i*n+blockIndex]+Z[j*n+blockIndex];      /* monomial add */
+      for ( k = 0; k < n; k += 1 ) {
+        temp[k]=Z[i*n+k]+Z[j*n+k];      /* monomial add */
       }
       index=findIndex(temp, SOSM, lengthM, n);  
       ASSERT(index>=0,"some thing wrong");
@@ -425,9 +431,9 @@ createArrangeM(const int supportId, indice_t const *SOSM ,  int *const blockSize
   }
 
   //	free(Z);
-
+  setArrangeM(supportId, re, *blockSize);
   return re ;
-}		/* -----  end of function getW  ----- */
+}		
 
 
 void
@@ -473,7 +479,7 @@ config (void  )
 
 }
 
-Poly* sosConvertPoly (Blockmatrix *const X,  const int blockIndex, const int blockSize, const int supportId ){
+Poly* sosConvertPoly (Blockmatrix *const X,  const int k, const int blockSize, const int supportId ){
 
   Poly *re;
   coef_t cf;
@@ -498,7 +504,7 @@ Poly* sosConvertPoly (Blockmatrix *const X,  const int blockIndex, const int blo
   re->indices	=(indice_t*) malloc_d ( re->size*varSize*sizeof(indice_t) );
   
   int dummy;
-  memcpy(re->indices, getsosSup(supportId,&dummy), re->size*varSize*sizeof(indice_t));
+  memcpy(re->indices, getSOSsup(supportId,&dummy), re->size*varSize*sizeof(indice_t));
 
   ArrangeMatrix ** S=getAMIndex(supportId,&dummy);
 
@@ -509,11 +515,11 @@ Poly* sosConvertPoly (Blockmatrix *const X,  const int blockIndex, const int blo
       row=S[i]->data[j].row+1;
       col=S[i]->data[j].col+1;
       if(row==col){
-        cf+=X->blocks[blockIndex+1].data.mat[ijtok(row,col,blockSize)];
+        cf+=X->blocks[k+1].data.mat[ijtok(row,col,blockSize)];
 
       }else{
 
-        cf+=2*(X->blocks[blockIndex+1].data.mat[ijtok(row,col,blockSize)]);
+        cf+=2*(X->blocks[k+1].data.mat[ijtok(row,col,blockSize)]);
       }
 
     }

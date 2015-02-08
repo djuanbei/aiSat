@@ -1,20 +1,14 @@
-/*
- * =====================================================================================
- *
- *       Filename:  parse.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  11/25/2013 09:15:21 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+/**
+ * @file   parse.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:49:53 2015
+ * 
+ * @brief  lex syntax  file
+ * 
+ * 
  */
+
 
 #ifndef  PARSE_INC
 #define  PARSE_INC

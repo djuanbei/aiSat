@@ -58,7 +58,6 @@ static clock_t start;
 static int DIM;
 
 
-
 enum  {
   SUCCESS=1,
   FAILURE=2,
@@ -388,7 +387,7 @@ static Constraintmatrix * createConstraintMatrix(const SubPoly *subpoly, const i
   ArrangeMatrix **AM=getAMIndex(sosId, &temploc);
   if(NULL==AM){ 
     AM=createArrangeM(sosId, SOSM, &temploc ,sosLength);
-    setArrangeM(sosId, AM, temploc );
+    //    setArrangeM(sosId, AM, temploc );
   }
 
 
@@ -492,7 +491,7 @@ static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const 
       if(num<size){
         if(NULL!=ans)
           cout	<< "found a split poly" << endl;
-        SubPoly * tempSub=createSubPoly1(subpoly->poly,  num, tempLoc);
+        SubPoly * tempSub=createSubPoly(subpoly->poly,  num, tempLoc);
         int preAnsLength=0;
         if(NULL!=ans)
           preAnsLength=size_L(ans);
@@ -541,7 +540,7 @@ static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const 
     int preAnsLength=0;
     if(NULL!=ans)
       preAnsLength=size_L(ans);
-    SubPoly * tempSub=createSubPoly1(subpoly->poly, checkSize, tempLoc);
+    SubPoly * tempSub=createSubPoly(subpoly->poly, checkSize, tempLoc);
     if(!polyIsSOS(tempSub,ans)){
       if(NULL!=ans)
         delListStart(ans,preAnsLength);
@@ -569,30 +568,33 @@ static int overConvexChecking(const SubPoly * subpoly, indice_t* indices, const 
   return OTHER;
 }
 
-/*
-  poly is a mult polynomial
-  this function checking wether poly can be
-  write as sum of  n sos polynomials'
 
-*/
+
+/** 
+ * 
+ * test whether a given subpoly is a SOS polynomial
+
+ * The semidefinite programming need data.
+ *
+ *     s.t. <(*constraints),X > (in dot) = b
+ *      X>=0 is a semidefinite matrix.
+ *      b is the array of the coefs of poly
+ *
+ *      X is the matrix [x^ax^b_{a,b}] 
+ *
+
+ * @param subpoly a mult-variable polynomial
+ * @param ans if subpoly is a SOS polynomial the subpoly=\sum_{
+ i=0}^s ans[ i ]^2
+ }
+ * @param verbose print information
+ * 
+ * @return true if find a SOS representation
+ * false otherwise
+ */
 
 bool polyIsSOS (SubPoly * subpoly, PointList * ans, const int verbose ){
-  /*
-   * The semidefinite programming need data.
-   *
-   *     s.t. <(*constraints),X > (in dot) = b
-   *      X>=0 is a semidefinite matrix.
-   *      b is the array of the coefs of poly
-   *
-   *      X is the matrix [x^ax^b_{a,b}]
-   *
-   */
 
-  /*
-    poly is a mult polynomial
-    this function checking wether poly can be
-    write as sums of polynomials'
-  */
 
   int i,k,j,sosId,sosLength,gLength,genLength,tempLength=0;
   bool even;
@@ -600,6 +602,7 @@ bool polyIsSOS (SubPoly * subpoly, PointList * ans, const int verbose ){
   indice_t* GSUP=NULL;
 
   int check=easyCheck(subpoly,ans);
+
   if(CONVEX_POLY==check){
 
   }else if(NOSOS==check){
@@ -614,7 +617,7 @@ bool polyIsSOS (SubPoly * subpoly, PointList * ans, const int verbose ){
   int size=subpoly->size;
 
   if(sosId>-1){
-    SOSM=getsosSup(sosId,  &sosLength);
+    SOSM=getSOSsup(sosId,  &sosLength);
     GSUP=getGsup(sosId, &gLength);
 
   }	
@@ -665,7 +668,7 @@ bool polyIsSOS (SubPoly * subpoly, PointList * ans, const int verbose ){
 
     qsortM(SOSM, DIM,0,sosLength-1,compare);
     setGsup(sosId, gLength, GSUP);
-    setsosSup(sosId,sosLength, SOSM);
+    setSOSsup(sosId,sosLength, SOSM);
     delete[] temp;
   }
 
@@ -733,7 +736,7 @@ bool easychecksos( Poly *p){
 
   Poly *poly=copyPoly(p);
   
-  SubPoly * subp=createSubPoly(poly);
+  SubPoly * subp=createSubPolyByPoly(poly);
 
   PointList *ans=createList(delpoly);
   

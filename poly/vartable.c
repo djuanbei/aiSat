@@ -424,6 +424,10 @@ int getvarNum ( const int id ){
   //  if(id>table.last-2) return -1;             /* an easy method to chech id extend bound */
   return (int)table.values[table.locMap[id]] ;
 } 
+/** 
+ * 
+ * @return  the number of current variable in this system
+ */
 
 int getAllVarNum (void  ){
   return table.varNum;

@@ -1,20 +1,14 @@
-/*
- * =====================================================================================
- *
- *       Filename:  pointstack.h
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  01/05/2013 01:53:24 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
- *
- * =====================================================================================
+
+/**
+ * @file   pointstack.h
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Sun Feb  8 12:52:39 2015
+ * 
+ * @brief  
+ * 
+ * 
  */
+
 
 #ifndef  POINTSTACK_INC
 #define  POINTSTACK_INC
@@ -23,10 +17,10 @@
 #include	"config.h"
 
 struct pointStack {
-	int capacity;
-	int size;
-	void ** data;
-	void (*delFun)(void *);
+  int capacity;
+  int size;
+  void ** data;
+  void (*delFun)(void *);
 	
 };				/* ----------  end of struct pointStack  ---------- */
 
