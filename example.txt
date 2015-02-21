@@ -14,11 +14,12 @@ cg=poly(M)# an unknown polynomial whose suppport is M
 g*cg +s == f1
 
 #example 19
-f2=1-x^2-y^2
+f2=1-x^2-y^2 # first coffiecient must be non-negative
 f3=x^2+4*y^2-10
 s2=sos(M)
 s3=sos(M)
 s4=sos(M)
+# constraints polys only occour in left and constant poly only occur in right part
 s4+s2+s3 == 10
 
 ff= x^2+2*x*y+y^2+1
