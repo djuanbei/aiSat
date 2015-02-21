@@ -386,12 +386,11 @@ compare (const  indice_t * key1, const indice_t* key2,const int size )
  * @param supportId 
  * @param SOSM 
  * @param blockSize 
- * @param lengthM the number of different element in SOSM
+ * @param lengthSOS the number of different element in SOSM
  * 
  * @return A array of ArrangeMatrix with nchoosek(n+d/2,d/2) * nchoosek(n+d/2,d/2)  for every element in SOSM 
  */
-ArrangeMatrix**
-createArrangeM(const int supportId, indice_t const *SOSM ,  int *const blockSize ,int const lengthM)
+ArrangeMatrix** createArrangeM(const int supportId, indice_t const *SOSM ,  int *const blockSize ,int const lengthSOS)
 {
   int i,j,k,index;
   Support *sup=getSupElem(supportId);
@@ -406,9 +405,9 @@ createArrangeM(const int supportId, indice_t const *SOSM ,  int *const blockSize
     sup->deg*=2;
   }
 
-  ArrangeMatrix **re=(ArrangeMatrix **) malloc_d(lengthM*sizeof(ArrangeMatrix *));
+  ArrangeMatrix **re=(ArrangeMatrix **) malloc_d(lengthSOS*sizeof(ArrangeMatrix *));
 
-  for ( i=0;i<lengthM; i++ ) {
+  for ( i=0;i<lengthSOS; i++ ) {
     re[i]=createSparse(*blockSize);
   }
 
@@ -424,7 +423,7 @@ createArrangeM(const int supportId, indice_t const *SOSM ,  int *const blockSize
       for ( k = 0; k < n; k += 1 ) {
         temp[k]=Z[i*n+k]+Z[j*n+k];      /* monomial add */
       }
-      index=findIndex(temp, SOSM, lengthM, n);  
+      index=findIndex(temp, SOSM, lengthSOS, n);  
       ASSERT(index>=0,"some thing wrong");
       addSparseElem(re[index],i,j);
     }

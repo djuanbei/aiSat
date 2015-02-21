@@ -932,7 +932,6 @@ YY_RULE_SETUP
 #line 62 "src/sosproblemscan.l"
 { 
 
-
   if(problem.polyMap.find(string(yytext) )!=problem.polyMap.end() ){
 
     yylval.poly=problem.polyMap[string(yytext)];
@@ -954,8 +953,6 @@ YY_RULE_SETUP
     return VAR;
   }else if (problem.varMap.find(string(yytext))!=problem.varMap.end() ){
 
-
-
     yylval.iVec=problem.varMap[string(yytext)];
     return VAR_LIST;
   }
@@ -968,12 +965,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 98 "src/sosproblemscan.l"
+#line 95 "src/sosproblemscan.l"
 
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 100 "src/sosproblemscan.l"
+#line 97 "src/sosproblemscan.l"
 {
   /* Comment line */
   int c;
@@ -991,15 +988,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 115 "src/sosproblemscan.l"
+#line 112 "src/sosproblemscan.l"
 { printf("Unknown Character in line %d : %s -- Ignored\n", lineNum, yytext); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 118 "src/sosproblemscan.l"
+#line 115 "src/sosproblemscan.l"
 ECHO;
 	YY_BREAK
-#line 1003 "include/sosproblemscan.h"
+#line 1000 "include/sosproblemscan.h"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1997,7 +1994,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 118 "src/sosproblemscan.l"
+#line 115 "src/sosproblemscan.l"
 
 
 

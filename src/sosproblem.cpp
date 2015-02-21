@@ -41,11 +41,21 @@ static int delRepeat(indice_t * indices, const int length, const int varNum ){
   
 }
 
-static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candidateLength, const indice_t * indices, const int size, indice_t **SOSM  ){
+static int reduceConvexHulll(const int DIM,  indice_t * candidateGsup, int &candidateLength, const indice_t * indices, const int size, indice_t **SOSM  ){
   
   int i, j, k, valueIndex, v, m, sosLength;
-
   size_t node_size=DIM*sizeof(indice_t);
+
+  if( 1==candidateLength ){
+    sosLength=1;
+    *SOSM=(indice_t*)malloc_d(sosLength*node_size);
+    for( i=0; i< DIM; i++ )
+      (  *SOSM)[ i ]=2*candidateGsup[ i ];
+    return sosLength;
+    
+  }
+
+
 
   indice_t * key=new indice_t[DIM];
   indice_t * key1=new indice_t[DIM];
@@ -73,7 +83,7 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
     for(  i=0; i<candidateLength ;i++ ){
       for( j=i; j<candidateLength; j++ ){
         for( k=0; k< DIM; k++){
-          key[k]=candidateSet[i*DIM+k]+candidateSet[j*DIM+k];
+          key[k]=candidateGsup[i*DIM+k]+candidateGsup[j*DIM+k];
         }
         if(monMap.find(monomial(key, DIM))!=monMap.end()){
           monMap[monomial(key, DIM)].value++;
@@ -91,13 +101,13 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
     k=0;
     for( j=0; j< candidateLength;  j++){
       for(i=0; i<DIM;  i++){
-        key[i]=2*candidateSet[j*DIM+i];
+        key[i]=2*candidateGsup[j*DIM+i];
       }
       v=monMap[monomial(key,DIM)].value;
       if(v==1){
         for(i=0; i<candidateLength; i++){
           for( m=0; m<DIM; m++){
-            key1[m]=key[m]/2+candidateSet[i*DIM+m];
+            key1[m]=key[m]/2+candidateGsup[i*DIM+m];
           }
           monMap.find(monomial(key1,DIM))->second.add(k);
         }
@@ -111,7 +121,7 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
     
     for( j=0; j< candidateLength;  j++){
       for(i=0; i<DIM;  i++){
-        key[i]=2*candidateSet[j*DIM+i];
+        key[i]=2*candidateGsup[j*DIM+i];
       }
 
       if(monMap.find(monomial(key,DIM))->second.size()==1 && findIndex(key,indices, size, DIM )<0){
@@ -119,7 +129,7 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
         del=true;
         for(i=0; i<candidateLength; i++){
           for( m=0; m<DIM; m++){
-            key1[m]=key[m]/2+candidateSet[i*DIM+m];
+            key1[m]=key[m]/2+candidateGsup[i*DIM+m];
           }
           if(monMap.find(monomial(key1,DIM))->second.size()>1 &&
              monMap.find(monomial(key,DIM))->second.conjunction(monMap.find(monomial(key1,DIM))->second)){
@@ -130,7 +140,7 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
         }
           
         if(del){
-          memmove(candidateSet+j*node_size,candidateSet+(j+1)*node_size,(candidateLength-j-1)*node_size );
+          memmove(candidateGsup+j*node_size, candidateGsup+(j+1)*node_size, (candidateLength-j-1)*node_size );
           candidateLength--;
             
           run=true;
@@ -159,14 +169,14 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateSet, int &candi
 
   delete[] indiceValues;
   return sosLength;
-
    
 }
+
 
 int SOSP::addSOSsup( vector<Monomial*> * indices_vec )
 {
     
-  int varNum=getvarNum(1);//all num of vaiable
+  int varNum=getAllVarNum(  );// getvarNum(1);//all num of vaiable
   int *varOccur=new int[varNum];
   int i,j;
 
@@ -194,7 +204,14 @@ int SOSP::addSOSsup( vector<Monomial*> * indices_vec )
       vars[j++]=i;
     }
   }
+
+  if(0==exactVarNum ){
+    exactVarNum=getAllVarNum( );
+    for( i=0;i< exactVarNum; i++  )
+      vars[i]=i;
+  }
   int varId=addvarElem(vars, exactVarNum);
+
   
   indice_t *indices= new indice_t[exactVarNum*length];
   
@@ -213,28 +230,28 @@ int SOSP::addSOSsup( vector<Monomial*> * indices_vec )
   int supportId=addSOSsupByIndice(varId, indices, length);
   
   
-
-  indice_t *temp=new indice_t[exactVarNum*length ];
+  indice_t *tempG=new indice_t[exactVarNum*length ];
 
   for (i = 0; i < length; i++) {
     for (j=0; j<exactVarNum; j++) {
-      temp[i*varNum+j]=(indices[i*varNum+j]+1)/2;
+      tempG[i*exactVarNum+j]=indices[i*exactVarNum+j]/2;
     }
   }
   
-  j= delRepeat(temp, length, exactVarNum );
+  int origLength= delRepeat(tempG, length, exactVarNum );
 
 
   int gLength=0;
   
-  indice_t *candidateSet =overConvexHull(temp, j , exactVarNum,  &gLength);
+  indice_t *candidateGsup =overConvexHull(tempG, origLength, exactVarNum,  &gLength);
 
   indice_t *SOSM=NULL;
   indice_t* GSUP=NULL;
-  int sosLength= reduceConvexHulll(exactVarNum, candidateSet, gLength, indices, length, &SOSM );
+  int sosLength= reduceConvexHulll(exactVarNum, candidateGsup, gLength, indices, length, &SOSM );
 
-  
-  GSUP=(indice_t*)realloc_d(candidateSet, gLength*exactVarNum*sizeof(indice_t));
+
+  GSUP=(indice_t*)realloc_d(candidateGsup, gLength*exactVarNum*sizeof(indice_t));
+
   qsortM(GSUP,exactVarNum , 0, gLength-1, compare);
   
   qsortM(SOSM, exactVarNum, 0,sosLength-1, compare);
@@ -244,11 +261,12 @@ int SOSP::addSOSsup( vector<Monomial*> * indices_vec )
     
   
   int AMlength=0;
-  ArrangeMatrix **AM=  createArrangeM(supportId,  SOSM ,&AMlength ,sosLength);
-  setArrangeM(supportId, AM, AMlength );
+  //  ArrangeMatrix **AM=  
+  createArrangeM(supportId,  SOSM ,&AMlength ,sosLength);
+  //  setArrangeM(supportId, AM, AMlength );
 
   delete[] indices;
-  delete[] temp;
+  delete[] tempG;
   delete[] vars;
   delete[] varOccur;
   return supportId;
@@ -272,7 +290,7 @@ int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec  ){
   }
   int varId=addvarElem(vars, varNum);
   int length=0;
-  
+
     
   for(it=degVec->begin(); it!=degVec->end(); it++){
     if(0==*it)
@@ -302,28 +320,30 @@ int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec  ){
   
   int supportId=addSOSsupByIndice(varId, indices, length);
   
-  
 
-  indice_t *temp=new indice_t[length*varNum ];
+  indice_t *tempG=new indice_t[length*varNum ];
 
   for(i=0; i<length; i++){
     for(j=0; j<varNum; j++){
-      temp[i*varNum+j]=(indices[i*varNum+j]+1)/2;
+      tempG[i*varNum+j]=(indices[i*varNum+j]+1)/2;
     }
   }
 
-  j=delRepeat(temp, length, varNum );
+  j=delRepeat(tempG, length, varNum );
 
 
   int gLength=0;
   
-  indice_t *candidateSet =overConvexHull(temp, j , varNum,  &gLength);
+  indice_t *candidateGsup =overConvexHull(tempG, j , varNum,  &gLength);
   indice_t *SOSM=NULL;
   indice_t* GSUP=NULL;
 
-  int sosLength= reduceConvexHulll(varNum, candidateSet, gLength, indices,length, &SOSM );
-  
-  GSUP=(indice_t*)realloc_d(candidateSet, gLength*varNum*sizeof(indice_t));
+  int sosLength= reduceConvexHulll(varNum, candidateGsup, gLength, indices,length, &SOSM );
+
+  if( 0!=gLength*varNum )
+    GSUP=(indice_t*)realloc_d(candidateGsup, gLength*varNum*sizeof(indice_t));
+  else
+    GSUP=candidateGsup;
   qsortM(GSUP,varNum , 0, gLength-1, compare);
   
   qsortM(SOSM, varNum, 0,sosLength-1, compare);
@@ -333,11 +353,12 @@ int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec  ){
   setSOSsup(supportId,sosLength, SOSM  );
   
   int AMlength=0;
-  ArrangeMatrix **AM=  createArrangeM( supportId,  SOSM,  &AMlength, sosLength);
-  setArrangeM(supportId, AM, AMlength );
+  //  ArrangeMatrix **AM=
+  createArrangeM( supportId,  SOSM,  &AMlength, sosLength);
+  //  setArrangeM(supportId, AM, AMlength );
     
   delete[] indices;
-  delete [] temp;
+  delete [] tempG;
   delete []vars;
   return supportId;
     
@@ -388,7 +409,7 @@ void SOSP::findSOS( Poly *poly ){
 
 void SOSP::interpolant(SOSProblem *sys, const int sep){
   title();
-  inter_sdp(sys,sep, "pro.txt","result.txt" );
+  inter_sdp(sys, sep, "pro.txt","result.txt" );
   left_printMap.clear();
 }
 void SOSP::clear(){

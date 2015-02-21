@@ -1374,6 +1374,17 @@ overConvexHull(const indice_t *genSet, const int genLength, const int dim, int *
 
   ASSERT(genLength>0,"at least have one point");
   int i,j,k;
+  if ( 1==genLength ){
+    indice_t * candidateSet=(indice_t*)malloc_d(dim);
+    for( i=0; i< dim; i++ )
+      candidateSet[ i ]=genSet[ i ];
+    *reLength=1;
+
+    return candidateSet;
+    
+  }
+
+
   node_dim=dim;
   node_b_size=dim*sizeof(indice_t);
   int max[dim];

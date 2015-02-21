@@ -95,7 +95,7 @@ int addBimapElem(Bimap *map , int value){
  * otherwise -1
  */
 
-int findMapElemByKey(Bimap *map, const int key){
+int findBimapByKey(Bimap *map, const int key){
   int loc=bisearchLocBettwen(map->keys, &key,map->size,2,compfun);
   if(loc<0) return -1;
   if(map->keys[2*loc]!=key) return -1;
