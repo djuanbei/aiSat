@@ -84,7 +84,7 @@
   SOSP problem;
 
   string unkown_name;
-  
+
   extern  int lineNum;
 
   extern int yyerror(const char *);
