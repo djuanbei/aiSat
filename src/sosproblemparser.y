@@ -24,7 +24,7 @@
   extern int yyparse();
   //  extern int yywrap();
   extern FILE* yyin;
-  extern SOSP problem;
+  //  extern SOSP problem;
  
   bool err;
   %}
