@@ -1,4 +1,5 @@
 
+
 /**
  * @file   sdpsolver.c
  * @author Liyun Dai <dlyun2009@gmail.com>
@@ -72,8 +73,11 @@ void wellform (SOSProblem *const sys, const int sep,  const int sosMId[], const 
   Poly *check=createPoly();
   Poly *mult;
   Poly *interpolant=copyPoly(sys->rhs);
-  
+
   p_mult_cons_assign(interpolant,-1.0/2);
+  printPoly( interpolant );
+  printf("\n");
+      
   
   //  p_add_cons_assign(interpolant,1.0/2);
 
@@ -82,6 +86,7 @@ void wellform (SOSProblem *const sys, const int sep,  const int sosMId[], const 
   for ( i = 0; i <sys->size; i += 1 ) {
 
     printf ( "\n%d...............................%d \n",i+1,i+1 );
+
     printf ( ".....................................\n" );
     if(sys->polyConstraints[i]->type==EQ){
 
@@ -107,6 +112,7 @@ void wellform (SOSProblem *const sys, const int sep,  const int sosMId[], const 
       mult=p_mult_Poly(sys->polys[i], posPoly);
       if(i+1>=sep){
         p_add_Poly_assign(interpolant,mult);
+
       }
 
       p_add_Poly_assign_del(check, mult);
@@ -122,6 +128,7 @@ void wellform (SOSProblem *const sys, const int sep,  const int sosMId[], const 
 
       if(i+1>=sep){
         p_add_Poly_assign(interpolant,mult);
+
       }
 
       p_add_Poly_assign_del(check,mult);
@@ -130,6 +137,7 @@ void wellform (SOSProblem *const sys, const int sep,  const int sosMId[], const 
       if(0==i){
         p_mult_cons_assign(poly,0.5);
         p_add_Poly_assign(interpolant,poly);
+
       }
       deletePoly(poly);
 

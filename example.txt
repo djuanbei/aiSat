@@ -1,7 +1,9 @@
 #example 17
-A = [x y] # variables
-f=x^6+y^6-2*x^2*y^2+x^4+y^4
+A = [x y z] # variables
+#f=x^6+y^6-2*x^2*y^2+x^4+y^4
+f=2*(x^8+y^8+z^8)-(x^6*y^2+x^6*z^2+y^6*x^2+y^6*z^2+z^6*x^2+z^6*y^2)-2*(x^4*y^4+x^4*z^4+y^4*z^4)+2*(x^4*y^2*z^2+y^4*x^2*z^2+z^4*y^2*x^2)
 findsos(f) # find sos decomposition of polynomial f
+
 
 #example 18
 M= { 1 x y x^2 x*y y^2 x^3 } # monomial used in sos unkown polynomial

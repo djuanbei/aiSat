@@ -24,7 +24,7 @@
   extern int yyparse();
   //  extern int yywrap();
   extern FILE* yyin;
-  extern SOSP problem;
+  //  extern SOSP problem;
  
   bool err;
   %}
@@ -588,6 +588,9 @@ INTERP '(' constraint_right ',' constraint_right ')'
   int i;
   for(i=0; i<$5->size; i++){
     addConstraint($3, $5->polys[i], $5->polyConstraints[i] );
+  }
+  for(i=0; i<$3->size; i++){
+    p_mult_cons_assign($3->polys[i],-1);
   }
   if(NULL==$3->rhs){
     $3->rhs=createPoly();
