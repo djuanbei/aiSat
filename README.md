@@ -25,5 +25,6 @@ example:
 ./aisat_release example.txt
 
 
-
+CAV13 eaxmple:
+./aisat_release example.txt
 
