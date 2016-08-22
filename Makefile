@@ -52,7 +52,7 @@ COPTIMIZE ?= -O3
 
 CFLAGS    += -I  include -I  ulib/include
 
-LFLAGS    +=  -L lib/   -lpoly -lsdp   -lm    -llapack -lblas -lgfortran   
+LFLAGS    +=  -L lib/   -lpoly -lsdp   -lm    -llapack -lblas    
   
 
 

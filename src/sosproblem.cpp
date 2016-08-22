@@ -353,7 +353,7 @@ int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec  ){
   setSOSsup(supportId,sosLength, SOSM  );
   
   int AMlength=0;
-  //  ArrangeMatrix **AM=
+  //  ArrangeMatrix **AM=x
   createArrangeM( supportId,  SOSM,  &AMlength, sosLength);
   //  setArrangeM(supportId, AM, AMlength );
     
