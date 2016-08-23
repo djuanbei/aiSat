@@ -3,31 +3,29 @@
  * @file   subpoly.h
  * @author Liyun Dai <dlyun2009@gmail.com>
  * @date   Sun Feb  8 13:54:28 2015
- * 
- * @brief  
- * 
- * 
+ *
+ * @brief
+ *
+ *
  */
 
-
-#ifndef  SUBPOLY_INC
-#define  SUBPOLY_INC
-#include	"polytype.h"
+#ifndef SUBPOLY_INC
+#define SUBPOLY_INC
+#include "polytype.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-  SubPoly *createSubPolyByPoly(Poly * poly);
+SubPoly *createSubPolyByPoly(Poly *poly);
 
-  SubPoly *createSubPoly(Poly * poly, const int size, int *loc);
+SubPoly *createSubPoly(Poly *poly, const int size, int *loc);
 
-  void printSubPoly ( const SubPoly * subpoly  );
-  void deleteSubPoly(SubPoly * poly);
+void printSubPoly(const SubPoly *subpoly);
+void deleteSubPoly(SubPoly *poly);
 
-
-#ifdef __cplusplus 
+#ifdef __cplusplus
 }
 #endif
 
-#endif   /* ----- #ifndef SUBPOLY_INC  ----- */
+#endif /* ----- #ifndef SUBPOLY_INC  ----- */

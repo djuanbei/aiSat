@@ -672,7 +672,7 @@ bool polyIsSOS (SubPoly * subpoly, PointList * ans, const int verbose ){
     delete[] temp;
   }
 
-  Blockmatrix *C;
+  Blockmatrix *C= (Blockmatrix*)malloc_d( sizeof( Blockmatrix ) );
 
   double **b= (double**) malloc_d(sizeof(double *));
 
@@ -695,7 +695,7 @@ bool polyIsSOS (SubPoly * subpoly, PointList * ans, const int verbose ){
     bsize[0]=gLength;
     /* printf(" bb size %d", blockSize); */
 
-    C=createBlockMatrixC(bsize, 1);
+    createBlockMatrixC(bsize, 1, C);
 
     //		int numofblock=blockSize;
 

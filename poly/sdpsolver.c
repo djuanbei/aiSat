@@ -319,13 +319,12 @@ void frontInsertBlock(Constraintmatrix *matrix, Sparseblock *block){
  *  size
  * =====================================================================================
  */
-Blockmatrix *
-createBlockMatrixC ( int blockSize[] , int const blockNum)
+
+void 
+createBlockMatrixC ( int blockSize[] , int const blockNum, Blockmatrix *C)
 {
   int i;
-  Blockmatrix *C;
 
-  C =(Blockmatrix *) malloc_d ( sizeof(Blockmatrix) );
 
   C->nblocks=blockNum;
 
@@ -354,8 +353,6 @@ createBlockMatrixC ( int blockSize[] , int const blockNum)
 
   }
 
-
-  return C;
 } 
 
 /*
@@ -1002,7 +999,7 @@ inter_sdp ( SOSProblem * const sys, const int sep, char const * fprobname , char
    */
   constraints=createConstraintmatrx(sys, &numofCons, sosMId, sosMap, blockSize, blockMap, &blockNum,  &b ); /* this place has some problem */
 
-  C=*createBlockMatrixC(blockSize, blockNum);    /* 1 is a default polynomial we want to notice  */
+  createBlockMatrixC(blockSize, blockNum, &C);    /* 1 is a default polynomial we want to notice  */
 
   //  double *b=malloc_d((numofCons+1)*sizeof(double));;
 
@@ -1064,6 +1061,7 @@ inter_sdp ( SOSProblem * const sys, const int sep, char const * fprobname , char
    * Free storage allocated for the problem and return.
    */
   free_prob(numofblock,numofCons,C,b,constraints,X,y,Z);
+  
 
   return ret;
 
@@ -1129,7 +1127,7 @@ int sdp_solver( SOSProblem *const sys, Poly** resP,   char const * fprobname , c
   
   constraints=createConstraintmatrx(sys, &numofCons, sosMId, sosMap, blockSize,blockMap, &blockNum,  &b ); /* this place has some problem */
 
-  C=*createBlockMatrixC(blockSize, blockNum);    /* 1 is a default polynomial we want to notice  */
+  createBlockMatrixC(blockSize, blockNum, &C);    /* 1 is a default polynomial we want to notice  */
 
 
   /* index start from 1 not 0 */

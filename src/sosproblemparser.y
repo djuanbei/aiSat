@@ -143,6 +143,7 @@ IDENT '=' MONO '(' VAR_LIST ',' '[' int_list ']'   ')'
 
   problem.monoMap[*($1)]=SOSP::addSOSsup( $5, $8);
   
+
   delete $1;
 
   delete $8;
@@ -231,7 +232,7 @@ var_list1 ',' IDENT
   
   int varIndex=findVarIndex($3->c_str());
   $1->push_back(varIndex);
-  
+  delete $3;
   $$=$1;
 }
 |
@@ -252,6 +253,8 @@ IDENT ',' IDENT {
   $$->push_back(varIndex );
   varIndex=findVarIndex($3->c_str());
   $$->push_back(varIndex);
+  delete $1;
+  delete $3;
 }
 |
 VAR ',' IDENT {
@@ -261,6 +264,7 @@ VAR ',' IDENT {
   $$->push_back($1 );
   int  varIndex=findVarIndex($3->c_str());
   $$->push_back(varIndex);
+  delete $3;
 }
 |
 IDENT ',' VAR {
@@ -270,6 +274,7 @@ IDENT ',' VAR {
   int  varIndex=findVarIndex($1->c_str());
   $$->push_back(varIndex);
   $$->push_back($3 );
+  delete $1;
 }
 |
 VAR ',' VAR {
@@ -285,6 +290,7 @@ var_list2   IDENT
   addVar($2->c_str() );
   int varIndex=findVarIndex($2->c_str());
   $1->push_back(varIndex);
+  delete $2;
   $$=$1;
 }
 |
@@ -299,6 +305,7 @@ IDENT  {
   int varIndex=findVarIndex($1->c_str());
   $$=new vector<int>();
   $$->push_back(varIndex);
+  delete $1;
 }
 |
 VAR  {
@@ -392,6 +399,7 @@ VAR
     key[i]=0;
   key[$1]=1;
   internal_addTerm($$,key,1);
+  delete[  ] key;
 
 }
 

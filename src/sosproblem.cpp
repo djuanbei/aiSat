@@ -166,7 +166,8 @@ static int reduceConvexHulll(const int DIM,  indice_t * candidateGsup, int &cand
   }
 
   ASSERT(i==sosLength,"");
-
+  delete[  ] key;
+  delete[  ] key1;
   delete[] indiceValues;
   return sosLength;
    

@@ -74,10 +74,10 @@ extern "C" {
   void frontInsertBlock(Constraintmatrix *matrix, Sparseblock *block);
 
 
-  Blockmatrix * createBlockMatrixC( int blockSize[] ,const int bnum); 
+  void  createBlockMatrixC( int blockSize[] ,const int bnum, Blockmatrix *); 
 
-  void
-  addMonomial ( indice_t** const  array,const indice_t *element, int *const capcity, int *const size ,const int n );
+
+  void   addMonomial ( indice_t** const  array,const indice_t *element, int *const capcity, int *const size ,const int n );
 
 
   indice_t ** createAllIndices(SOSProblem *const sys, int *const sosmMap, indice_t **const SOSM, int const  * lengthM, int size[], indice_t * varMap[], indice_t * pvarMap[], indice_t *  svarMap[]);
