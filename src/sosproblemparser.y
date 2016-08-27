@@ -605,7 +605,9 @@ INTERP '(' constraint_right ',' constraint_right ')'
   }
   if(NULL!=$5->rhs)
     p_add_Poly_assign_del($3->rhs, $5->rhs);
-  //  p_mult_cons_assign($3->rhs,-1);
+  
+  p_add_cons_assign($3->rhs,  1 );
+  p_mult_cons_assign($3->rhs,-1);
   
   problem.interpolant( $3, sep);
   

@@ -192,7 +192,7 @@ int sdp(int n, int k, struct blockmatrix C, double *a, double constant_offset,
 int easy_sdp(int n, int k, struct blockmatrix C, double *a, 
 	     struct constraintmatrix *constraints, double constant_offset,
 	     struct blockmatrix *pX, double **py, struct blockmatrix *pZ,
-	     double *ppobj, double *pdobj);
+             double *ppobj, double *pdobj);
 
 void tweakgap(int n, int k, double *a, struct constraintmatrix *constraints,
 	      double gap, struct blockmatrix Z, struct blockmatrix dZ, 

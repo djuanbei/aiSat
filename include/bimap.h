@@ -3,31 +3,28 @@
  * @file   bimap.h
  * @author Liyun Dai <dlyun2009@gmail.com>
  * @date   Sun Feb  8 12:21:47 2015
- * 
+ *
  * @brief  a map which can search by both key and value
- * 
- * 
+ *
+ *
  */
 
-#ifndef  BIMAP_INC
-#define  BIMAP_INC
+#ifndef BIMAP_INC
+#define BIMAP_INC
 
-
-#include	"config.h"
+#include "config.h"
 struct bimap {
   int capacity;
   int size;
-  int *values;// values[ 2*k ]=value; values[ 2*k+1 ]= key
-  int *keys;//keys[ 2*i ]=key; keys[ 2*i+1 ]=value
-
-};		
+  int *values;  // values[ 2*k ]=value; values[ 2*k+1 ]= key
+  int *keys;    // keys[ 2*i ]=key; keys[ 2*i+1 ]=value
+};
 
 typedef struct bimap Bimap;
 
-Bimap * createBimap(void);
+Bimap *createBimap(void);
 
-
-int addBimapElem(Bimap * , int value);
+int addBimapElem(Bimap *, int value);
 
 int findBimapByKey(Bimap *, const int key);
 
@@ -37,5 +34,4 @@ void deleteBimap(Bimap *);
 
 void clearBimap(Bimap *);
 
-
-#endif   /* ----- #ifndef BIMAP_INC  ----- */
+#endif /* ----- #ifndef BIMAP_INC  ----- */

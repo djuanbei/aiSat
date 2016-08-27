@@ -23,7 +23,7 @@ f2=20-3*x1^2-4*x2^3-10*x3^2
 h2=x1^2+x2^2-x3-1
 
 
-s0= sos(M)
+
 
 s1= sos(M)
 
@@ -34,6 +34,6 @@ s2= sos(M)
 M1 = monomial(A, [0 1 2 3 4])# monomial used in sos unkown polynomial
 
 p2 = poly(M1)
-
+s0= sos(M1)
 
 interp(s0+ f1*s1+ h1*p1+1, s2*f2+p2*h2)
