@@ -1,28 +1,30 @@
 #example 17
 A = [x y z] # variables
 #f=x^6+y^6-2*x^2*y^2+x^4+y^4
-f=2*(x^8+y^8+z^8)-(x^6*y^2+x^6*z^2+y^6*x^2+y^6*z^2+z^6*x^2+z^6*y^2)-2*(x^4*y^4+x^4*z^4+y^4*z^4)+2*(x^4*y^2*z^2+y^4*x^2*z^2+z^4*y^2*x^2)
+f=2*(x^8+y^8+z^8)-(x^6*y^2+x^6*z^2+y^6*x^2+y^6*z^2+z^6*x^2+z^6*y^2)-2*(x^4*y^4+x^4*z^4+y^4*z^4)+2*(x^4*y^2*z^2+y^4*x^2*z^2+z^4*y^2*x^2)  # constant polynomail declare
 findsos(f) # find sos decomposition of polynomial f
 
 
 #example 18
-M= { 1 x y x^2 x*y y^2 x^3 } # monomial used in sos unkown polynomial
+M= { 1 x y x^2 x*y y^2 x^3 } # monomial used in  unkown polynomial
 
 
 f1=4*x^2-y^2
 g=x-y
-s=sos(M) # an unknown sos polynomial whose support is M
+s=sos(M) # an unknown sos polynomial whose support is M (evey  momomial of s must occur in set M ),in orther words s =f_1^2+...+f_s^2 
+
 cg=poly(M)# an unknown polynomial whose suppport is M
-g*cg +s == f1
+
+g*cg +s == f1 #solve a constraintd polynomails problem 
 
 #example 19
 f2=1-x^2-y^2 # first coffiecient must be non-negative
-f3=x^2+4*y^2-10
+f3=x^2+4*y^2-10 
 s2=sos(M)
 s3=sos(M)
 s4=sos(M)
 # constraints polys only occour in left and constant poly only occur in right part
-s4+s2+s3 == 10
+s4+s2+s3 == 10 # solve a constraintd polynomails problem 
 
 ff= x^2+2*x*y+y^2+1
 s6=sos(M)
