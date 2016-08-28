@@ -127,7 +127,7 @@ LEX: src/sosproblemscan.l
 	lex -o include/sosproblemscan.h src/sosproblemscan.l
 
 YACC: src/sosproblemparser.y
-	bison -o  src/sosproblemparser.cpp  -v src/sosproblemparser.y
+	bison  -o  src/sosproblemparser.cpp  -v src/sosproblemparser.y
 
 ## Build rule
 %.oc:	%.$(SRCSUF)

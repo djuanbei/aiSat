@@ -36,4 +36,4 @@ M1 = monomial(A, [0 1 2 3 4])# monomial used in sos unkown polynomial
 p2 = poly(M1)
 s0= sos(M1)
 
-interp(s0+ f1*s1+ h1*p1+1, s2*f2+p2*h2)
+interp(s0+ f1*s1+ h1*p1, s2*f2+p2*h2)

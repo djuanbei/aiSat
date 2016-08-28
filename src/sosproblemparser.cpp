@@ -485,12 +485,12 @@ static const yytype_uint16 yyrline[] =
        0,    90,    90,    96,    98,   101,   105,   107,   109,   111,
      116,   118,   127,   141,   156,   166,   175,   187,   189,   193,
      198,   207,   213,   222,   225,   229,   239,   247,   260,   270,
-     280,   288,   297,   303,   311,   321,   329,   336,   345,   354,
-     364,   371,   382,   390,   409,   412,   417,   423,   432,   438,
-     447,   453,   460,   467,   474,   492,   519,   550,   586,   593,
-     627,   638,   649,   664,   675,   687,   700,   710,   723,   727,
-     736,   747,   762,   773,   784,   797,   809,   820,   831,   842,
-     853,   857,   867,   879
+     280,   288,   297,   303,   311,   321,   327,   334,   343,   352,
+     362,   369,   380,   388,   407,   410,   415,   421,   430,   436,
+     445,   451,   458,   465,   472,   490,   517,   548,   584,   591,
+     626,   637,   648,   663,   674,   686,   699,   709,   722,   726,
+     735,   746,   761,   772,   783,   795,   807,   818,   829,   840,
+     851,   855,   865,   876
 };
 #endif
 
@@ -1647,7 +1647,7 @@ yyreduce:
     break;
 
   case 36:
-#line 330 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 328 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   p_add_Poly_assign_del((yyvsp[-2].poly),(yyvsp[0].poly)); 
   (yyval.poly)=(yyvsp[-2].poly);
@@ -1657,7 +1657,7 @@ yyreduce:
     break;
 
   case 37:
-#line 337 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 335 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   p_mult_cons_assign((yyvsp[0].poly),-1); 
   p_add_Poly_assign_del((yyvsp[-2].poly),(yyvsp[0].poly)); 
@@ -1669,7 +1669,7 @@ yyreduce:
     break;
 
   case 38:
-#line 346 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 344 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
 
   p_mult_Poly_assign_del((yyvsp[-2].poly),(yyvsp[0].poly));
@@ -1681,7 +1681,7 @@ yyreduce:
     break;
 
   case 39:
-#line 355 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 353 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
     
   p_pow_assign((yyvsp[-2].poly),(yyvsp[0].dilVal));
@@ -1693,7 +1693,7 @@ yyreduce:
     break;
 
   case 40:
-#line 365 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 363 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.poly)=copyPoly((yyvsp[0].poly));
 }
@@ -1701,7 +1701,7 @@ yyreduce:
     break;
 
   case 41:
-#line 372 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 370 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
 
   (yyval.poly)=createPoly();
@@ -1714,7 +1714,7 @@ yyreduce:
     break;
 
   case 42:
-#line 382 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 380 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
 
   (yyval.poly)=createPoly();
@@ -1726,7 +1726,7 @@ yyreduce:
     break;
 
   case 43:
-#line 391 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 389 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.poly)=createPoly();
   polyChangeVarId((yyval.poly),1);
@@ -1745,19 +1745,19 @@ yyreduce:
     break;
 
   case 44:
-#line 410 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 408 "src/sosproblemparser.y" /* yacc.c:1646  */
     {(yyval.mVec)=(yyvsp[0].mVec); }
 #line 1751 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 413 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 411 "src/sosproblemparser.y" /* yacc.c:1646  */
     {(yyval.mVec)=(yyvsp[0].mVec); }
 #line 1757 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 418 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 416 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyvsp[-2].mVec)->push_back((yyvsp[0].mon));
   (yyval.mVec)=(yyvsp[-2].mVec);
@@ -1766,7 +1766,7 @@ yyreduce:
     break;
 
   case 47:
-#line 424 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 422 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.mVec)=new vector<Monomial*>();
   (yyval.mVec)->push_back((yyvsp[-2].mon));
@@ -1776,7 +1776,7 @@ yyreduce:
     break;
 
   case 48:
-#line 433 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 431 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyvsp[-1].mVec)->push_back((yyvsp[0].mon));
   (yyval.mVec)=(yyvsp[-1].mVec);
@@ -1785,7 +1785,7 @@ yyreduce:
     break;
 
   case 49:
-#line 439 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 437 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.mVec)=new vector<Monomial*>();
   (yyval.mVec)->push_back((yyvsp[0].mon));
@@ -1795,7 +1795,7 @@ yyreduce:
     break;
 
   case 50:
-#line 448 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 446 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyvsp[-4].mon)->addIndices((yyvsp[-2].dilVal),(yyvsp[0].dilVal));
   (yyval.mon)=(yyvsp[-4].mon);
@@ -1804,7 +1804,7 @@ yyreduce:
     break;
 
   case 51:
-#line 454 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 452 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
 
   (yyvsp[-2].mon)->addIndices((yyvsp[0].dilVal),1);
@@ -1814,7 +1814,7 @@ yyreduce:
     break;
 
   case 52:
-#line 460 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 458 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   int varNum=getAllVarNum();//getvarNum(1);
   (yyval.mon)=new Monomial(varNum);
@@ -1825,7 +1825,7 @@ yyreduce:
     break;
 
   case 53:
-#line 468 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 466 "src/sosproblemparser.y" /* yacc.c:1646  */
     { 
   int varNum=getAllVarNum();//varNum(1);
   (yyval.mon)=new Monomial(varNum);
@@ -1835,7 +1835,7 @@ yyreduce:
     break;
 
   case 54:
-#line 474 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 472 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   int varNum=getAllVarNum();//varNum(1);
   (yyval.mon)=new Monomial(varNum);
@@ -1844,7 +1844,7 @@ yyreduce:
     break;
 
   case 55:
-#line 493 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 491 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
 
   (yyval.prob)=(yyvsp[-2].prob);
@@ -1874,7 +1874,7 @@ yyreduce:
     break;
 
   case 56:
-#line 520 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 518 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
 
   (yyval.prob)=(yyvsp[-3].prob);
@@ -1907,7 +1907,7 @@ yyreduce:
     break;
 
   case 57:
-#line 551 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 549 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   
   (yyval.prob)=(yyvsp[-2].prob);
@@ -1946,7 +1946,7 @@ yyreduce:
     break;
 
   case 58:
-#line 587 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 585 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   problem.findSOS((yyvsp[-1].poly));
   deletePoly((yyvsp[-1].poly));
@@ -1955,7 +1955,7 @@ yyreduce:
     break;
 
   case 59:
-#line 594 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 592 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   int sep= (yyvsp[-3].prob)->size+1;
   int i;
@@ -1971,6 +1971,7 @@ yyreduce:
   if(NULL!=(yyvsp[-1].prob)->rhs)
     p_add_Poly_assign_del((yyvsp[-3].prob)->rhs, (yyvsp[-1].prob)->rhs);
   
+  p_add_cons_assign((yyvsp[-3].prob)->rhs,  1 );
   p_mult_cons_assign((yyvsp[-3].prob)->rhs,-1);
   
   problem.interpolant( (yyvsp[-3].prob), sep);
@@ -1984,11 +1985,11 @@ yyreduce:
   /* free($3->polyConstraints ); */
   /* free($3); */
 }
-#line 1988 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 1989 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 628 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 627 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-4].prob);
 
@@ -1996,11 +1997,11 @@ yyreduce:
   int index=addConstraint((yyval.prob),(yyvsp[-2].poly), pcons );
   problem.left_printMap[index]=unkown_name;
 }
-#line 2000 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2001 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 639 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 638 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-4].prob);
   PolyConstraint *pcons=copyPolyConstraint((yyvsp[-2].polycons));
@@ -2008,11 +2009,11 @@ yyreduce:
   int index=addConstraint((yyval.prob),(yyvsp[0].poly), pcons );
   problem.left_printMap[index]=unkown_name;
 }
-#line 2012 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2013 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 650 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 649 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-4].prob);
 
@@ -2022,11 +2023,11 @@ yyreduce:
   int index=addConstraint((yyval.prob),(yyvsp[-2].poly), pcons );
   problem.left_printMap[index]=unkown_name;
 }
-#line 2026 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2027 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 665 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 664 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-4].prob);
 
@@ -2035,11 +2036,11 @@ yyreduce:
   int index=addConstraint((yyval.prob), (yyvsp[0].poly), pcons );
   problem.left_printMap[index]=unkown_name;
 }
-#line 2039 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2040 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 676 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 675 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-2].prob);
   //  Poly *poly=copyPoly($3);
@@ -2050,11 +2051,11 @@ yyreduce:
     p_add_Poly_assign((yyval.prob)->rhs,(yyvsp[0].poly) );
   }
 }
-#line 2054 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2055 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 688 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 687 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-2].prob);
   //  Poly *poly=copyPoly($3);
@@ -2065,11 +2066,11 @@ yyreduce:
     p_add_Poly_assign((yyval.prob)->rhs,(yyvsp[0].poly) );
   }
 }
-#line 2069 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2070 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 701 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 700 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-2].prob);
   Poly * poly=createPoly();
@@ -2078,11 +2079,11 @@ yyreduce:
   int index=addConstraint((yyval.prob),poly, pcons );
   problem.left_printMap[index]=unkown_name;
 }
-#line 2082 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2083 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 711 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 710 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-2].prob);
   Poly * poly=createPoly();
@@ -2093,17 +2094,17 @@ yyreduce:
   problem.left_printMap[index]=unkown_name;
   
 }
-#line 2097 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2098 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 724 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 723 "src/sosproblemparser.y" /* yacc.c:1646  */
     {  (yyval.prob)=(yyvsp[-1].prob); }
-#line 2103 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2104 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 728 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 727 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=problem.problem;
   PolyConstraint *pcons=copyPolyConstraint((yyvsp[0].polycons));
@@ -2111,11 +2112,11 @@ yyreduce:
   problem.left_printMap[index]=unkown_name;
   
 }
-#line 2115 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2116 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 737 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 736 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=problem.problem;
   PolyConstraint *pcons=copyPolyConstraint((yyvsp[-2].polycons));
@@ -2123,11 +2124,11 @@ yyreduce:
   problem.left_printMap[index]=unkown_name;
   
 }
-#line 2127 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2128 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 748 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 747 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob) =problem.problem;
   Poly *poly=createPoly();
@@ -2137,11 +2138,11 @@ yyreduce:
   int index=addConstraint((yyval.prob),poly, pcons );
   problem.left_printMap[index]=unkown_name;
 }
-#line 2141 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2142 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 763 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 762 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-4].prob);
 
@@ -2150,11 +2151,11 @@ yyreduce:
   int index=addConstraint((yyval.prob),(yyvsp[-2].poly), pcons );
   problem.right_printMap[index]=unkown_name;
 }
-#line 2154 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2155 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 774 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 773 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
 
   p_mult_cons_assign((yyvsp[0].poly),-1);
@@ -2163,11 +2164,11 @@ yyreduce:
   int index=addConstraint((yyval.prob),(yyvsp[0].poly), pcons );
   problem.right_printMap[index]=unkown_name;
 }
-#line 2167 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2168 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 785 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 784 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-4].prob);
 
@@ -2176,11 +2177,11 @@ yyreduce:
   int index=addConstraint((yyval.prob),(yyvsp[-2].poly), pcons );
   problem.right_printMap[index]=unkown_name;
 }
-#line 2180 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2181 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 798 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 796 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-4].prob);
 
@@ -2189,11 +2190,11 @@ yyreduce:
   problem.right_printMap[index]=unkown_name;
 
 }
-#line 2193 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2194 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 810 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 808 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-2].prob);
 
@@ -2203,11 +2204,11 @@ yyreduce:
     p_add_Poly_assign((yyval.prob)->rhs,(yyvsp[0].poly) );
   }
 }
-#line 2207 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2208 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 821 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 819 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-2].prob);
   p_mult_cons_assign((yyvsp[0].poly),-1  );
@@ -2217,11 +2218,11 @@ yyreduce:
     p_add_Poly_assign((yyval.prob)->rhs,(yyvsp[0].poly) );
   }
 }
-#line 2221 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2222 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 832 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 830 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-2].prob);
   Poly * poly=createPoly();
@@ -2231,11 +2232,11 @@ yyreduce:
   int index=addConstraint((yyval.prob),poly, pcons );
   problem.right_printMap[index]=unkown_name;
 }
-#line 2235 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2236 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 79:
-#line 843 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 841 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob)=(yyvsp[-2].prob);
   Poly * poly=createPoly();
@@ -2245,17 +2246,17 @@ yyreduce:
   int index=addConstraint((yyval.prob),poly, pcons );
   problem.right_printMap[index]=unkown_name;
 }
-#line 2249 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2250 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 854 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 852 "src/sosproblemparser.y" /* yacc.c:1646  */
     {  (yyval.prob)=(yyvsp[-1].prob); }
-#line 2255 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2256 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 81:
-#line 857 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 855 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
 
   (yyval.prob) =createSOSProblem();
@@ -2265,11 +2266,11 @@ yyreduce:
   
   problem.right_printMap[index]=unkown_name;    
 }
-#line 2269 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2270 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 867 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 865 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob) =createSOSProblem();
   PolyConstraint *pcons=copyPolyConstraint((yyvsp[-2].polycons));
@@ -2279,11 +2280,11 @@ yyreduce:
   problem.right_printMap[index]=unkown_name;    
   
 }
-#line 2283 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2284 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
   case 83:
-#line 880 "src/sosproblemparser.y" /* yacc.c:1646  */
+#line 877 "src/sosproblemparser.y" /* yacc.c:1646  */
     {
   (yyval.prob) =createSOSProblem();
   
@@ -2294,11 +2295,11 @@ yyreduce:
   int index=addConstraint((yyval.prob),poly, pcons );
   problem.right_printMap[index]=unkown_name;
 }
-#line 2298 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2299 "src/sosproblemparser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2302 "src/sosproblemparser.cpp" /* yacc.c:1646  */
+#line 2303 "src/sosproblemparser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2526,7 +2527,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 893 "src/sosproblemparser.y" /* yacc.c:1906  */
+#line 890 "src/sosproblemparser.y" /* yacc.c:1906  */
 
 #include "sosproblemscan.h"
 
