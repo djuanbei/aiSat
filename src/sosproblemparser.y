@@ -323,8 +323,6 @@ poly:
   $$=$2;
 }
 
-
-
 |
 poly '+' poly
 {
@@ -794,7 +792,6 @@ constraint_right '-' poly '*' UNHNOW
 
 |
 
-
 constraint_right '-' UNHNOW '*' poly
 {
   $$=$1;
@@ -874,7 +871,6 @@ UNHNOW '*' poly{
   problem.right_printMap[index]=unkown_name;    
   
 }
-
 
 |
 UNHNOW
