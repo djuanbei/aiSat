@@ -10,7 +10,7 @@
 A = [x1 x2 x3] #variables
 
 
-M = monomial(A, [0 1 2]) # monomial used in sos unkown polynomial
+M = monomial(A, [0 1 2]) # monomial used in sos unkown polynomial, the degree of these momails must contain in set {0,1,2}
 
 
 f1=x1^2+x2^2+x3^2-2
@@ -21,8 +21,6 @@ h1=1.2*x1^2+x2^2+x1*x3
 f2=20-3*x1^2-4*x2^3-10*x3^2
 
 h2=x1^2+x2^2-x3-1
-
-
 
 
 s1= sos(M)
@@ -36,4 +34,4 @@ M1 = monomial(A, [0 1 2 3 4])# monomial used in sos unkown polynomial
 p2 = poly(M1)
 s0= sos(M1)
 
-interp(s0+ f1*s1+ h1*p1, s2*f2+p2*h2)
+interp(s0+ f1*s1+ h1*p1, s2*f2+p2*h2) # find sos polynomails s0, s1, p1, s2, p2  which statisfy s0+ f1*s1+ h1*p1+ s2*f2+p2*h2= -1, the interpolant is: -1/2(1+ s2*f2+p2*h2+s0) > 0

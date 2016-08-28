@@ -406,7 +406,7 @@ struct paramstruc parameters;
       Print out some status information.
     */
 
-    if (printlevel >= 1)
+    if (printlevel >= 2)
     {
         printf("Iter: %2d Ap: %.2e Pobj: % .7e Ad: %.2e Dobj: % .7e \n",iter,alphap,*pobj,alphad,*dobj);
         fflush(stdout);
@@ -1246,7 +1246,7 @@ struct paramstruc parameters;
                 if (printlevel >= 3)
                     printf("Finishing with a final affine step.\n");
                 iter=iter+1;
-                if (printlevel >= 1)
+                if (printlevel >= 2)
                     printf("Iter: %2d Ap: %.2e Pobj: % .7e Ad: %.2e Dobj: % .7e \n",iter,alphap1,affpobj,alphad1,affdobj);
                 if (printlevel >= 2)
                     printf("Total Iterations: %d \n",iter);
@@ -2138,7 +2138,7 @@ struct paramstruc parameters;
         */
 
         iter++;
-        if (printlevel >= 1)
+        if (printlevel >= 2)
         {
             printf("Iter: %2d Ap: %.2e Pobj: % .7e Ad: %.2e Dobj: % .7e \n",iter,alphap,*pobj,alphad,*dobj);
             fflush(stdout);

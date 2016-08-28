@@ -77,7 +77,7 @@ double *pdobj;
    */
    initparams(&params, &printlevel);
    
-   if (printlevel) printlevel = csdp_verbose;
+   printlevel = csdp_verbose;
 
 
   /*
@@ -578,7 +578,7 @@ struct constraintmatrix *constraints;
   struct sparseblock *p;
 
   for (i = 1; i <= k; i++) {
-    if (printlevel > 0) printf("Checking constraint %d \n", i);
+    if (printlevel > 2) printf("Checking constraint %d \n", i);
 
     p = constraints[i].blocks;
     if (p == NULL) {
