@@ -11,10 +11,10 @@
  */
 
 #include "sdpsolver.h"
-#include "util.h"
-#include "poly.h"
 #include <assert.h>
+#include "poly.h"
 #include "search.h"
+#include "util.h"
 
 SparseSOSblock *createSparseSOSblock(void) {
   SparseSOSblock *re;
@@ -64,11 +64,19 @@ static Poly *getConstraintPoly(SOSProblem *const sys, const int index,
   return NULL;
 }
 
-/**
- *  interpolant:= -( 1/2+1/2f0+\sum_{f\in T_2}) >0
- * 
- */
 
+
+/** 
+ * @brief  interpolant:= -( 1/2+1/2f0+\sum_{f\in T_2}) >0
+ * 
+ * @param sys 
+ * @param sep 
+ * @param sosMId 
+ * @param sosMap 
+ * @param blockSize 
+ * @param blockMap 
+ * @param X 
+ */
 void wellform(SOSProblem *const sys, const int sep, const int sosMId[],
               const int sosMap[], const int blockSize[], const int blockMap[],
               Blockmatrix *const X) {
@@ -82,7 +90,6 @@ void wellform(SOSProblem *const sys, const int sep, const int sosMId[],
 
   printf("\n");
 
-
   k = 0;
 
   for (i = 0; i < sys->size; i += 1) {
@@ -92,13 +99,12 @@ void wellform(SOSProblem *const sys, const int sep, const int sosMId[],
     if (sys->polyConstraints[i]->type == EQ) {
       Poly *posPoly = sosConvertPoly(X, k, blockSize[k],
                                      sosMId[sosMap[abs(blockMap[k]) - 1]]);
-      
+
       k++;
       Poly *negPoly = sosConvertPoly(X, k, blockSize[k],
                                      sosMId[sosMap[abs(blockMap[k]) - 1]]);
 
       p_mult_cons_assign(negPoly, -1);
-
 
       p_add_Poly_assign_del(posPoly, negPoly);
       printf("%i normal polynomial :\n", i + 1);
@@ -150,7 +156,6 @@ void wellform(SOSProblem *const sys, const int sep, const int sosMId[],
   printf(" > 0\n");
   deletePoly(check);
   deletePoly(interpolant);
-
 }
 
 void enlargeSparseSOSblock(SparseSOSblock *const block) {
@@ -203,16 +208,6 @@ Sparseblock *createblock(const int blockNum, const int consnum,
 
   return re;
 }
-/*
- * ===  FUNCTION
- *======================================================================
- *         Name:  createSparseblock
- *         dailiyun
- *2012年05月09日
- *blockNum block number
- *  Description:
- * =====================================================================================
- */
 
 Sparseblock *createSparseblock(const int blockNum, const int bsize,
                                const int consnum, const int nument) {
@@ -244,20 +239,21 @@ void frontInsertBlock(Constraintmatrix *matrix, Sparseblock *block) {
   matrix->blocks = block;
 }
 
-/*
- * ===  FUNCTION
- * ======================================================================
- *         Name:  createBlockMatrixC
- *  Description:  construct sdp's matrix  C. blockNum is the number of block of
+
+
+/** 
+ * @brief  construct sdp's matrix  C. blockNum is the number of block of
  * matrix C. n
  *  is the respect to polynomial's number of variables and d is the total degree
  * of
  *  respect with polynomial . We need d is a even number. blockSize every block
  * matrix
- *  size
- * =====================================================================================
+ *  size 
+ * 
+ * @param blockSize 
+ * @param blockNum 
+ * @param C 
  */
-
 void createBlockMatrixC(int blockSize[], int const blockNum, Blockmatrix *C) {
   int i;
 
@@ -290,18 +286,25 @@ void createBlockMatrixC(int blockSize[], int const blockNum, Blockmatrix *C) {
   }
 }
 
-/*
- * ===  FUNCTION
- *======================================================================
- *         Name:  createAllIndices
- *
- *  Description:  sys is the set of polynomials, n is the number of variables d
+
+
+/** 
+ * @brief  sys is the set of polynomials, n is the number of variables d
  *is the
  *  total degree of multiplication  sos polynomial.
  *  Find all monomials occurs in this multiplicity system.
- * =====================================================================================
+ * 
+ * @param sys 
+ * @param sosmMap 
+ * @param SOSM 
+ * @param lengthM 
+ * @param reSize 
+ * @param varMap 
+ * @param polyVarMap 
+ * @param sosVarMap 
+ * 
+ * @return 
  */
-
 indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
                             indice_t **const SOSM, int const *lengthM,
                             int reSize[], indice_t *varMap[],
@@ -495,43 +498,13 @@ void addMonomial(indice_t **const array, const indice_t *element,
 
   (*size)++;
 
-  /*
-   *    if(size<*capacity){
-   *        (*array)[size]  =(indice_t*) malloc ( n*sizeof(indice_t) );
-   *
-   *        if ( (*array)[size]==NULL ) {
-   *            fprintf ( stderr, "\ndynamic memory allocation failed\n" );
-   *            exit (EXIT_FAILURE);
-   *        }
-   *
-   *        for ( i = 0; i <n; i += 1 ) {
-   *            (*array)[size][i]=element[i];
-   *
-   *        }
-   *        return ;
-   *    }
-   *
-   *    else{
-   *
-   *        *capacity=(int) (*capacity) *1.1+4;
-   *        *array=(indice_t **) realloc( *array,(*capacity)*sizeof(indice_t
-   **));
-   *
-   *        if ( *array==NULL ) {
-   *
-   *            printf ( "cannot allow memory\n" );
-   *            exit(1);
-   *        }
-   *
-   *        addMonomial(array,element,capacity,size,n);
-   *
-   *    }
-   */
 
-} /* -----  end of function addMonomial  ----- */
+
+}
+
 
 /**
- *  sys  allM is the set of all the monomials in
+ *@brief  sys  allM is the set of all the monomials in
  *  the sys. numofCons  is the number of variables in sys. deg is the total
  *degree   of sos
  *  polynomial consSize is the length of allM . blocksize is the number of
@@ -610,7 +583,6 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
 
   *blockNum = 0;
   for (i = 0; i < sys->size; i += 1) {
-    
     if (sys->polyConstraints[i]->type == EQ) {
       blockSize[*blockNum] = tempblockSize[sosmMap[i]];
       blockMap[*blockNum] = i + 1; /* more attention on +1 */
@@ -667,7 +639,6 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
     }
   }
 
-
   Constraintmatrix *re = createNconstraintmatrix(
       *numofCons); /* every monomial w.r.t. to a constraint */
 
@@ -684,9 +655,8 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
        *block has a
        *  sosM polynomial respective.
        *-----------------------------------------------------------------------------*/
-      block[i][j] =
-          createSparseSOSblock(); /* every polynomial with regard to a
-                                     constraint block */
+      block[i][j] = createSparseSOSblock(); /* every polynomial with regard to a
+                                               constraint block */
     }
   }
 
@@ -736,26 +706,18 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
           k++;
         }
 
-        if (blockMap[i] > 0){
-
-          addSparse(
-              block[index][i],
-              j, sys->polys[p]->coef[h]);          
+        if (blockMap[i] > 0) {
+          addSparse(block[index][i], j, sys->polys[p]->coef[h]);
         }
         /* >= index is the constraints
            location and i is the number of
            block, j is the index of SOSM. */
-        else{
-
-          addSparse(
-              block[index][i], j,
-              (-1) * (sys->polys[p]
-                      ->coef[h]));
-          
+        else {
+          addSparse(block[index][i], j, (-1) * (sys->polys[p]->coef[h]));
         }
-           /* <= index is the constraints location
-                                          and j is the number of polynomial it
-                                          respect to. */
+        /* <= index is the constraints location
+                                       and j is the number of polynomial it
+                                       respect to. */
       }
     }
   }
@@ -825,7 +787,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
 } /* -----  end of function createConstraintmatrix  ----- */
 
 /**
- *   From Putiner's positivtellensatz Theorem
+ *@brief   From Putiner's positivtellensatz Theorem
  *  The main function we use.
  *  num is a label of whether output the problem solution in a file. sys is the
  *  polynomials . The sys is a constrain system where all the constraints are
@@ -967,11 +929,9 @@ int inter_sdp(SOSProblem *const sys, const int sep, char const *fprobname,
   return ret;
 }
 
-/*
- * ===  FUNCTION
- *======================================================================
- *         Name:  sdp_solver
- *         From Putiner's positivtellensatz Theorem
+/** 
+ * @brief 
+ * From Putiner's positivtellensatz Theorem
  *  Description:  The main function we use.
  *  num is a label of whether output the problem solution in a file. sys is the
  *  polynomials . The sys is a constrain system where all the constraints are
@@ -986,8 +946,12 @@ int inter_sdp(SOSProblem *const sys, const int sep, char const *fprobname,
  *  a set of sos polynomials which satisfy
  *  find sys->cons satisfy that
  *  \sum_{i=0}^{sys->size-1}sys->polys[i]*sys->cons[i]=rhs->rhs
- *
- * =====================================================================================
+ * @param sys 
+ * @param resP 
+ * @param fprobname 
+ * @param fsolname 
+ * 
+ * @return 
  */
 int sdp_solver(SOSProblem *const sys, Poly **resP, char const *fprobname,
                char const *fsolname) {

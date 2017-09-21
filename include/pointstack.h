@@ -3,30 +3,28 @@
  * @file   pointstack.h
  * @author Liyun Dai <dlyun2009@gmail.com>
  * @date   Sun Feb  8 12:52:39 2015
- * 
- * @brief  
- * 
- * 
+ *
+ * @brief
+ *
+ *
  */
 
+#ifndef POINTSTACK_INC
+#define POINTSTACK_INC
 
-#ifndef  POINTSTACK_INC
-#define  POINTSTACK_INC
-
-
-#include	"config.h"
+#include "config.h"
 
 struct pointStack {
   int capacity;
   int size;
-  void ** data;
+  void **data;
   void (*delFun)(void *);
-	
-};				/* ----------  end of struct pointStack  ---------- */
+
+};
 
 typedef struct pointStack PointStack;
 
-PointStack * createStack(void (*)(void *));
+PointStack *createStack(void (*)(void *));
 
 void reScale_S(PointStack *);
 
@@ -35,8 +33,7 @@ int isEmpty_S(PointStack *);
 
 void push_S(PointStack *, void *);
 
-void* top_S(PointStack *); 
+void *top_S(PointStack *);
 void pop_S(PointStack *);
 
-
-#endif   /* ----- #ifndef POINTSTACK_INC  ----- */
+#endif 

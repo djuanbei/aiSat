@@ -25,51 +25,47 @@
 
 #include "gcd.h"
 
-unsigned long gcd(unsigned long a, unsigned long b)
-{
-	unsigned long r;
+unsigned long gcd(unsigned long a, unsigned long b) {
+  unsigned long r;
 
-	while (b) {
-		r = a % b;
-		a = b;
-		b = r;
-	}
-	return a;
+  while (b) {
+    r = a % b;
+    a = b;
+    b = r;
+  }
+  return a;
 }
 
-void egcd(unsigned long a, unsigned long b, long *x, long *y)
-{
-	long x1, x2, x3, y1, y2, y3;
-	unsigned long r, q;
+void egcd(unsigned long a, unsigned long b, long *x, long *y) {
+  long x1, x2, x3, y1, y2, y3;
+  unsigned long r, q;
 
-	x1 = 1;
-	x2 = 0;
-	y1 = 0;
-	y2 = 1;
+  x1 = 1;
+  x2 = 0;
+  y1 = 0;
+  y2 = 1;
 
-	while (b != 0) {
-		q = a / b;
-		r = a % b;
-		a = b;
-		b = r;
-		x3 = x1 - q * x2;
-		x1 = x2;
-		x2 = x3;
-		y3 = y1 - q * y2;
-		y1 = y2;
-		y2 = y3;
-	}
-	*x = x1;
-	*y = y1;
+  while (b != 0) {
+    q = a / b;
+    r = a % b;
+    a = b;
+    b = r;
+    x3 = x1 - q * x2;
+    x1 = x2;
+    x2 = x3;
+    y3 = y1 - q * y2;
+    y1 = y2;
+    y2 = y3;
+  }
+  *x = x1;
+  *y = y1;
 }
 
-unsigned long invert(unsigned long m, unsigned long b)
-{
-	long s, t;
+unsigned long invert(unsigned long m, unsigned long b) {
+  long s, t;
 
-	egcd(m, b, &t, &s);
+  egcd(m, b, &t, &s);
 
-	if (s < 0)
-		return m + s;
-	return s;
+  if (s < 0) return m + s;
+  return s;
 }

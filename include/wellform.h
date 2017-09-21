@@ -1,7 +1,6 @@
-#ifndef  WELLFORM_INC
-#define  WELLFORM_INC
+#ifndef WELLFORM_INC
+#define WELLFORM_INC
 
-#include	"poly.h"
+#include "poly.h"
 
-
-#endif   /* ----- #ifndef WELLFORM_INC  ----- */
+#endif

@@ -30,15 +30,15 @@
 extern "C" {
 #endif
 
-unsigned long gcd(unsigned long a, unsigned long b);
+  unsigned long gcd(unsigned long a, unsigned long b);
 
-/* compute x,y st. ax + by = 1 */
-void egcd(unsigned long a, unsigned long b, long *x, long *y);
+  /* compute x,y st. ax + by = 1 */
+  void egcd(unsigned long a, unsigned long b, long *x, long *y);
 
-/* computes a st. a * b = 1 mod m */
-unsigned long invert(unsigned long m, unsigned long b);
+  /* computes a st. a * b = 1 mod m */
+  unsigned long invert(unsigned long m, unsigned long b);
 
 #ifdef __cplusplus
 }
 #endif
-#endif		    /* __ULIB_GCD_H */
+#endif 

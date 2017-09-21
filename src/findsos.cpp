@@ -18,22 +18,21 @@
 
 #include "findsos.h"
 
-#include "polyissos.h"
 #include <cmath>
-#include "sdpsolver.h"
-#include "util.h"
-#include "poly.h"
-#include "selfassert.h"
-#include "polyissos.h"
-#include "convexhull.h"
-#include "subpoly.h"
-#include "sort.h"
-#include "search.h"
 #include <map>
+#include "convexhull.h"
+#include "poly.h"
+#include "polyissos.h"
+#include "sdpsolver.h"
+#include "search.h"
+#include "selfassert.h"
+#include "sort.h"
+#include "subpoly.h"
+#include "util.h"
 
-#include "pointlist.h"
-#include "monomial.h"
 #include "iostream"
+#include "monomial.h"
+#include "pointlist.h"
 
 using std::map;
 using std::cout;
@@ -143,7 +142,7 @@ static int exactConvHull(const SubPoly *subpoly, indice_t *candidateSet,
   }
 
   //	for(open_hash_map<nominal,int>::const_iterator
-  //it=monMap.begin();it!=monMap.end();++it){
+  // it=monMap.begin();it!=monMap.end();++it){
   //		cout << it.key() << " => " << it.value() << '\n';
   //	}
 

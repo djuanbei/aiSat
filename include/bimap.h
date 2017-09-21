@@ -34,4 +34,4 @@ void deleteBimap(Bimap *);
 
 void clearBimap(Bimap *);
 
-#endif /* ----- #ifndef BIMAP_INC  ----- */
+#endif

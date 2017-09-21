@@ -2,8 +2,8 @@
   Add a matrix to a second matrix in Fortran storage format.
 */
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "declarations.h"
 
 void add_mat(A, B) struct blockmatrix A;

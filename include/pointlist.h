@@ -2,22 +2,20 @@
  * @file   pointlist.h
  * @author Liyun Dai <dlyun2009@gmail.com>
  * @date   Sun Feb  8 12:20:48 2015
- * 
- * @brief  point list containt 
- * 
- * 
+ *
+ * @brief  point list containt
+ *
+ *
  */
 
-
-#ifndef  POINTLIST_INC
-#define  POINTLIST_INC
+#ifndef POINTLIST_INC
+#define POINTLIST_INC
 #include <stdlib.h>
 
 struct pointElem {
-
-  void* value;
+  void *value;
   struct pointElem *next;
-};				/* ----------  end of struct pointElem  ---------- */
+}; 
 
 typedef struct pointElem PointElem;
 
@@ -25,11 +23,11 @@ typedef struct pointElem PointElem;
 extern "C" {
 #endif
 
-  PointElem *createElem(void * );
+  PointElem *createElem(void *);
 
-  void setValue( PointElem*, void *, void (* ) (void *));
+  void setValue(PointElem *, void *, void (*)(void *));
 
-  void delElem(PointElem * , void (*delfun)(void*));
+  void delElem(PointElem *, void (*delfun)(void *));
 
   void clear_E(PointElem *);
 
@@ -38,19 +36,19 @@ extern "C" {
     PointElem *tail;
     void (*delfun)(void *);
 
-  };				/* ----------  end of struct pointList  ---------- */
+  }; 
 
   typedef struct pointList PointList;
 
-  PointList* createList(void (*)(void *) );
+  PointList *createList(void (*)(void *));
 
   void delList(PointList *list);
 
-  void delListStart(PointList* list, const int start);
+  void delListStart(PointList *list, const int start);
 
   int isEmpty_L(PointList *list);
 
-  void* front_L(PointList *list);
+  void *front_L(PointList *list);
 
   void pop_front_L(PointList *list);
 
@@ -58,14 +56,13 @@ extern "C" {
 
   void push_back_L(PointList *list, void *);
 
-  void sortList(PointList *list, int ( *com)( void *, void *)); 
+  void sortList(PointList *list, int (*com)(void *, void *));
   void clear_L(PointList *list);
 
   size_t size_L(PointList *);
 
-
-#ifdef __cplusplus 
+#ifdef __cplusplus
 }
 #endif
 
-#endif   /* ----- #ifndef POINTLIST_INC  ----- */
+#endif 

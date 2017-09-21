@@ -3,7 +3,7 @@
  *
  *       Filename:  constraint.c
  *
- *    Description:  
+ *    Description:
  *
  *        Version:  1.0
  *        Created:  12/04/2012 10:04:01 AM
@@ -11,146 +11,146 @@
  *       Compiler:  gcc
  *
  *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:  
+ *        Company:
  *
  * =====================================================================================
  */
 
+#include "mono_const.h"
+#include <stdarg.h>
+#include "vartable.h"
 
-#include	"mono_const.h"
-#include	"vartable.h"
-#include	<stdarg.h>
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  cons
- *  Description:  
- * =====================================================================================
- */
-BOOL
-consEval ( indice_t *a ,  const int varId, MonomialConstraint *C )
-{
-  fn_ptr_t fun= getconsFunById(C->consFunId) ;
-  return fun(a, varId, C->deg, C->varId , C->linCoefs, 
-             C->minValue);
-}		/* -----  end of function cons  ----- */
+BOOL consEval(indice_t *a, const int varId, MonomialConstraint *C) {
+  fn_ptr_t fun = getconsFunById(C->consFunId);
+  return fun(a, varId, C->deg, C->varId, C->linCoefs, C->minValue);
+} 
 
 
-
-/* 
- * ===  FUNCTION  ======================================================================
- *  Name:  homog
- *  Description:  
- *  Input:
- *   (a1,...,an)
+/** 
+ * @brief 
+ * 
+ * @param a 
+ * @param varId 
+ * @param cdeg 
+ * @param cvarId 
+ * @param clinCoefs 
+ * @param cminValue 
+ * 
+ * @return
  *  if Sum(a1,...,an)==deg return YES
  *  otherwise return false;
- * =====================================================================================
  */
-BOOL homog (indice_t * a, const int varId , const int cdeg , const int cvarId,   const int *clinCoefs, const int cminValue      )
-{
-  int i=0;
-  int sum=0;
-  const int size=getvarNum(varId);
+BOOL homog(indice_t *a, const int varId, const int cdeg, const int cvarId,
+           const int *clinCoefs, const int cminValue) {
+  int i = 0;
+  int sum = 0;
+  const int size = getvarNum(varId);
 
-  for ( i = 0; i < size; i += 1 ) {
-    sum+=a[i];
+  for (i = 0; i < size; i += 1) {
+    sum += a[i];
   }
-  if(sum==cdeg) return TRUE;
-  else return  FALSE;
+  if (sum == cdeg)
+    return TRUE;
+  else
+    return FALSE;
 }
 
+BOOL Khomog(indice_t *a, const int varId, const int cdeg, const int cvarId,
+            const int *clinCoefs, const int cminValue) {
+  int i, j, sum;
 
-
-
-BOOL Khomog (indice_t * a, const int varId , const int cdeg , const int cvarId,    const int *clinCoefs, const int cminValue    ) {
-  
-  int i,j,sum;
-	
-
-  const indice_t * varMap=getvarElem(varId);
-  const indice_t * KvarMap = getvarElem(cvarId) ;
-  const int size=(int)varMap[0] ;
-  const int KvarSize=getvarNum(cvarId);
-  sum=0;
-  i=j=1;
-  while(i<=size&&j<=KvarSize){
-    if(varMap[i]<KvarMap[j]) i++;
-    else if  (varMap[i] > KvarMap[j]) j++;
-    else{
-
-      sum+=a[i];
+  const indice_t *varMap = getvarElem(varId);
+  const indice_t *KvarMap = getvarElem(cvarId);
+  const int size = (int)varMap[0];
+  const int KvarSize = getvarNum(cvarId);
+  sum = 0;
+  i = j = 1;
+  while (i <= size && j <= KvarSize) {
+    if (varMap[i] < KvarMap[j])
+      i++;
+    else if (varMap[i] > KvarMap[j])
+      j++;
+    else {
+      sum += a[i];
       i++;
       j++;
     }
-
   }
-  if (cdeg==sum) return TRUE;
-  else return FALSE;
+  if (cdeg == sum)
+    return TRUE;
+  else
+    return FALSE;
 }
 
 
-
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  symm
- *  Description:   every variable contain in symvarMap   
+/** 
+ * 
+ * @brief   every variable contain in symvarMap
  *  has same degree
- * =====================================================================================
+ * @param a 
+ * @param varId 
+ * @param cdeg 
+ * @param cvarId 
+ * @param clinCoefs 
+ * @param cminValue 
+ * 
+ * @return 
  */
-BOOL symm (indice_t * a, const int varId , const int cdeg , const int cvarId,  const int *clinCoefs, const int cminValue ) {
-  
-  int i,j, value;
+BOOL symm(indice_t *a, const int varId, const int cdeg, const int cvarId,
+          const int *clinCoefs, const int cminValue) {
+  int i, j, value;
 
-  const indice_t * varMap=getvarElem(varId);
-  const indice_t * symvarMap=getvarElem(cvarId) ;
-  const int size=(int) varMap[0];
-  const int symSize= (int )symvarMap[0];
+  const indice_t *varMap = getvarElem(varId);
+  const indice_t *symvarMap = getvarElem(cvarId);
+  const int size = (int)varMap[0];
+  const int symSize = (int)symvarMap[0];
 
-  value=-1;
-  i=j=1;
-  while(i<=size && j<=symSize){
-    if(varMap[i]<symvarMap[j])i++;
-		
-    else if (varMap[i]>symvarMap[j]){
+  value = -1;
+  i = j = 1;
+  while (i <= size && j <= symSize) {
+    if (varMap[i] < symvarMap[j])
+      i++;
 
-      if(-1==value)value=0;
-      else if (0!=value) return FALSE;
+    else if (varMap[i] > symvarMap[j]) {
+      if (-1 == value)
+        value = 0;
+      else if (0 != value)
+        return FALSE;
       j++;
 
-    }else{
-      if(-1==value)value= a[i];
-      else if (value!=a[i]) {
+    } else {
+      if (-1 == value)
+        value = a[i];
+      else if (value != a[i]) {
         return FALSE;
       }
       i++;
       j++;
-
     }
   }
-  if(j!=symSize+1){
-    if(-1!=value|| 0!=value )
-      return FALSE;
-  }	
-  return TRUE ;
+  if (j != symSize + 1) {
+    if (-1 != value || 0 != value) return FALSE;
+  }
+  return TRUE;
 }
 
+BOOL linCons(indice_t *a, const int varId, const int cdeg, const int cvarId,
+             const int *clinCoefs, const int cminValue) {
+  int i, j;
+  int sum = 0;
+  const indice_t *varMap = getvarElem(varId);
+  const indice_t *linvarMap = getvarElem(cvarId);
+  const int size = (int)varMap[0];
+  const int linSize = (int)linvarMap[0];
 
-BOOL linCons (indice_t * a, const int varId , const int cdeg , const int cvarId,  const int *clinCoefs, const int cminValue  ) { 
-  int i,j;
-  int sum=0;
-  const indice_t * varMap=getvarElem(varId);
-  const indice_t * linvarMap=getvarElem(cvarId);
-  const int size=(int)varMap[0];
-  const int linSize=(int)linvarMap[0];
-
-  i=j=1;    
-  while(i<=size&&j<=linSize){
-    if(varMap[i]<linvarMap[j]) i++;
-    else if (varMap[i]>linvarMap[j]){
+  i = j = 1;
+  while (i <= size && j <= linSize) {
+    if (varMap[i] < linvarMap[j])
+      i++;
+    else if (varMap[i] > linvarMap[j]) {
       j++;
-    }
-    else {
-      sum+=clinCoefs[j]*a[i];
+    } else {
+      sum += clinCoefs[j] * a[i];
       i++;
       j++;
     }
@@ -158,7 +158,8 @@ BOOL linCons (indice_t * a, const int varId , const int cdeg , const int cvarId,
   /*-----------------------------------------------------------------------------
    *  sum>= minValue or sum > minValue need further consider.
    *-----------------------------------------------------------------------------*/
-  if (sum>=cminValue) return TRUE;
-  else return FALSE;
-
+  if (sum >= cminValue)
+    return TRUE;
+  else
+    return FALSE;
 }

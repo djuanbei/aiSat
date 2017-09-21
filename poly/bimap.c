@@ -86,8 +86,8 @@ int addBimapElem(Bimap *map, int value) {
  * @param map
  * @param key
  *
- * @return loc >=0 if find key in map
- * otherwise -1
+ * @return loc >=0 if find key in map,
+ * otherwise, -1
  */
 
 int findBimapByKey(Bimap *map, const int key) {

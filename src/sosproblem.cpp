@@ -1,11 +1,11 @@
 #include "sosproblem.h"
-#include "findsos.h"
-#include "sort.h"
-#include "search.h"
-#include "monomial.h"
-#include "convexhull.h"
-#include <map>
 #include <iostream>
+#include <map>
+#include "convexhull.h"
+#include "findsos.h"
+#include "monomial.h"
+#include "search.h"
+#include "sort.h"
 
 using std::cout;
 using std::endl;
@@ -53,8 +53,7 @@ static int delRepeat(indice_t *indices, const int length, const int varNum) {
 static int reduceConvexHulll(const int DIM, indice_t *Gsup, int &GLength,
                              const indice_t *polyS, const int polyS_size,
                              indice_t **SOSM) {
-  
-  int i, j, k, valueIndex,  m, sosLength;
+  int i, j, k, valueIndex, m, sosLength;
   size_t node_size = DIM * sizeof(indice_t);
 
   if (1 == GLength) {
@@ -76,7 +75,7 @@ static int reduceConvexHulll(const int DIM, indice_t *Gsup, int &GLength,
 
   while (run) {
     run = false;
-    monMap.clear(  );
+    monMap.clear();
 
     valueIndex = 0;
 
@@ -105,7 +104,7 @@ static int reduceConvexHulll(const int DIM, indice_t *Gsup, int &GLength,
       }
       /**
        * monomial(key, DIM) only has one method to create by G^2
-       * 
+       *
        */
 
       if (1 == monMap[monomial(key, DIM)].value) {
@@ -154,19 +153,16 @@ static int reduceConvexHulll(const int DIM, indice_t *Gsup, int &GLength,
       }
     }
   }
-  
 
-  sosLength = monMap.size(  );
+  sosLength = monMap.size();
 
   *SOSM = (indice_t *)malloc_d(sosLength * node_size);
 
   i = 0;
   for (map<monomial, monomialvalue>::const_iterator it = monMap.begin();
        it != monMap.end(); ++it) {
-
     memcpy((*SOSM) + i * DIM, it->first.indice, node_size);
     i++;
-
   }
 
   delete[] key;

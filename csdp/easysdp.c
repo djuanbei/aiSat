@@ -7,9 +7,9 @@
  *
  */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "declarations.h"
 
 int csdp_verbose = 1;
@@ -17,8 +17,7 @@ int csdp_verbose = 1;
 int checkc(int n, struct blockmatrix C, int printlevel);
 
 int easy_sdp(n, k, C, a, constraints, constant_offset, pX, py, pZ, ppobj,
-             pdobj)
-int n;
+             pdobj) int n;
 int k;
 struct blockmatrix C;
 double *a;
@@ -75,10 +74,9 @@ double *pdobj;
   /*
    *  Initialize the parameters.
    */
-   initparams(&params, &printlevel);
-   
-   printlevel = csdp_verbose;
+  initparams(&params, &printlevel);
 
+  printlevel = csdp_verbose;
 
   /*
    *  Allocate working storage
@@ -455,7 +453,7 @@ struct constraintmatrix *constraints;
             if (C.blocks[ptri->blocknum].blockcategory == MATRIX) {
               nnz++;
               goto NEXTJ;
-            } else {/* DIAG block */
+            } else { /* DIAG block */
               for (ii = 1; ii <= ptri->numentries; ii++) {
                 for (jj = 1; jj <= ptrj->numentries; jj++) {
                   if (ptri->iindices[ii] == ptrj->iindices[jj]) {
@@ -472,8 +470,7 @@ struct constraintmatrix *constraints;
         ptri = ptri->next;
       }; /* end while */
 
-    NEXTJ:
-      ;
+    NEXTJ:;
     }; /* end nested fors */
 
   return (nnz);

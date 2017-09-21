@@ -17,15 +17,15 @@
 extern "C" {
 #endif
 
-SubPoly *createSubPolyByPoly(Poly *poly);
+  SubPoly *createSubPolyByPoly(Poly *poly);
 
-SubPoly *createSubPoly(Poly *poly, const int size, int *loc);
+  SubPoly *createSubPoly(Poly *poly, const int size, int *loc);
 
-void printSubPoly(const SubPoly *subpoly);
-void deleteSubPoly(SubPoly *poly);
+  void printSubPoly(const SubPoly *subpoly);
+  void deleteSubPoly(SubPoly *poly);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ----- #ifndef SUBPOLY_INC  ----- */
+#endif 
