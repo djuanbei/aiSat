@@ -52,7 +52,7 @@ BOOL boolformula_positive_lit(lit l) {
  * vector of length 0 is the unit of disjunction (F)
  */
 boolformula_t *boolformula_disjunction_unit(void) {
-  boolformula_t *ret = malloc_d(sizeof(boolformula_t));
+  boolformula_t *ret =(boolformula_t*) malloc_d(sizeof(boolformula_t));
   ret->d.v = vector_new(boolformula_free);
   ret->t = DISJUNCT;
   ret->ref = 1;
@@ -60,7 +60,7 @@ boolformula_t *boolformula_disjunction_unit(void) {
 }
 
 boolformula_t *boolformula_disjunction_new(uscalar_t length) {
-  boolformula_t *ret = malloc_d(sizeof(boolformula_t));
+  boolformula_t *ret =(boolformula_t*) malloc_d(sizeof(boolformula_t));
   ret->d.v = vector_newByL(boolformula_free, length);
   ret->t = DISJUNCT;
   ret->ref = 1;
@@ -71,7 +71,7 @@ boolformula_t *boolformula_disjunction_new(uscalar_t length) {
  * vector of length 0 is the unit of disjunction (T)
  */
 boolformula_t *boolformula_conjunction_unit(void) {
-  boolformula_t *ret = malloc_d(sizeof(boolformula_t));
+  boolformula_t *ret =(boolformula_t*) malloc_d(sizeof(boolformula_t));
   ret->d.v = vector_new(boolformula_free);
   ret->t = CONJUNCT;
   ret->ref = 1;
@@ -79,7 +79,7 @@ boolformula_t *boolformula_conjunction_unit(void) {
 }
 
 boolformula_t *boolformula_conjunction_new(uscalar_t length) {
-  boolformula_t *ret = malloc_d(sizeof(boolformula_t));
+  boolformula_t *ret =(boolformula_t*) malloc_d(sizeof(boolformula_t));
   ret->t = CONJUNCT;
   ret->d.v = vector_newByL(boolformula_free, length);
   ret->ref = 1;
@@ -87,7 +87,7 @@ boolformula_t *boolformula_conjunction_new(uscalar_t length) {
 }
 
 boolformula_t *boolformula_literal_new(lit l) {
-  boolformula_t *ret = malloc_d(sizeof(boolformula_t));
+  boolformula_t *ret =(boolformula_t*) malloc_d(sizeof(boolformula_t));
   ret->d.l = l;
   ret->t = LITERAL;
   ret->ref = 1;

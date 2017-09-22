@@ -47,7 +47,7 @@ endif
 
 COPTIMIZE ?= -O3
 
-CFLAGS    += -I  ../include  -I ../ulib/include -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -std=c99
+CFLAGS    += -I  ../include  -I ../ulib/include -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS  -std=c99
 LFLAGS    += -lz   
 
 

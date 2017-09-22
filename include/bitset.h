@@ -43,9 +43,9 @@ extern "C" {
   void bitSet_clear(BitSet *);
   void bitSet_add(BitSet *, const unsigned int loc);
 
-  void bitSet_set(BitSet *, unsigned int loc, BOOL v);
+  void bitSet_set(BitSet *, unsigned int loc, bool v);
 
-  BOOL bitSet_get(const BitSet *, const unsigned int loc);
+  bool bitSet_get(const BitSet *, const unsigned int loc);
 
 #ifdef __cplusplus
 } 

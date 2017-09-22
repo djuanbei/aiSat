@@ -89,7 +89,7 @@ void bitSet_add(BitSet *b, const unsigned int loc) {
   if (loc >= b->length) b->length = loc + 1;
 }
 
-void bitSet_set(BitSet *b, unsigned int loc, BOOL v) {
+void bitSet_set(BitSet *b, unsigned int loc, bool v) {
   unsigned int row;
   unsigned int col;
 
@@ -101,7 +101,7 @@ void bitSet_set(BitSet *b, unsigned int loc, BOOL v) {
     b->value[row] &= ~(map[col]);
 }
 
-BOOL bitSet_get(const BitSet *b, const unsigned int loc) {
+bool bitSet_get(const BitSet *b, const unsigned int loc) {
   ASSERT(loc < (b->length), "overflow");
   unsigned int row;
   unsigned int col;

@@ -13,6 +13,7 @@
 #define POLYTYPE_INC
 #include <stdint.h>
 #include <stdlib.h>
+
 #include "config.h"
 #include "pointlist.h"
 
@@ -74,6 +75,8 @@ extern "C" {
   };
 
   typedef struct poly Poly;
+
+  // typedef aiSat::poly<coef_t, indice_t> Poly;
 
   struct subPoly {
     Poly *poly;                   /// the reference polynomial

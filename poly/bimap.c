@@ -15,10 +15,10 @@
 #include "selfmemutil.h"
 
 Bimap *createBimap(void) {
-  Bimap *re = malloc_d(sizeof(Bimap));
+  Bimap *re =(Bimap*) malloc_d(sizeof(Bimap));
   re->capacity = DEFAULT_CAP;
-  re->values = malloc_d(2 * re->capacity * sizeof(int));
-  re->keys = malloc_d(2 * re->capacity * sizeof(int));
+  re->values =(int*) malloc_d(2 * re->capacity * sizeof(int));
+  re->keys =(int*) malloc_d(2 * re->capacity * sizeof(int));
   re->size = 0;
   return re;
 }
