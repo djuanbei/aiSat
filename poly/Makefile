@@ -8,12 +8,12 @@
 PWD        = $(shell pwd)
 EXEC      ?= $(notdir $(PWD))
 
-WROOT      = $(PWD)
+WROOT      = $(PWD)/src
 LIB        = poly
 
 MAINFILE   = main
 
-SRCSUF     = c
+SRCSUF     = cpp
 
 CSRCS      = $(wildcard $(WROOT)/*.$(SRCSUF)) 
 DSRCS      = $(foreach dir, $(DEPDIR), $(filter-out $(WROOT)/$(dir)/$(MAINFILE).$(SRCSUF), $(wildcard $(WROOT)/$(dir)/*.$(SRCSUF))))
@@ -47,8 +47,8 @@ endif
 
 COPTIMIZE ?= -O3
 
-CFLAGS    += -I  ../include  -I ../ulib/include -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS  -std=c99
-LFLAGS    += -lz   
+CFLAGS    +=  -I include -I  ../include -I ../util/include   -I ../ulib/include -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS  #-std=c99
+LFLAGS    += -lz   -L ../lib -lutil
 
 
 .PHONY : s p d r rs clean 
