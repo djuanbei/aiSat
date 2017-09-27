@@ -47,7 +47,7 @@ indice_t *getAllMonByTd(const int supportId, int *const length) {
     return NULL;
   }
 
-  n = Poly_t::VAR_TABLE.getVarNum(sup->varId);
+  n = getVarTable<indice_t>().getVarNum(sup->varId);
   if (0 == n) {
     Z = (indice_t *)malloc_d(sizeof(indice_t));
     Z[0] = 0;
@@ -225,7 +225,7 @@ ArrangeMatrix **createArrangeM(const int supportId, indice_t const *SOSM,
                                int *const blockSize, int const lengthSOS) {
   int i, j, k, index;
   Support *sup = SUPPORT_TABLE.getSupElem(supportId);
-  const int n = Poly_t::VAR_TABLE.getVarNum(sup->varId);
+  const int n = getVarTable<indice_t>().getVarNum(sup->varId);
 
   indice_t temp[n + 1];
   indice_t *Z = SUPPORT_TABLE.getGsup(supportId, blockSize);
@@ -240,7 +240,7 @@ ArrangeMatrix **createArrangeM(const int supportId, indice_t const *SOSM,
       (ArrangeMatrix **)malloc_d(lengthSOS * sizeof(ArrangeMatrix *));
 
   for (i = 0; i < lengthSOS; i++) {
-    re[i] = createSparse(*blockSize);
+    re[i] = new ArrangeMatrix(*blockSize);
   }
 
   /*-----------------------------------------------------------------------------
@@ -258,7 +258,7 @@ ArrangeMatrix **createArrangeM(const int supportId, indice_t const *SOSM,
       }
       index = findIndex(temp, SOSM, lengthSOS, n);
       ASSERT(index >= 0, "some thing wrong");
-      addSparseElem(re[index], i, j);
+      re[index]->addSparseElem(i, j);
     }
   }
 
@@ -272,7 +272,8 @@ void deleteW(ArrangeMatrix **W[], const int size, const int len[]) {
 
   for (i = 0; i < size; i += 1) {
     for (j = 0; j < len[i]; j += 1) {
-      deleteSparse(W[i][j]);
+      delete W[i][j];
+      // deleteSparse(W[i][j]);
     }
     free(W[i]);
   }
@@ -281,7 +282,7 @@ void deleteW(ArrangeMatrix **W[], const int size, const int len[]) {
 void deleteSparseA(ArrangeMatrix **s, const int len) {
   int i;
   for (i = 0; i < len; i += 1) {
-    deleteSparse(s[i]);
+    delete s[i];
   }
   free(s);
 }
@@ -293,7 +294,7 @@ Poly_t *sosConvertPoly(Blockmatrix *const X, const int k, const int blockSize,
   coef_t cf;
   int i, j, row, col;
 
-  const int varSize = Poly_t::VAR_TABLE.getVarNum(vid);
+  const int varSize = getVarTable<indice_t>().getVarNum(vid);
 
   const int length = SUPPORT_TABLE.getsosSLength(supportId);
 
@@ -310,9 +311,9 @@ Poly_t *sosConvertPoly(Blockmatrix *const X, const int k, const int blockSize,
     }
 
     cf = 0;
-    for (j = 0; j < S[i]->size; j += 1) {
-      row = S[i]->data[j].row + 1;
-      col = S[i]->data[j].col + 1;
+    for (j = 0; j < S[i]->size(); j += 1) {
+      row = (*(S[i]))[j].row + 1;
+      col = (*(S[i]))[j].col + 1;
       if (row == col) {
         cf += X->blocks[k + 1].data.mat[ijtok(row, col, blockSize)];
 

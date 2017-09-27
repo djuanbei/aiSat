@@ -19,12 +19,11 @@ namespace aiSat {
 
 namespace psd {
 
-class MonomialConstTable{
+class MonomialConstTable {
  private:
+  vector<MonomialConstraint*> values;
 
-  vector<MonomialConstraint*>  values;
  public:
-
   int addconsElem(const int deg, const int varId, const int* linCoef,
                   int minValue, const int consFunId);
 
@@ -34,7 +33,6 @@ class MonomialConstTable{
   MonomialConstraint* getconsElem(const int id);
 
   void clear(void);
-  
 };
 
 extern MonomialConstTable MONO_CONS_TABLE;

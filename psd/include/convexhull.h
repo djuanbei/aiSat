@@ -14,24 +14,54 @@
 
 #include "pointlist.h"
 #include "polytype.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "psdtype.h"
 
-enum { NOSOS, CONVEX_POLY, EXACTLY_SOS, UNHNOW };
+namespace aiSat{
+namespace psd{
 
-int easyCheck(const SubPoly* poly, PointList* ans);
+enum POLY_SOS_T{ NOSOS, CONVEX_POLY, EXACTLY_SOS, UNHNOW };
 
-int onSameSurf(const SubPoly* poly, const int* checkPoints, const int size,
-               indice_t* rePoints, const int limt);
-indice_t* randPointSet(const int length, const int dim, const int domain);
-indice_t* overConvexHull(const indice_t* genSet, const int length,
-                         const int dim, int* relength);
+class SOSChecker{
 
-int reduceConvexHull(indice_t* candidateSet, const int length, const int dim,
-                     const indice_t* genSet, const int lengthG);
+ private:
+  const Subpoly_t* subpoly;
+  
+  POLY_SOS_T checkThreeP(const int dim,
+                                PointList* ans);
+  
+  
 
-#ifdef __cplusplus
+  int reduceByPlane(indice_t* candidateSet, const int length,
+                    const int dim, const int* coefs, int maxSum);
+  
+
+ public:
+  SOSChecker(  const Subpoly_t* subp):subpoly(subp){
+  }
+  
+  POLY_SOS_T easyCheck( PointList* ans);
+
+  int onSameSurf( const int* checkPoints, const int size,
+                 indice_t* rePoints, const int limt);
+
+  indice_t* randPointSet(const int length, const int dim, const int domain);
+
+  indice_t* overConvexHull(const indice_t* genSet, const int length,
+                           const int dim, int* relength);
+
+  int reduceConvexHull(indice_t* candidateSet, const int length, const int dim,
+                       const indice_t* genSet, const int lengthG);
+
+  int reduceByLestEignV(indice_t* candidateSet, const int candLength,
+                      const int dim, const indice_t* genSet,
+                        const int genLength, const int max[]);
+};
+
+
+
+
+
 }
-#endif
+}
+
 #endif

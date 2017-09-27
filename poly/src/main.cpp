@@ -25,6 +25,9 @@
 using namespace aiSat::poly;
 
 int main(int argc, char *argv[]) {
+  
+  // VarTable<indice_t> Poly<double,indice_t>::VAR_TABLE;
+  
   // int length = 10;
   // const int dim = 7;
   // const int domain = 5;

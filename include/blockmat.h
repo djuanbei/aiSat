@@ -5,10 +5,8 @@
  *   This file contains definitions for the block matrix data structures used
  * in CSDP 3.0.  Note that there are an additional set of definitions used
  *  for sparse constraint matrices.
- * 
+ *
  */
-
-
 
 /*
  *  Each block is a diagonal block or a matrix

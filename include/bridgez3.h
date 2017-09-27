@@ -18,4 +18,4 @@ bool membership();
 
 equivalence();
 
-#endif 
+#endif

@@ -18,13 +18,11 @@
 
 #include "mono_const.h"
 #include <stdarg.h>
-#include "vartable.hpp"
 #include "psdtype.h"
-
+#include "vartable.hpp"
 
 namespace aiSat {
-namespace psd{
-  
+namespace psd {
 
 bool consEval(indice_t *a, const int varId, MonomialConstraint *C) {
   fn_ptr_t fun = getconsFunById(C->consFunId);
@@ -49,15 +47,14 @@ bool homog(indice_t *a, const int varId, const int cdeg, const int cvarId,
            const int *clinCoefs, const int cminValue) {
   int i = 0;
   int sum = 0;
-  const int size = Poly_t::VAR_TABLE.getVarNum(varId);
+  const int size = getVarTable<indice_t>().getVarNum(varId);
 
   for (i = 0; i < size; i += 1) {
     sum += a[i];
   }
-  if (sum == cdeg){
+  if (sum == cdeg) {
     return true;
-  }
-  else{
+  } else {
     return false;
   }
 }
@@ -66,13 +63,13 @@ bool Khomog(indice_t *a, const int varId, const int cdeg, const int cvarId,
             const int *clinCoefs, const int cminValue) {
   int i, j, sum;
 
-  vector<indice_t>  varMap;
-  Poly_t::VAR_TABLE.getVarElem(varId, varMap);
+  vector<indice_t> varMap;
+  getVarTable<indice_t>().getVarElem(varId, varMap);
   vector<indice_t> KvarMap;
-  Poly_t::VAR_TABLE.getVarElem(cvarId, KvarMap);
+  getVarTable<indice_t>().getVarElem(cvarId, KvarMap);
 
   const int size = (int)varMap[0];
-  const int KvarSize =Poly_t::VAR_TABLE.getVarNum(cvarId);
+  const int KvarSize = getVarTable<indice_t>().getVarNum(cvarId);
   sum = 0;
   i = j = 1;
   while (i <= size && j <= KvarSize) {
@@ -109,10 +106,10 @@ bool symm(indice_t *a, const int varId, const int cdeg, const int cvarId,
           const int *clinCoefs, const int cminValue) {
   int i, j, value;
   vector<indice_t> varMap;
-  Poly_t::VAR_TABLE.getVarElem(varId, varMap);
-  
+  getVarTable<indice_t>().getVarElem(varId, varMap);
+
   vector<indice_t> symvarMap;
-  Poly_t::VAR_TABLE.getVarElem(cvarId, symvarMap);
+  getVarTable<indice_t>().getVarElem(cvarId, symvarMap);
 
   const int size = (int)varMap[0];
   const int symSize = (int)symvarMap[0];
@@ -151,10 +148,10 @@ bool linCons(indice_t *a, const int varId, const int cdeg, const int cvarId,
   int i, j;
   int sum = 0;
   vector<indice_t> varMap;
-  Poly_t::VAR_TABLE.getVarElem(varId, varMap);
-  
+  getVarTable<indice_t>().getVarElem(varId, varMap);
+
   vector<indice_t> linvarMap;
-  Poly_t::VAR_TABLE.getVarElem(cvarId, linvarMap);
+  getVarTable<indice_t>().getVarElem(cvarId, linvarMap);
 
   const int size = (int)varMap[0];
   const int linSize = (int)linvarMap[0];
@@ -179,6 +176,5 @@ bool linCons(indice_t *a, const int varId, const int cdeg, const int cvarId,
   else
     return false;
 }
-
 }
 }

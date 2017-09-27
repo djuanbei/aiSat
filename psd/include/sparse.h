@@ -21,32 +21,38 @@ namespace psd {
 /*-----------------------------------------------------------------------------
  *  struct sparse is a special matrix have few same nonzero element
  *-----------------------------------------------------------------------------*/
-struct arrangeMatrix {
-  coef_t mult; /* coefficient of this matrix */
+class ArrangeMatrix {
+ private:
+  coef_t multCF; /* coefficient of this matrix */
   int rowLength;
-  int size;
-  SparseRowCol* data; /* start from 0  all elements of matrix is one or zero
-                         and data record the coordinate of element if one*/
-  int capacity;
+
+  /**
+   *   start from 0  all elements of matrix is one or zero
+   *                      and data record the coordinate of element if one
+   *
+   */
+  vector<SparseRowCol> data;
+
+ public:
+  ArrangeMatrix(const int rowLength);
+
+  int size() const { return data.size(); }
+  int getRowLength() const { return rowLength; }
+
+  coef_t getCF() const { return multCF; }
+
+  void printS();
+
+  void addSparseElem(int i, int j);
+
+  coef_t getValue(int i, int j);
+
+  void mult(const double a);
+
+  string toString() const;
+
+  const SparseRowCol& operator[](int i) const { return data[i]; }
 };
-
-typedef struct arrangeMatrix ArrangeMatrix;
-
-ArrangeMatrix* createSparse(const int rowLength);
-
-void printS(ArrangeMatrix* s);
-
-void deleteSparse(ArrangeMatrix* s);
-
-void addSparseElem(ArrangeMatrix* const s, int i, int j);
-
-coef_t getValue(ArrangeMatrix const* s, int i, int j);
-
-void reScale(ArrangeMatrix* const S);
-
-void mult(ArrangeMatrix* const S, const double a);
-
-void print(const ArrangeMatrix* S);
 }
 }
 

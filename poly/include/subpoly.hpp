@@ -11,15 +11,20 @@
 #define __SUB_OLY_H
 #include "crypt_md5.h"
 #include "poly.hpp"
-
+#include <cstring>
 namespace aiSat {
+namespace psd{
+class SOSChecker;
+}
 namespace poly {
 
 template <typename C = double, typename T = unsigned char>
 
 class Subpoly {
+  
+  friend class aiSat::psd::SOSChecker;
  private:
-  const poly<C, T> &parent;
+  const Poly<C, T> &parent;
   uint8_t md5sum[DIGEST_SIZE];  /// the md5sum of this subpolynomial, when test
   /// whether the two polynomials equal first test
   /// the two mds5sum equal
@@ -29,17 +34,17 @@ class Subpoly {
     md5_init(ctx);
     uint8_t varId = parent.getVarId();
     md5_update(ctx, &varId, 1);
-    int dim = parent.getVarNum();
+
     for (int i; i < locs.size(); i++) {
       uint8_t loc = locs[i];
       md5_update(ctx, &loc, 1);
     }
 
-    md5sum_finalize(ctx);
+    md5_finalize(ctx);
   }
 
  public:
-  Subpoly(poly<C, T> &p) : parent(p) {
+  Subpoly(Poly<C, T> &p) : parent(p) {
     int size = parent.getSize();
     for (int i = 0; i < size; i++) {
       locs.push_back(i);
@@ -48,17 +53,33 @@ class Subpoly {
     getMd5sum(&ctx);
     memcpy(md5sum, MD5_DIGEST(&ctx), 16 * sizeof(uint8_t));
   }
-  Subpoly(poly<C, T> &p, const vector<int> &loc) : parent(p), locs(loc) {
+  Subpoly(Poly<C, T> &p, const vector<int> &loc) : parent(p), locs(loc) {
     md5_ctx_t ctx;
     getMd5sum(&ctx);
     memcpy(md5sum, MD5_DIGEST(&ctx), 16 * sizeof(uint8_t));
   }
+  
+  int size() const{
+    
+    return locs.size();
+  }
+  
+  uint8_t* getmd5(){
+    return md5sum;
+  }
+  
+  int operator[] (const int i ) const{
+    return locs[i];
+  }
   string toString(void) const { return parent.toString(locs); }
 
-  poly<C, T> getPoly() const {
-    poly<C, T> rep;
+  Poly<C, T> getPoly() const {
+    Poly<C, T> rep;
     parent.getSubpoly(locs, rep);
     return rep;
+  }
+  const  Poly<C,T> & getParent() const{
+    return parent;
   }
 };
 }

@@ -198,18 +198,18 @@ Sparseblock *createblock(const int blockNum, const int consnum,
   re = (Sparseblock *)malloc_d(sizeof(Sparseblock));
 
   re->blocknum = blockNum;
-  re->blocksize = s->rowLength;
+  re->blocksize = s->getRowLength();
   re->constraintnum = consnum;
   re->next = NULL;
   re->nextbyblock = NULL;
-  re->entries = (double *)malloc_d((s->size + 1) * sizeof(double));
-  re->iindices = (int *)malloc_d((s->size + 1) * sizeof(int));
-  re->jindices = (int *)malloc_d((s->size + 1) * sizeof(int));
-  re->numentries = s->size;
-  for (i = 0; i < s->size; i += 1) {
-    re->iindices[i] = s->data[i].row;
-    re->jindices[i] = s->data[i].col;
-    re->entries[i] = s->mult;
+  re->entries = (double *)malloc_d((s->size() + 1) * sizeof(double));
+  re->iindices = (int *)malloc_d((s->size() + 1) * sizeof(int));
+  re->jindices = (int *)malloc_d((s->size() + 1) * sizeof(int));
+  re->numentries = s->size();
+  for (i = 0; i < s->size(); i += 1) {
+    re->iindices[i] = (*s)[i].row;
+    re->jindices[i] = (*s)[i].col;
+    re->entries[i] = s->getCF();
   }
 
   return re;
@@ -343,7 +343,8 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
     Poly_t::VAR_TABLE.getVarElem(sys->polys[i]->getVarId(), polyVarMap[i]);
 
     Poly_t::VAR_TABLE.getVarElem(
-        SUPPORT_TABLE.getSupElem((sys->polyConstraints[i])->supportId)->varId, sosVarMap[i]);
+        SUPPORT_TABLE.getSupElem((sys->polyConstraints[i])->supportId)->varId,
+        sosVarMap[i]);
 
     multVarId[i] = Poly_t::VAR_TABLE.mergeVar(
         sys->polys[i]->getVarId(),
@@ -746,7 +747,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
       p = sosmMap[abs(blockMap[j]) - 1]; /* which sosM */
 
       for (k = 0; k < block[i][j]->size; k += 1) {
-        sum += AM[p][block[i][j]->index[k]]->size;
+        sum += AM[p][block[i][j]->index[k]]->size();
       }
 
       blockptr = createSparseblock(
@@ -756,13 +757,11 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
       tempI = 1;
 
       for (k = 0; k < block[i][j]->size; k += 1) {
-        for (h = 0; h < AM[p][block[i][j]->index[k]]->size; h += 1) {
-          blockptr->iindices[tempI] =
-              AM[p][block[i][j]->index[k]]->data[h].row +
-              1; /* row start form 1 */
-          blockptr->jindices[tempI] =
-              AM[p][block[i][j]->index[k]]->data[h].col +
-              1; /* colum start form 1 */
+        for (h = 0; h < AM[p][block[i][j]->index[k]]->size(); h += 1) {
+          blockptr->iindices[tempI] = (*(AM[p][block[i][j]->index[k]]))[h].row +
+                                      1; /* row start form 1 */
+          blockptr->jindices[tempI] = (*(AM[p][block[i][j]->index[k]]))[h].col +
+                                      1; /* colum start form 1 */
 
           /*-----------------------------------------------------------------------------
            *   There need must attention bolckptr->entries is

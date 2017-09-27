@@ -33,18 +33,17 @@
 
 #include "support_table.h"
 
-#include "crypt_md5.h"
-#include "sort.h"
-#include "sparse.h"
-#include "util.h"
-#include "psdutil.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include "crypt_md5.h"
+#include "psdutil.h"
+#include "sort.h"
+#include "sparse.h"
+#include "util.h"
 
 namespace aiSat {
 namespace psd {
-
 
 Support *createSupport(const int deg, const int varId, const int consNum,
                        int *consId) {
@@ -70,7 +69,7 @@ Support *createSupport(const int deg, const int varId, const int consNum,
   return re;
 }
 
-// Support *createSupByPoly(SubPoly *subpoly) {
+// Support *createSupByPoly(Subpoly_t *subpoly) {
 //   Support *re;
 //   re = (Support *)malloc_d(sizeof(Support));
 
@@ -86,7 +85,6 @@ Support *createSupport(const int deg, const int varId, const int consNum,
 //   re->consCap = 0;
 //   return re;
 // }
-
 
 void deleteSupport(Support *S) {
   if (S == NULL) return;
@@ -112,7 +110,8 @@ void Supporttable::enlargetable(void) {
 //
 //	table..SOSsup	= (indice_t**)malloc_d (table.value_capacity*
 // sizeof(indice_t*) );
-//	table.Gsup=(indice_t**)malloc_d (table.value_capacity*  sizeof(indice_t*) );
+//	table.Gsup=(indice_t**)malloc_d (table.value_capacity*
+//sizeof(indice_t*) );
 //
 //
 //	table.sosLength	= (int*)malloc_d (table.value_capacity* sizeof(int) );
@@ -163,11 +162,11 @@ int Supporttable::findSupElem(const int deg, const int varId, const int consNum,
   return -1;
 }
 
-int Supporttable::findSupByPoly(const SubPoly *subpoly) {
+int Supporttable::findSupByPoly(const Subpoly_t *subpoly) {
   int i = 0;
   for (i = 0; i < values.size(); i += 1) {
     if (values[i]->type == SUB_POLY) {
-      if (0 == memcmp(values[i]->md5sum, subpoly->md5sum, DIGEST_SIZE))
+      if (0 == memcmp(values[i]->md5sum, subpoly->getmd5(), DIGEST_SIZE))
         return findBimapByValue(loc, i);
     }
   }
@@ -191,18 +190,17 @@ int Supporttable::findSupElemByIndice(const int varId, const indice_t *indices,
 int Supporttable::addSOSup(const int deg, const int varId, const int consNum,
                            int *consIds) {
   int re = findSupElem(deg, varId, consNum, consIds);
-  int value_size= values.size();
-  if (re > -1){
+  int value_size = values.size();
+  if (re > -1) {
     return re;
   }
 
-  
   re = values.size();
-  values.push_back( createSupport(deg, varId, consNum, consIds));
+  values.push_back(createSupport(deg, varId, consNum, consIds));
 
-  SOSsup.push_back( NULL);
-  
-  Gsup.push_back( NULL);
+  SOSsup.push_back(NULL);
+
+  Gsup.push_back(NULL);
   arrangeM.push_back(NULL);
   return addBimapElem(loc, re);
 }
@@ -215,14 +213,14 @@ int Supporttable::addSOSsupByIndice(const int varId, indice_t *indices,
 
   if (re > -1) {
     return re;
-  } 
-  re=values.size();
-  int value_size=re;
-  values.push_back( createSupBySup(varId, indices, value_size));
+  }
+  re = values.size();
+  int value_size = re;
+  values.push_back(createSupBySup(varId, indices, value_size));
 
-  SOSsup.push_back( NULL);
-  Gsup.push_back( NULL);
-  arrangeM.push_back( NULL);
+  SOSsup.push_back(NULL);
+  Gsup.push_back(NULL);
+  arrangeM.push_back(NULL);
 
   return addBimapElem(loc, re);
 }
@@ -273,20 +271,19 @@ void Supporttable::setGsup(const int id, const int len, indice_t *value) {
   Gsup[index] = value;
 }
 
-int Supporttable::addconvexsosSup(SubPoly *poly) {
+int Supporttable::addconvexsosSup(Subpoly_t *poly) {
   int re = findSupByPoly(poly);
   if (re > -1) {
     return re;
   }
 
+  int value_size = values.size();
 
-  int value_size=values.size();
-  
-  values.push_back( createSupByPoly(poly));
+  values.push_back(createSupByPoly(poly));
 
-  SOSsup.push_back( NULL);
-  Gsup.push_back( NULL);
-  arrangeM.push_back( NULL);
+  SOSsup.push_back(NULL);
+  Gsup.push_back(NULL);
+  arrangeM.push_back(NULL);
   re = value_size;
   value_size++;
   return addBimapElem(loc, re);
@@ -316,9 +313,8 @@ ArrangeMatrix **Supporttable::getAMIndex(const int id, int *gLength) {
 }
 
 void Supporttable::clearSupportTable(void) {
-  
   if (!values.empty()) {
-    int value_size=values.size();
+    int value_size = values.size();
     int i;
     for (i = 0; i < value_size; i += 1) {
       deleteSupport(values[i]);
@@ -335,21 +331,19 @@ void Supporttable::clearSupportTable(void) {
   arrangeM.clear();
   SOSsup.clear();
   Gsup.clear();
-  
+
   values.clear();
-  
 }
 
+Supporttable::~Supporttable() {
+  int value_size = values.size();
 
-Supporttable::~Supporttable(){
-  int value_size=values.size();
-  
   for (int i = 0; i < value_size; i += 1) {
     deleteSupport(values[i]);
-    if (SOSsup[i] != NULL){
+    if (SOSsup[i] != NULL) {
       free(SOSsup[i]);
     }
-    if (Gsup[i] != NULL){
+    if (Gsup[i] != NULL) {
       free(Gsup[i]);
     }
     if (arrangeM[i] != NULL) {
@@ -358,8 +352,7 @@ Supporttable::~Supporttable(){
   }
 
   deleteBimap(loc);
-  }
-
+}
 
 Supporttable SUPPORT_TABLE;
 }

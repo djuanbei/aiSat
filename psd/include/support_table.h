@@ -43,13 +43,12 @@ namespace psd {
 Support *createSupport(const int deg, const int varId, const int consNum,
                        int *consId);
 
-Support *createSupByPoly(SubPoly *poly);
+Support *createSupByPoly(Subpoly_t *poly);
 
 Support *createSupBySup(const int varId, const indice_t *indices,
                         const int value_size);
 
- void deleteSupport(Support *S);
-
+void deleteSupport(Support *S);
 
 class Supporttable {
   /**
@@ -70,26 +69,25 @@ class Supporttable {
   // int value_capacity;
   // int value_size;
   Bimap *loc;
-  
+
   vector<int> sosLength;
   vector<int> gLength;
 
-  vector<ArrangeMatrix**> arrangeM;
+  vector<ArrangeMatrix **> arrangeM;
   // ArrangeMatrix ***arrangeM;
   /*-----------------------------------------------------------------------------
    *  monomial of p
    *-----------------------------------------------------------------------------*/
-  vector<indice_t*>  SOSsup;
+  vector<indice_t *> SOSsup;
 
   /*-----------------------------------------------------------------------------
    * p=sum_i g_i^2
    * monomial of g
    *-----------------------------------------------------------------------------*/
 
-  vector<indice_t*> Gsup;
+  vector<indice_t *> Gsup;
 
   vector<Support *> values;
-
 
   void enlargetable(void);
 
@@ -101,11 +99,12 @@ class Supporttable {
 
  public:
   ~Supporttable();
-  
-  int findSupByPoly(const SubPoly *subpoly);
+
+  int findSupByPoly(const Subpoly_t *subpoly);
 
   int addSOSup(const int deg, const int varId, const int consNum, int *consIds);
-  int addSOSsupByIndice(const int varId, indice_t *indices, const int value_size);
+  int addSOSsupByIndice(const int varId, indice_t *indices,
+                        const int value_size);
 
   Support *getSupElem(const int id);
 
@@ -117,7 +116,7 @@ class Supporttable {
 
   void setGsup(const int id, const int len, indice_t *value);
 
-  int addconvexsosSup(SubPoly *poly);
+  int addconvexsosSup(Subpoly_t *poly);
 
   int getsosSLength(const int id);
 

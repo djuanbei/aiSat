@@ -13,12 +13,14 @@
 
 #include <cstdint>
 #include "poly.hpp"
+#include "subpoly.hpp"
 
 namespace aiSat {
 namespace psd {
 using namespace poly;
 
 typedef Poly<coef_t, indice_t> Poly_t;
+typedef Subpoly<coef_t, indice_t> Subpoly_t;
 
 /**
 *An array of spare two dimension coordinate
@@ -47,27 +49,14 @@ struct MonomialConstraint {
   int *linCoefs;
   int minValue; /* only use in linconstraints */
   int consFunId;
-  MonomialConstraint(){
-    linCoefs=NULL;
-  }
-  
+  MonomialConstraint() { linCoefs = NULL; }
 };
-
 
 enum polyConstraintType { EQ, GE, GT, NE };
 
 typedef enum polyConstraintType PolyConstraintType;
 
-struct subPoly {
-  Poly_t *poly;                 /// the reference polynomial
-  uint8_t md5sum[DIGEST_SIZE];  /// the md5sum of this subpolynomial, when test
-  /// whether the two polynomials equal first test
-  /// the two mds5sum equal
-  int size;  /// the size of monomials
-  int *locs;
-};
 
-typedef struct subPoly SubPoly;
 
 struct polyConstraint {
   PolyConstraintType type;
@@ -82,7 +71,7 @@ struct support {
   SupportType type;
   //    BOOL isPoly;
 
-  SubPoly *subp;
+  Subpoly_t *subp;
 
   uint8_t md5sum[DIGEST_SIZE];
 
