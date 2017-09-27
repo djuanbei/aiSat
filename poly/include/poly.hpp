@@ -1,13 +1,15 @@
-
 /**
- * @file   poly.hpp
+ * @file   Poly.hpp
  * @author Liyun Dai <dlyun2009@gmail.com>
  * @date   Thu Sep 21 22:01:34 2017
  *
- * @brief  poly template class
+ * @brief  Poly template class
  *
  *
  */
+#ifndef __POLY_H
+#define __POLY_H
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -17,26 +19,29 @@
 #include <cmath>
 #include <iomanip>
 
-#include "vartable.h"
+#include "vartable.hpp"
 
 namespace aiSat {
 
 namespace poly {
-
 static size_t POLY_ID = 0;
+
 using namespace std;
-template <typename C = double, typename T = unsigned char>
-class poly {
+template <typename C = double, typename T = int>
+class Poly {
  public:
   struct term {
     vector<T> key;
     C cf;
+    term() {}
     term(const vector<T> &k, const C &c) : key(k), cf(c) {}
   };
 
-  typedef poly<C, T> poly_t;
+  typedef Poly<C, T> poly_t;
 
-  typedef poly<C, T>::term term_t;
+  typedef Poly<C, T>::term term_t;
+
+  static VarTable<T> VAR_TABLE;
 
  private:
   size_t id;
@@ -45,7 +50,7 @@ class poly {
   vector<T> indices;
   vector<C> coef;
 
-  void addTermWithSort(const vector<T> &key, const C cf) {
+  void add_term_with_sort(const vector<T> &key, const C cf) {
     int i, j;
     int length = coef.size();
     if (coef.empty()) {
@@ -125,6 +130,8 @@ class poly {
     }
     return -1;
   }
+
+
   /**
    * bi-search method
    *
@@ -196,17 +203,22 @@ class poly {
   }
 
  public:
-  poly() {
+  Poly() {
     varId = 0;
     varNum = 0;
     id = POLY_ID++;
   }
+  Poly(const int vid) {
+    varId = vid;
+    varNum = VAR_TABLE.getVarNum(varId);
+    id = POLY_ID++;
+  }
 
-  poly(const int evarId, const C coefDomain, const int termLength,
+  Poly(const int evarId, const C coefDomain, const int termLength,
        const int indiceDomain) {
     id = POLY_ID++;
     varId = evarId;
-    varNum = VAR_TABLE.getvarNum(varId);
+    varNum = VAR_TABLE.getVarNum(varId);
     C cf;
     vector<T> key(varNum, 0);
     int cfD = (int)coefDomain;
@@ -221,7 +233,7 @@ class poly {
     update();
   }
 
-  poly(const poly_t &other) {
+  Poly(const poly_t &other) {
     id = POLY_ID++;
     varId = other.varId;
     varNum = other.varNum;
@@ -235,6 +247,31 @@ class poly {
   int getVarId() const { return varId; }
   int getVarNum() const { return varNum; }
 
+
+  /** 
+   * @brief get the corresponding degree of k-th term i variate degree
+   * 
+   * @param k term index
+   * @param i  variate index
+   * 
+   * @return 
+   */
+  int getDegreeAt(int k, int i) const{
+
+    return indices[k*varNum+i];
+  }
+  
+  void getDegreeAt(int k, vector<T> & re) const{
+    re.resize(varNum);
+    for(int i=0; i< varNum; i++){
+      re[i]=indices[k*varNum+i];
+    }
+  }
+
+  C getCF(const int i) const{
+    return coef[i];
+  }
+  
   /**
    * @brief  combine the terms whoes indices are same
    *
@@ -300,9 +337,9 @@ class poly {
     int i, j;
     bool isFirst = true;
     stringstream str;
-    vector<int> vars;
+    vector<T> vars;
 
-    VAR_TABLE.getvarElem(varId, vars);
+    VAR_TABLE.getVarElem(varId, vars);
 
     vector<string> varname(varNum);
 
@@ -311,7 +348,7 @@ class poly {
     }
 
     for (i = 0; i < varNum; i++) {
-      varname[i] = VAR_TABLE.getvarName(vars[i + 1]);
+      varname[i] = VAR_TABLE.getVarName(vars[i + 1]);
     }
 
     size_t size = coef.size();
@@ -359,7 +396,7 @@ class poly {
     C minValue = MIN_COEF;
     int prec = 6;
     vector<int> vars;
-    VAR_TABLE.getvarElem(varId, vars);
+    VAR_TABLE.getVarElem(varId, vars);
 
     vector<string> varname(varNum);
 
@@ -368,7 +405,7 @@ class poly {
     }
 
     for (i = 0; i < varNum; i++) {
-      varname[i] = VAR_TABLE.getvarName(vars[i + 1]);
+      varname[i] = VAR_TABLE.getVarName(vars[i + 1]);
     }
 
     size_t size = locs.size();
@@ -515,7 +552,7 @@ class poly {
   }
 
   /**
-   * @brief enlarge or reduce poly's vars
+   * @brief enlarge or reduce Poly's vars
    *Notice keep capacity and size
    * if reduce I do not deal with the indice who variable is not exist
    *
@@ -528,10 +565,10 @@ class poly {
     }
     int length = coef.size();
     const int oldSize = varNum;
-    const int newSize = VAR_TABLE.getvarNum(vid);
+    const int newSize = VAR_TABLE.getVarNum(vid);
 
     int map[oldSize];
-    VAR_TABLE.getconvertMap(varId, vid, map);
+    VAR_TABLE.getConvertMap(varId, vid, map);
     varId = vid;
     varNum = newSize;
     if (coef.empty()) {
@@ -543,10 +580,6 @@ class poly {
 
       indices.resize(coef.size() * newSize);
 
-      /* 		memset((poly->indices)+poly->size*oldSize, 0 ,
-       * 						sizeof(T)*(poly->capacity)*(newSize-oldSize));
-       *
-       */
       /*-----------------------------------------------------------------------------
        *  can improve effective
        *-----------------------------------------------------------------------------*/
@@ -618,8 +651,8 @@ class poly {
     add_term(key, cf);
   }
 
-  poly<C, T> operator+(const C &cf) const {
-    poly<C, T> temp = *this;
+  Poly<C, T> operator+(const C &cf) const {
+    Poly<C, T> temp = *this;
     temp.add(cf);
     return temp;
   }
@@ -629,8 +662,8 @@ class poly {
     coef.push_back(t.cf);
   }
 
-  poly<C, T> operator+(const term_t &t) const {
-    poly<C, T> temp = *this;
+  Poly<C, T> operator+(const term_t &t) const {
+    Poly<C, T> temp = *this;
     temp.add_term(t);
     return temp;
   }
@@ -641,8 +674,8 @@ class poly {
     }
   }
 
-  poly<C, T> operator*(const C &cf) const {
-    poly<C, T> temp = *this;
+  Poly<C, T> operator*(const C &cf) const {
+    Poly<C, T> temp = *this;
     temp.mult(cf);
     return temp;
   }
@@ -657,8 +690,8 @@ class poly {
     }
   }
 
-  poly<C, T> operator*(const term_t &t) const {
-    poly<C, T> temp = *this;
+  Poly<C, T> operator*(const term_t &t) const {
+    Poly<C, T> temp = *this;
     temp.mult_term(t);
     return temp;
   }
@@ -677,7 +710,7 @@ class poly {
 
     int map[p2Size];
 
-    VAR_TABLE.getconvertMap(poly2.varId, varId, map);
+    VAR_TABLE.getConvertMap(poly2.varId, varId, map);
 
     int size = coef.size();
 
@@ -696,8 +729,8 @@ class poly {
     }
   }
 
-  poly<C, T> operator+(const poly_t &poly2) const {
-    poly<C, T> temp = *this;
+  Poly<C, T> operator+(const poly_t &poly2) const {
+    Poly<C, T> temp = *this;
     temp, add_poly(poly2);
     return temp;
   }
@@ -724,7 +757,7 @@ class poly {
 
       int map[p2Size];
 
-      VAR_TABLE.getconvertMap(poly2.varId, vid, map);
+      VAR_TABLE.getConvertMap(poly2.varId, vid, map);
 
       for (i = 0; i < poly2.coef.size(); i += 1) {
         if (poly2.coef[i] == 0) continue;
@@ -744,9 +777,9 @@ class poly {
 
       poly22.changeVarId(vid);
 
-      const int p1Size = VAR_TABLE.getvarNum(varId);
+      const int p1Size = VAR_TABLE.getVarNum(varId);
       int map[p1Size];
-      VAR_TABLE.getconvertMap(varId, vid, map);
+      VAR_TABLE.getConvertMap(varId, vid, map);
 
       for (i = 0; i < coef.size(); i += 1) {
         if (coef[i] == 0) continue;
@@ -772,3 +805,4 @@ class poly {
 };
 }
 }
+#endif

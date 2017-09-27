@@ -1,3 +1,5 @@
+#ifndef __BLOCK_MATH_H
+#define __BLOCK_MATH_H
 
 /**
  *   This file contains definitions for the block matrix data structures used
@@ -72,3 +74,5 @@ struct sparseblock {
 struct constraintmatrix {
   struct sparseblock *blocks;
 };
+
+#endif

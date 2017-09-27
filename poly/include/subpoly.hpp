@@ -1,12 +1,14 @@
 /**
- * @file   subpoly.hpp
+ * @file   Subpoly.hpp
  * @author Liyun Dai <dlyun2009@gmail.com>
  * @date   Fri Sep 22 22:31:51 2017
  *
- * @brief  subpoly
+ * @brief  Subpoly
  *
  *
  */
+#ifndef __SUB_OLY_H
+#define __SUB_OLY_H
 #include "crypt_md5.h"
 #include "poly.hpp"
 
@@ -15,7 +17,7 @@ namespace poly {
 
 template <typename C = double, typename T = unsigned char>
 
-class subpoly {
+class Subpoly {
  private:
   const poly<C, T> &parent;
   uint8_t md5sum[DIGEST_SIZE];  /// the md5sum of this subpolynomial, when test
@@ -37,7 +39,7 @@ class subpoly {
   }
 
  public:
-  subpoly(poly<C, T> &p) : parent(p) {
+  Subpoly(poly<C, T> &p) : parent(p) {
     int size = parent.getSize();
     for (int i = 0; i < size; i++) {
       locs.push_back(i);
@@ -46,7 +48,7 @@ class subpoly {
     getMd5sum(&ctx);
     memcpy(md5sum, MD5_DIGEST(&ctx), 16 * sizeof(uint8_t));
   }
-  subpoly(poly<C, T> &p, const vector<int> &loc) : parent(p), locs(loc) {
+  Subpoly(poly<C, T> &p, const vector<int> &loc) : parent(p), locs(loc) {
     md5_ctx_t ctx;
     getMd5sum(&ctx);
     memcpy(md5sum, MD5_DIGEST(&ctx), 16 * sizeof(uint8_t));
@@ -61,3 +63,5 @@ class subpoly {
 };
 }
 }
+
+#endif

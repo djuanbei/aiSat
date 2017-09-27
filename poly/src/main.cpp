@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
   // indice_t *cand = overConvexHull(points, length, dim, &relength);
   // printf("%d\n %s", relength, cand);
   // printf(" argc %d file %s\n", argc, argv[0]);
-  poly<double, indice_t> p1, p2;
-  poly<double, indice_t> p3 = p1 * p2;
+  Poly<double, indice_t> p1, p2;
+  Poly<double, indice_t> p3 = p1 * p2;
   return EXIT_SUCCESS;
 }
