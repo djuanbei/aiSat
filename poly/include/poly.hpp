@@ -669,6 +669,13 @@ class Poly {
     coef.push_back(cf);
   }
   
+  void add_term(const T * key, const C cf){
+    for(int i=0; i< varNum; i++){
+      indices.push_back(key[i]);
+    }
+    coef.push_back(cf);
+  }
+  
   Poly<C, T> operator+(const term_t &t) const {
     Poly<C, T> temp = *this;
     temp.add_term(t);

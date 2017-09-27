@@ -6,20 +6,21 @@
 #include "config.h"
 #include "declarations.h"
 #include "pointlist.h"
-#include "poly.h"
+#include "psdtype.h"
 #include "polytype.h"
 #include "sparse.h"
 #include "support_table.h"
-#include "vartable.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
+namespace aiSat{
+namespace psd{
+
+
 
 void sosrepresent(PointList* sosList, double* X, const int blockSize,
                   const int sosMid, const float minv);
 
-#ifdef __cplusplus
 }
-#endif
+}
+
 #endif

@@ -57,7 +57,7 @@ int MonomialConstTable::findconsElem(const int deg, const int varId,
       if (linCoef == NULL) {
         return i;
       }
-      num = Poly_t::VAR_TABLE.getVarNum(varId);
+      num = getVarTable<indice_t>().getVarNum(varId);
 
       for (j = 0; j < num; j += 1) {
         if (linCoef[j] != values[i]->linCoefs[j]) {

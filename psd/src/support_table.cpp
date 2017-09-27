@@ -99,39 +99,7 @@ void Supporttable::enlargetable(void) {
   }
 }
 
-// void
-// initSupTable(void  ){
-//	int i;
-//	table.value_capacity=DEFAULT_COEFMTABLE_SIZE;
-//
-//	table.loc=createTable();
-//	table.values	= (Support**)   malloc_d (table.value_capacity*
-// sizeof(Support* ) );
-//
-//	table..SOSsup	= (indice_t**)malloc_d (table.value_capacity*
-// sizeof(indice_t*) );
-//	table.Gsup=(indice_t**)malloc_d (table.value_capacity*
-//sizeof(indice_t*) );
-//
-//
-//	table.sosLength	= (int*)malloc_d (table.value_capacity* sizeof(int) );
-//
-//	table.gLength=(int*)malloc_d(table.value_capacity*sizeof(int));
-//
-//	table.arrangeM	=(ArrangeMatrix ***) malloc_d (table.value_capacity*
-// sizeof(ArrangeMatrix **) );
-//
-//	for ( i = 0; i < MAX_DEGREE+1; i += 1 ) {
-//		table.values[i]=createSupport(i,1,0,NULL);
-//		table.values[i]->id=i;
-//		table..SOSsup[i]=NULL;
-//		table.Gsup[i]=NULL;
-//		table.arrangeM[i]=NULL;
-//
-//	}
-//	table.value_size=MAX_DEGREE+1;
-//
-//}		/* -----  end of function initcoefMTable  ----- */
+
 
 int Supporttable::findSupElem(const int deg, const int varId, const int consNum,
                               const int *consIds) {
@@ -207,7 +175,7 @@ int Supporttable::addSOSup(const int deg, const int varId, const int consNum,
 
 int Supporttable::addSOSsupByIndice(const int varId, indice_t *indices,
                                     const int esize) {
-  qsortM(indices, Poly_t::VAR_TABLE.getVarNum(varId), 0, esize - 1, compare);
+  qsortM(indices, getVarTable<indice_t>().getVarNum(varId), 0, esize - 1, compare);
 
   int re = findSupElemByIndice(varId, indices, esize);
 
@@ -216,7 +184,7 @@ int Supporttable::addSOSsupByIndice(const int varId, indice_t *indices,
   }
   re = values.size();
   int value_size = re;
-  values.push_back(createSupBySup(varId, indices, value_size));
+  values.push_back(new Support(varId, indices, value_size));
 
   SOSsup.push_back(NULL);
   Gsup.push_back(NULL);
@@ -279,7 +247,7 @@ int Supporttable::addconvexsosSup(Subpoly_t *poly) {
 
   int value_size = values.size();
 
-  values.push_back(createSupByPoly(poly));
+  values.push_back( new Support(poly));
 
   SOSsup.push_back(NULL);
   Gsup.push_back(NULL);

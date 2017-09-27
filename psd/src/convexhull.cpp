@@ -32,11 +32,12 @@
 
 namespace aiSat{
 namespace psd{
-
+extern "C" {
 /* DGELSD prototype */
 extern void dgelsd_(int* m, int* n, int* nrhs, double* a, int* lda, double* b,
                     int* ldb, double* s, double* rcond, int* rank, double* work,
                     int* lwork, int* iwork, int* info);
+}
 /* Auxiliary routines prototypes */
 extern void print_matrix_(char* desc, int m, int n, double* a, int lda);
 

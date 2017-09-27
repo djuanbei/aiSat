@@ -317,7 +317,7 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
   int polyVarSize;
   int sosVarSize;
 
-  const int n = Poly_t::VAR_TABLE.getAllVarNum(); /* all the variables */
+  const int n = getVarTable<indice_t>().getAllVarNum(); /* all the variables */
 
   indice_t temp1[n];
   indice_t temp2[n];
@@ -340,17 +340,17 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
         lengthM[sosmMap[i]] * ENLARGE_RAT /
         (i * i * i + 1); /* here can have more smart method to deal with */
 
-    Poly_t::VAR_TABLE.getVarElem(sys->polys[i]->getVarId(), polyVarMap[i]);
+    getVarTable<indice_t>().getVarElem(sys->polys[i]->getVarId(), polyVarMap[i]);
 
-    Poly_t::VAR_TABLE.getVarElem(
+    getVarTable<indice_t>().getVarElem(
         SUPPORT_TABLE.getSupElem((sys->polyConstraints[i])->supportId)->varId,
         sosVarMap[i]);
 
-    multVarId[i] = Poly_t::VAR_TABLE.mergeVar(
+    multVarId[i] = getVarTable<indice_t>().mergeVar(
         sys->polys[i]->getVarId(),
         SUPPORT_TABLE.getSupElem((sys->polyConstraints[i])->supportId)->varId);
 
-    Poly_t::VAR_TABLE.getVarElem(multVarId[i], varMap[i]);
+    getVarTable<indice_t>().getVarElem(multVarId[i], varMap[i]);
 
     varSize[i] = (int)varMap[i][0];
   }
@@ -534,7 +534,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
   int i, j, k, h, p, pi, si, sum, tempI;
   int pSize, sSize, mSize;
   int index, tempIndex;
-  indice_t key[Poly_t::VAR_TABLE.getAllVarNum()];
+  indice_t key[getVarTable<indice_t>().getAllVarNum()];
   Sparseblock *blockptr;
   /*    int sosMId[sys->size];
    */
@@ -621,7 +621,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
     rhs->update();
 
     vector<indice_t> rhsVars;
-    Poly_t::VAR_TABLE.getVarElem(rhs->getVarId(), rhsVars);
+    getVarTable<indice_t>().getVarElem(rhs->getVarId(), rhsVars);
 
     int size = rhs->getSize();
     for (i = 0; i < size; i++) {
@@ -726,8 +726,8 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
           addSparse(block[index][i], j, (-1) * (sys->polys[p]->getCF(h)));
         }
         /* <= index is the constraints location
-                                       and j is the number of polynomial it
-                                       respect to. */
+           and j is the number of polynomial it
+           respect to. */
       }
     }
   }
@@ -1044,7 +1044,7 @@ int sdp_solver(SOSProblem *const sys, Poly_t **resP, char const *fprobname,
    */
   /*
 
-  */
+   */
   write_sol(fsolname, numofblock, numofCons, X, y, Z);
 
   /*

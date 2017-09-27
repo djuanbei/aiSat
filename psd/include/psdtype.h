@@ -14,7 +14,7 @@
 #include <cstdint>
 #include "poly.hpp"
 #include "subpoly.hpp"
-
+#include "util.h"
 namespace aiSat {
 namespace psd {
 using namespace poly;
@@ -67,7 +67,7 @@ typedef struct polyConstraint PolyConstraint;
 enum supportType { NORMAL, SUB_POLY, INDICE };
 typedef enum supportType SupportType;
 
-struct support {
+struct Support {
   SupportType type;
   //    BOOL isPoly;
 
@@ -80,8 +80,31 @@ struct support {
   int *consId;
   int constNum;
   int consCap;
+  Support(const int evarId, const indice_t *indices,
+                        const int size ){
+    
+    type = INDICE;
+    md5sumbyIndice(md5sum, evarId, indices, size);
+    varId = evarId;
+
+  }
+  Support(Subpoly_t *subpoly){
+
+    type = SUB_POLY;
+    subp = subpoly;
+
+    memcpy(md5sum, subpoly->getmd5(), DIGEST_SIZE);
+
+    deg = subpoly->getTotalDegree();
+    
+    varId = subpoly->getParent().getVarId();
+    constNum = 0;
+    consId = NULL;
+    consCap = 0;
+
+  }
 };
-typedef struct support Support;
+
 
 /*
   sum_{i=0}^{size-1} polys[i]*polyConstraints[i]=rhs

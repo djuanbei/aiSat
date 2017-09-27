@@ -64,13 +64,34 @@ class Subpoly {
     return locs.size();
   }
   
-  uint8_t* getmd5(){
+  const  uint8_t* getmd5() const{
     return md5sum;
   }
   
   int operator[] (const int i ) const{
     return locs[i];
   }
+  int getTotalDegree( ) {
+    
+    int re = 0;
+    int temp, i, j;
+
+    int varNum = parent.getVarNum( );
+
+    for (i = 0; i <locs.size(); i += 1) {
+      temp = 0;
+
+      for (j = 0; j < varNum; j += 1) {
+        temp += parent.getDegreeAt(locs[i], j);// poly->indices[sp->locs[i] * varNum + j];
+      }
+      if (temp > re) {
+        re = temp;
+      }
+    }
+    return re;
+  }
+  
+  
   string toString(void) const { return parent.toString(locs); }
 
   Poly<C, T> getPoly() const {

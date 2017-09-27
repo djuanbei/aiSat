@@ -43,10 +43,7 @@ namespace psd {
 Support *createSupport(const int deg, const int varId, const int consNum,
                        int *consId);
 
-Support *createSupByPoly(Subpoly_t *poly);
 
-Support *createSupBySup(const int varId, const indice_t *indices,
-                        const int value_size);
 
 void deleteSupport(Support *S);
 
