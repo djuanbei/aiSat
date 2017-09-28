@@ -70,9 +70,16 @@ POLY
 };
 
 POLY:
+'(' POLY ')'
+{
+  $$=$2;
+}
+|
 POLY '*' POLY
 {
   $1->mult_poly(*($3));
+  $$=$1;
+  delete $3;
 }
 |
 POLY '-' POLY
