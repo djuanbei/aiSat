@@ -50,9 +50,9 @@ endif
 
 COPTIMIZE ?= -O3
 
-CFLAGS    += -I  include -I  ulib/include
+CFLAGS    += -I  include -I  util/include -I poly/include -I sdp/include -I psd/include
 
-LFLAGS    +=  -L lib/   -lpoly -lsdp   -lm    -llapack -lblas    
+LFLAGS    +=  -L lib/ -lutil  -lpoly -lsdp  -lpsd  -lm    -llapack -lblas    
   
 
 
@@ -110,13 +110,23 @@ lib$(LIB)_release.a:	$(filter-out */$(MAINFILE).or, $(RCOBJS))
 	@echo Compiling: $(subst $(WROOT)/,,$@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
-otherlib: libpoly libcsdp
+otherlib:  libutil libsdp  libpoly libcsdp
+
+libutil:
+	cd util; make libr
+
 
 libpoly:
-	cd poly; make libr;
+	cd poly; make libr
 
-libcsdp:
+libsdp:
 	cd csdp; make libr
+
+libpsd:
+	cd psd; make libr
+
+test:
+	cd test; ./runtest.sh
 
 etags:
 	find . -name '*.[ch]' -o -name "*.cpp" | xargs etags

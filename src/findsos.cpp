@@ -21,7 +21,7 @@
 #include <cmath>
 #include <map>
 #include "convexhull.h"
-#include "poly.h"
+
 #include "polyissos.h"
 #include "sdpsolver.h"
 #include "search.h"

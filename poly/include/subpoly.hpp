@@ -74,11 +74,11 @@ class Subpoly {
   int getTotalDegree( ) {
     
     int re = 0;
-    int temp, i, j;
+    int temp, j;
 
     int varNum = parent.getVarNum( );
 
-    for (i = 0; i <locs.size(); i += 1) {
+    for (size_t i = 0; i <locs.size(); i += 1) {
       temp = 0;
 
       for (j = 0; j < varNum; j += 1) {

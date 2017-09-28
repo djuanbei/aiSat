@@ -81,7 +81,8 @@
 
 
 %right '^'
-%nonassoc uminus
+
+/* %nonassoc uminus */
 
 %start program
 

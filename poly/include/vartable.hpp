@@ -35,7 +35,7 @@ class VarTable {
 
   vector<T> variateCombine;
 
-  vector<int> locationIndex;
+  vector<int> startLocation;
 
   int varElemContain(const int sId, const int bId) {
     int re = 0;
@@ -45,19 +45,21 @@ class VarTable {
     getVarElem(sId, svars);
 
     getVarElem(bId, bvars);
+    int sNum=getVarNum(sId);
+    int bNum=getVarNum(bId);
 
-    if (svars[0] <= bvars[0]) {
+    if (sNum <= bNum) {
       i = j = 0;
-      while (i < (int)svars[0] && j < (int)bvars[0]) {
-        if (bvars[j + 1] < svars[i + 1])
+      while (i < sNum && j < bNum) {
+        if (bvars[j] < svars[i])
           j++;
-        else if (bvars[j + 1] == svars[i + 1]) {
+        else if (bvars[j] == svars[i]) {
           j++;
           i++;
         } else
           return re;
       }
-      if (i < (int)svars[0])
+      if (i < sNum)
         return re; /* svars has more variables than bvars */
     }
 
@@ -66,38 +68,32 @@ class VarTable {
 
  public:
   VarTable() {
-    variateCombine.push_back(0); /* const indices */
-    variateCombine.push_back(0);
-
-    locationIndex.push_back(0);
-    locationIndex.push_back(1);
+    startLocation.push_back(0);
+    startLocation.push_back(0);
   }
 
   VarTable(const int n) { reset(n); }
 
+  
   bool addVar(const string &name) {
+    
     int varNum = variateSymbol.size();
     for (int i = 0; i < varNum; i++) {
       if (name == variateSymbol[i]) {
         return false;
       }
     }
-    int varCap = variateSymbol.size();
-    if (varNum >= variateSymbol.size()) {
-      varCap *= ENLARGE_RAT;
-      varCap++;
-      variateSymbol.resize(varCap);
-    }
-    variateSymbol[varNum] = name;
-    varNum++;
 
-    int start = varNum + 1;
+    variateSymbol.push_back( name);
+    
 
-    int num = variateCombine.size() - varNum - 1;
+    int start = varNum;
+
+    int num = variateCombine.size() - varNum;
     variateCombine.push_back(0);
 
     for (int i = num; i > 0; i--) {
-      variateCombine[start + i] = variateCombine[start + i - 1];
+      variateCombine[start + i+1] = variateCombine[start + i];
     }
 
     /**
@@ -105,12 +101,12 @@ class VarTable {
      *
      */
 
-    for (int i = 2; i < locationIndex.size(); i++) {
-      locationIndex[i]++;
+    for (int i = 1; i < startLocation.size(); i++) {
+      startLocation[i]++;
     }
+    
 
     variateCombine[1] = varNum;
-    variateCombine[varNum + 1] = varNum - 1;
 
     return true;
   }
@@ -137,40 +133,40 @@ class VarTable {
     return variateSymbol[index];
   }
 
-  int addVarElem(const vector<T> &vars, const int n) {
+  int addVarElem(const vector<T> &vars) {
+    int n =vasr.size();
     if (0 == n) {
       return 0;
     }
     ASSERT(n <= variateSymbol.size(), "");
 
-    int re, i;
 
-    re = findVarElem(vars, n);
+    int re = findVarElem(vars);
     if (re > -1) {
       return re;
     }
+    
 
-    locationIndex.push_back(variateCombine.size());
-    variateCombine.push_back(n);
-
-    for (i = 0; i < n; i += 1) {
+    for (int i = 0; i < n; i += 1) {
       ASSERT(vars[i] < variateSymbol.size(), "");
       variateCombine.push_back(vars[i]);
     }
-
-    return locationIndex.size() - 1;
+    startLocation.push_back(variateCombine.size());
+    return startLocation.size() - 2;
   }
 
-  int findVarElem(const vector<T> &vars, const int n) {
-    int i, j, k, step;
+  int findVarElem(const vector<T> &vars) {
+    int i, j, k, len;
 
     i = 0;
-    while (i < locationIndex.size()) {
-      k = locationIndex[i];
-      step = (int)variateCombine[k];
-      if (n == step) {
+    while (i+1 < startLocation.size()) {
+      
+      k = startLocation[i];
+
+      len=startLocation[i+1]-startLocation[i];
+      if (n == len) {
         for (j = 0; j < n; j += 1) {
-          if (variateCombine[i + j + 1] != vars[j]) break;
+          if (variateCombine[k + j] != vars[j]) break;
         }
         if (j == n) {
           return i;
@@ -184,22 +180,21 @@ class VarTable {
 
   void getVarElem(const int id, vector<T> &re) {
     re.clear();
-    if (id >= locationIndex.size()) {
+    if (id+1 >= startLocation.size()) {
       return;
     }
-    int num = variateCombine[locationIndex[id]];
-    re.push_back(num);
+    int num = startLocation[id+1]-startLocation[id];
+    int start=startLocation[id];
     for (int i = 0; i < num; i++) {
-      re.push_back(variateCombine[locationIndex[id]] + i);
+      re.push_back(variateCombine[start+i]);
     }
   }
 
   int getVarNum(const int id) {
-    if (id >= locationIndex.size()) {
+    if (id+1 >= startLocation.size()) {
       return -1;
     }
-
-    return (int)variateCombine[locationIndex[id]];
+    return starLocation[id+1]-starLocation[id];
   }
 
   /**
@@ -210,7 +205,7 @@ class VarTable {
 
   int mergeVar(const int id1, const int id2) {
     int i, j, k;
-    i = j = 1;
+    i = j = 0;
     k = 0;
     if (id1 == id2) return id1;
 
@@ -219,9 +214,13 @@ class VarTable {
     getVarElem(id1, var1);
 
     getVarElem(id2, var2);
-    vector<T> var(var1[0] + var2[0]);
+    int var1Len=getVarNum(id1);
+    int var2Len=getVarNum(id2);
+    
+    
+    vector<T> var(var1Len + var2Len);
 
-    while (i <= var1[0] && j <= var2[0]) {
+    while (i < var1Len && j < var2Len) {
       if (var1[i] < var2[j]) {
         var[k] = var1[i++];
       } else if (var1[i] > var2[j]) {
@@ -233,17 +232,17 @@ class VarTable {
       }
       k++;
     }
-    while (i <= var1[0]) {
+    while (i <= var1Len) {
       var[k++] = var1[i++];
     }
-    while (j <= var2[0]) {
+    while (j <= var2Len) {
       var[k++] = var2[j++];
     }
 
-    return addVarElem(var, k);
+    return addVarElem(var);
   }
 
-  void getConvertMap(const int oId, const int nId, int map[]) {
+  void getConvertMap(const int oId, const int nId, int mapIndex[]) {
     if (oId != 0) ASSERT(varElemContain(oId, nId), "");
 
     int i, j;
@@ -251,23 +250,23 @@ class VarTable {
     getVarElem(oId, ovars);
     getVarElem(nId, nvars);
 
-    const int oSize = (int)ovars[0];
-    const int nSize = (int)nvars[0];
+    const int oSize = getVarNum(oId);
+    const int nSize =getVarNum(nId);
     if (oId == nId) {
       for (i = 0; i < oSize; i += 1) {
-        map[i] = i;
+        mapIndex[i] = i;
       }
       return;
     }
 
-    i = j = 1;
+    i = j = 0;
 
-    while (i <= oSize && j <= nSize) {
+    while (i < oSize && j < nSize) {
       if (ovars[i] < nvars[j]) {
         ASSERT(0,
                "every variable contain in ovars must aslo contain in novars ");
 
-        map[i - 1] = -1;
+        mapIndex[i] = -1;
         i++;
       }
 
@@ -275,7 +274,7 @@ class VarTable {
         j++;
 
       else {
-        map[i - 1] = j - 1;
+        mapIndex[i] = j;
         i++;
         j++;
       }
@@ -300,14 +299,14 @@ class VarTable {
       variateCombine.push_back(i);
     }
 
-    locationIndex.push_back(0);
-    locationIndex.push_back(1);
+    startLocation.push_back(0);
+    startLocation.push_back(1);
   }
 
   void clear(void) {
     variateSymbol.clear();
     variateCombine.clear();
-    locationIndex.clear();
+    startLocation.clear();
   }
 };
 

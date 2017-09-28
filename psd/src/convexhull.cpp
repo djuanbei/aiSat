@@ -235,10 +235,12 @@ POLY_SOS_T SOSChecker::easyCheck( PointList* ans) {
   int dim = getVarTable<indice_t>().getVarNum(poly.getVarId());
 
   vector<indice_t> key(dim);
-
-  int coefs[dim];
-  char convexSurf[size];
-  char maxPoint[size];
+  vector<int> coefs(dim);
+  vector<char > convexSurf(size, 0);
+  vector<char> maxPoint(size);
+  // int coefs[dim];
+  // char convexSurf[size];
+  // char maxPoint[size];
   int i, j, k;
   int coefDomain = 1;
   int maxSum = 0;
@@ -247,10 +249,10 @@ POLY_SOS_T SOSChecker::easyCheck( PointList* ans) {
   int first = 0;
   int second = 0;
   double planeSum;
-  memset(convexSurf, 0, size * sizeof(char));
+
   int loc0=(*subpoly)[0];
   int loc1=(*subpoly)[1];
-  int loc2=(*subpoly)[2];
+
   
   if (size == 1) {
     if (poly.getCF(loc0) < 0){
@@ -347,7 +349,8 @@ POLY_SOS_T SOSChecker::easyCheck( PointList* ans) {
   int checkTime = (size)*dim * dim;
 
   for (i = 0; i < checkTime; i += 1) {
-    memset(maxPoint, 0, size * sizeof(char));
+    fill(maxPoint.begin(), maxPoint.end(), 0);
+
     number = 0;
     coefDomain = sqrt(i) / (2 * size) + 1;
 
@@ -376,7 +379,8 @@ POLY_SOS_T SOSChecker::easyCheck( PointList* ans) {
       }
       if (tempSum > maxSum) {
         maxSum = tempSum;
-        memset(maxPoint, 0, k * sizeof(char));
+        fill(maxPoint.begin(), maxPoint.end(), 0);
+
         maxPoint[k] = 1;
         number = 1;
         first = k;
@@ -468,11 +472,15 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
   int i, j, m, k, maxSum, tempSum;
   int checkTime = dim * limit * size;
   int number = 0;
-  int choose[limit];
-  long int numBound;\
-  int coefsNum[dim];
-  int coefsDen[dim];
-  double A[size * dim];
+  vector<int> choose(limit);
+  // int choose[limit];
+  long int numBound;
+  vector<int> coefsNum(dim);
+  vector<int> coefsDen(dim);
+  // int coefsNum[dim];
+  // int coefsDen[dim];
+  vector<double> A(size*dim);
+  // double A[size * dim];
   double dummy;
   int info;
   int DUM_DOMAIN = 1, bound = 1;
@@ -482,12 +490,12 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
       A[ijtok(j + 1, i + 1, size)] = indices[loc[checkPoints[j]] * dim + i];
     }
   }
+  vector<double> VT(dim * dim);
+  // double VT[dim * dim];
+  vector<double> eigenvector(dim);
+  // double eigenvector[dim];
 
-  double VT[dim * dim];
-
-  double eigenvector[dim];
-
-  info = lpca(A, size, dim, VT, TRUE);
+  info = lpca(&A[0], size, dim, &VT[0], TRUE);
 
   if (info != -1) {
     for (k = 0; k < dim; k += 1) {
@@ -503,7 +511,7 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
         DUM_DOMAIN++;
 
         for (i = 0; i < dim; i += 1) {
-          f2rat(eigenvector[i], DUM_DOMAIN, coefsDen + i, coefsNum + i);
+          f2rat(eigenvector[i], DUM_DOMAIN, &coefsDen[i], &coefsNum[i]);
         }
 
         bound = 1;
@@ -564,6 +572,7 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
     }
   }
 
+  
   int M = limit;
   int N = dim;
   int NRHS = 1;
@@ -630,7 +639,7 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
             iwork, &info);
     if (info == 0) { /* success */
       for (k = 0; k < dim; k += 1) {
-        f2rat(b[k], numBound, coefsDen + k, coefsNum + k);
+        f2rat(b[k], numBound, &coefsDen[ k], &coefsNum[ k]);
       }
       numBound = 1;
 

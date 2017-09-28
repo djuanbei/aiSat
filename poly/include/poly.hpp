@@ -21,10 +21,10 @@
 
 #include "vartable.hpp"
 
-namespace aiSat {
+namespace assiSat {
 
 namespace psd{
-class SOSChecker;
+class SOSChecsker;
 }
 
 
@@ -350,7 +350,7 @@ class Poly {
     }
 
     for (i = 0; i < varNum; i++) {
-      varname[i] = getVarTable<T>().getVarName(vars[i + 1]);
+      varname[i] = getVarTable<T>().getVarName(vars[i]);
     }
 
     size_t size = coef.size();
@@ -407,7 +407,7 @@ class Poly {
     }
 
     for (i = 0; i < varNum; i++) {
-      varname[i] = getVarTable<T>().getVarName(vars[i + 1]);
+      varname[i] = getVarTable<T>().getVarName(vars[i]);
     }
 
     size_t size = locs.size();

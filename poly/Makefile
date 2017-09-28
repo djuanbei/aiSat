@@ -114,6 +114,14 @@ libs libp libd libr:
 	@ln -sf $(PWD)/$^  lib$(LIB).a
 	@ln -sf $(PWD)/$^ ../lib/lib$(LIB).a
 
+parser: LEX YACC
+
+LEX: src/polyscan.l
+	lex -o include/polyscan.h src/polyscan.l
+
+YACC: src/polyparser.y
+	bison  -o  src/polyparser.cpp  -v src/polyparser.y
+
 ## Clean rule
 clean:
 	@rm -f $(EXEC) $(EXEC)_profile $(EXEC)_debug $(EXEC)_release $(EXEC)_static \

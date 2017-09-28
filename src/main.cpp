@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
   } else {
     parseProblem();
   }
-  aiSat::poly<double, indice_t> p1, p2;
-  aiSat::poly<double, indice_t> p3 = p1 * p2;
+  aiSat::poly::Poly<double, indice_t> p1, p2;
+  aiSat::poly::Poly<double, indice_t> p3 = p1 * p2;
   return 0;
 }

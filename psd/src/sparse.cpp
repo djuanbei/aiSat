@@ -35,9 +35,8 @@ ArrangeMatrix::ArrangeMatrix(const int rLength) {
 }
 
 void ArrangeMatrix::printS() {
-  int i;
 
-  for (i = 0; i < data.size(); i += 1) {
+  for (size_t i = 0; i < data.size(); i += 1) {
     printf("%d %d %f\n", data[i].row, data[i].col, multCF);
   }
   printf("\n");
@@ -99,9 +98,9 @@ coef_t ArrangeMatrix::getValue(int row, int col) {
 void ArrangeMatrix::mult(const double a) { multCF = a; }
 
 string ArrangeMatrix::toString() const {
-  int i;
+
   stringstream str;
-  for (i = 0; i < data.size(); i += 1) {
+  for (size_t i = 0; i < data.size(); i += 1) {
     str << "(" << data[i].row << " , " << data[i].col << ")" << endl;
   }
   return str.str();

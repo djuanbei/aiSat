@@ -64,15 +64,18 @@ bool Khomog(indice_t *a, const int varId, const int cdeg, const int cvarId,
   int i, j, sum;
 
   vector<indice_t> varMap;
-  getVarTable<indice_t>().getVarElem(varId, varMap);
+  VarTable<indice_t> & vartable= getVarTable<indice_t>();
+  
+  vartable.getVarElem(varId, varMap);
   vector<indice_t> KvarMap;
-  getVarTable<indice_t>().getVarElem(cvarId, KvarMap);
+  vartable.getVarElem(cvarId, KvarMap);
 
-  const int size = (int)varMap[0];
-  const int KvarSize = getVarTable<indice_t>().getVarNum(cvarId);
+  const int size = vartable.getVarNum(varId );
+  
+  const int KvarSize = vartable.getVarNum(cvarId);
   sum = 0;
-  i = j = 1;
-  while (i <= size && j <= KvarSize) {
+  i = j = 0;
+  while (i < size && j < KvarSize) {
     if (varMap[i] < KvarMap[j])
       i++;
     else if (varMap[i] > KvarMap[j])
@@ -106,30 +109,35 @@ bool symm(indice_t *a, const int varId, const int cdeg, const int cvarId,
           const int *clinCoefs, const int cminValue) {
   int i, j, value;
   vector<indice_t> varMap;
-  getVarTable<indice_t>().getVarElem(varId, varMap);
+  VarTable<indice_t> & vartable= getVarTable<indice_t>();
+    
+  vartable.getVarElem(varId, varMap);
 
   vector<indice_t> symvarMap;
-  getVarTable<indice_t>().getVarElem(cvarId, symvarMap);
+  vartable.getVarElem(cvarId, symvarMap);
 
-  const int size = (int)varMap[0];
-  const int symSize = (int)symvarMap[0];
+  const int size = vartable.getVarNum(varId);
+  const int symSize =vartable.getVarNum(cvarId);
 
   value = -1;
-  i = j = 1;
-  while (i <= size && j <= symSize) {
-    if (varMap[i] < symvarMap[j])
+  i = j = 0;
+  while (i < size && j < symSize) {
+    if (varMap[i] < symvarMap[j]){
       i++;
-
+    }
     else if (varMap[i] > symvarMap[j]) {
-      if (-1 == value)
+      if (-1 == value){
         value = 0;
-      else if (0 != value)
+      }
+      else if (0 != value){
         return false;
+      }
       j++;
 
     } else {
-      if (-1 == value)
+      if (-1 == value){
         value = a[i];
+      }
       else if (value != a[i]) {
         return false;
       }
@@ -138,7 +146,9 @@ bool symm(indice_t *a, const int varId, const int cdeg, const int cvarId,
     }
   }
   if (j != symSize + 1) {
-    if (-1 != value || 0 != value) return false;
+    if (-1 != value || 0 != value){
+      return false;
+    }
   }
   return true;
 }
@@ -148,16 +158,18 @@ bool linCons(indice_t *a, const int varId, const int cdeg, const int cvarId,
   int i, j;
   int sum = 0;
   vector<indice_t> varMap;
-  getVarTable<indice_t>().getVarElem(varId, varMap);
+  VarTable<indice_t> & vartable= getVarTable<indice_t>();
+    
+  vartable.getVarElem(varId, varMap);
 
   vector<indice_t> linvarMap;
-  getVarTable<indice_t>().getVarElem(cvarId, linvarMap);
+  vartable.getVarElem(cvarId, linvarMap);
 
-  const int size = (int)varMap[0];
-  const int linSize = (int)linvarMap[0];
+  const int size = vartable.getVarNum(varId);
+  const int linSize = vartable.getVarNum(cvarId);
 
-  i = j = 1;
-  while (i <= size && j <= linSize) {
+  i = j = 0;
+  while (i < size && j < linSize) {
     if (varMap[i] < linvarMap[j])
       i++;
     else if (varMap[i] > linvarMap[j]) {
@@ -171,10 +183,12 @@ bool linCons(indice_t *a, const int varId, const int cdeg, const int cvarId,
   /*-----------------------------------------------------------------------------
    *  sum>= minValue or sum > minValue need further consider.
    *-----------------------------------------------------------------------------*/
-  if (sum >= cminValue)
+  if (sum >= cminValue){
     return true;
-  else
+  }
+  else{
     return false;
+  }
 }
 }
 }
