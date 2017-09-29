@@ -337,68 +337,19 @@ class Poly {
   }
 
   string toString(const float minValue, const int prec) const {
-    int i, j;
-    bool isFirst = true;
-    stringstream str;
-    vector<T> vars;
-
-    getVarTable<T>().getVarElem(varId, vars);
-
-    vector<string> varname(varNum);
-
-    if (0 == coef.size()) {
-      return " 0 \n";
+    vector<int> locs;
+    for(size_t i=0; i< coef.size(); i++){
+      locs.push_back(i);
     }
-
-    for (i = 0; i < varNum; i++) {
-      varname[i] = getVarTable<T>().getVarName(vars[i]);
-    }
-
-    size_t size = coef.size();
-
-    for (i = 0; i < size; i += 1) {
-      if (coef[i] > minValue || coef[i] < -minValue) {
-        if (i == 0) {
-          str << std::setprecision(prec) << coef[i];
-
-        } else if (coef[i] > 0.0) {
-          if (!isFirst) {
-            str << "+" << std::setprecision(prec) << coef[i];
-          }
-
-        } else if (coef[i] < 0.0) {
-          str << std::setprecision(prec) << coef[i];
-        }
-
-        for (j = 0; j < varNum; j += 1) {
-          if (indices[i * varNum + j] > 0) {
-            if (indices[i * varNum + j] > 1) {
-              str << "*" << varname[j] << "^" <<(int) (indices[i * varNum + j]);
-            }
-
-            else if (1 == indices[i * varNum + j]) {
-              str << "*" << varname[j];
-            }
-          }
-        }
-        isFirst = false;
-      }
-    }
-
-    if (isFirst) {
-      return " 0 \n";
-    }
-
-    return str.str();
+    return toString(locs, minValue, prec);
   }
 
-  string toString(const vector<int> &locs) const {
+  string toString(const vector<int> &locs, float minValue=MIN_COEF,   int prec = 6 ) const {
     int i, j;
     bool isFirst = true;
     stringstream str;
-    C minValue = MIN_COEF;
-    int prec = 6;
-    vector<int> vars;
+
+    vector<T> vars;
     getVarTable<T>().getVarElem(varId, vars);
 
     vector<string> varname(varNum);
@@ -416,26 +367,56 @@ class Poly {
     for (i = 0; i < size; i += 1) {
       int loc = locs[i];
       if (coef[loc] > minValue || coef[loc] < -minValue) {
-        if (i == 0) {
-          str << std::setprecision(prec) << coef[loc];
-
-        } else if (coef[loc] > 0.0) {
-          if (!isFirst) {
-            str << "+" << std::setprecision(prec) << coef[loc];
+        bool isConstant=true;
+        for(j=0; j< varNum; j++){
+          if((int)indices[loc * varNum + j]>0){
+            isConstant=false;
+            break;
+          }
+        }
+        
+        if(isConstant){
+          if (coef[loc] > 0.0) {
+            if(!isFirst){
+              str << "+";
+            }
+            str << std::setprecision(prec) << coef[loc];
+          }
+          else if (coef[loc] < 0.0) {
+            str << std::setprecision(prec) << coef[loc];
+          }
+          
+        }else{
+          bool isCeng=false;
+          if (coef[loc] > 0.0) {
+            if (!isFirst) {
+              str << "+";
+            }
+            if(coef[loc]!=(C)1.0){
+              isCeng=true;
+              str << std::setprecision(prec) << coef[loc];
+            }
           }
 
-        } else if (coef[loc] < 0.0) {
-          str << std::setprecision(prec) << coef[loc];
-        }
+          else if (coef[loc] < 0.0) {
+            str << std::setprecision(prec) << coef[loc];
+          }
 
-        for (j = 0; j < varNum; j += 1) {
-          if (indices[loc * varNum + j] > 0) {
-            if (indices[loc * varNum + j] > 1) {
-              str << "*" << varname[j] << "^" << (int)indices[loc * varNum + j];
+          for (j = 0; j < varNum; j += 1) {
+            if(indices[loc * varNum + j]!=0){
+              if(isCeng){
+                str << "*";
+              }
+              isCeng=true;
             }
+            if (indices[loc * varNum + j] > 0) {
+              if (indices[loc * varNum + j] > 1) {
+                str << varname[j] << "^" << (int)indices[loc * varNum + j];
+              }
 
-            else if (1 == indices[loc * varNum + j]) {
-              str << "*" << varname[j];
+              else if (1 == indices[loc * varNum + j]) {
+                str <<varname[j];
+              }
             }
           }
         }
@@ -713,7 +694,7 @@ class Poly {
   }
 
   void add_poly(const poly_t &poly2) {
-    int i, j;
+
     int vid = varId;
     if (varId != poly2.varId) {
       vid = getVarTable<T>().mergeVar(varId, poly2.varId);
@@ -728,17 +709,17 @@ class Poly {
     vector<int> mapIndex(p2Size);
     getVarTable<T>().getConvertMap(poly2.varId, varId, mapIndex);
 
-    int size = coef.size();
+    int size = poly2.coef.size();
 
-    for (i = 0; i < size; i += 1) {
-      if (0 == coef[i]) continue;
-
-      for (j = 0; j < varNum; j += 1) {
-        key[j] = 0;
+    for (int i = 0; i < size; i += 1) {
+      if (0 == poly2.coef[i]){
+        continue;
       }
+      fill(key.begin(), key.end(), 0);
 
-      for (j = 0; j < p2Size; j += 1) {
-        if (mapIndex [j] > -1) key[mapIndex[j]] = indices[i * p2Size + j];
+
+      for (int j = 0; j < p2Size; j += 1) {
+        if (mapIndex [j] > -1) key[mapIndex[j]] = poly2.indices[i * p2Size + j];
       }
       term_t tempt(key, poly2.coef[i]);
       add_term(tempt);  //  key, poly2.coef[i]);
@@ -818,8 +799,15 @@ class Poly {
     temp.mult_poly(poly2);
     return temp;
   }
+  template<typename CC, typename  TT> 
+  friend ostream& operator<<(ostream& os, Poly<CC,TT>& p);
 };
 
+template<typename CC, typename  TT>
+ostream& operator<<(ostream& os, Poly<CC,TT>& p){
+  os<< p.toString();
+  return os;
+}
 
 }
 }

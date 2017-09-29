@@ -28,7 +28,6 @@ namespace poly {
 using namespace std;
 
 
-
 template <typename T>
 class VarTable {
  private:
@@ -71,7 +70,6 @@ class VarTable {
   VarTable() {
     startLocation.push_back(0);
     startLocation.push_back(0);
-    startLocation.push_back(0);
   }
 
   VarTable(const int n) { reset(n); }
@@ -93,25 +91,6 @@ class VarTable {
     }
 
     variateSymbol.push_back( name);
-   
-    int start = varNum;
-
-    int num = variateCombine.size() - varNum;
-    variateCombine.push_back(0);
-
-    for (int i = num; i > 0; i--) {
-      variateCombine[start + i] = variateCombine[start + i-1];
-    }
-    variateCombine[varNum]=varNum;
-    
-    /**
-     * right shift one
-     *
-     */
-
-    for (int i = 2; i < startLocation.size(); i++) {
-      startLocation[i]++;
-    }
 
     return true;
   }
@@ -187,12 +166,17 @@ class VarTable {
    */
 
   int findVarElem(const vector<T> &evars) {
+    
+    if(evars.empty()){
+      return 0;
+    }
+    
     vector<T> vars(evars);
     sort(vars.begin(), vars.end());
     
     int i, j, k, len;
     int n=vars.size();
-    i = 0;
+    i = 1;
     while (i+1 < startLocation.size()) {
       
       k = startLocation[i];
@@ -340,10 +324,7 @@ class VarTable {
       variateSymbol[i][1] = 'a' + (i / 26) % 26;
       variateSymbol[i][2] = '@' + (i / 26) % 26;
 
-      variateCombine.push_back(i);
     }
-    
-    startLocation[2]=n;
 
   }
 
@@ -351,7 +332,6 @@ class VarTable {
     variateSymbol.clear();
     variateCombine.clear();
     startLocation.clear();
-    startLocation.push_back(0);
     startLocation.push_back(0);
     startLocation.push_back(0);
   }

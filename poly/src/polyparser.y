@@ -97,6 +97,7 @@ POLY '+' POLY
 {
 
   $1->add_poly(*($3));
+
   $$=$1;
   delete $3;
 }
@@ -129,13 +130,14 @@ TERM
 |
 NUM
 {
+
   $$=new Poly_t(varId);
   $$->add($1);
 }
 |
 INTEGER
 {
-  
+
   $$=new Poly_t(varId);
   $$->add($1);
 }
