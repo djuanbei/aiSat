@@ -117,13 +117,21 @@ TERM
   for(size_t i=0; i< vars.size(); i++){
     keyMap[vars[i]]=i;
   }
-  fill(vars.begin(), vars.end(), 0);
 
+  vector<indice_t> pows(vars.size(), 0);
   for(size_t i=0; i< $1->size(); i+=2){
-    vars[ keyMap[(*$1)[i]]]+=(*$1)[i+1];
+    pows[ keyMap[(*$1)[i]]]+=(*$1)[i+1];
+  }
+
+  vector<pair< indice_t, indice_t> > key(vars.size());
+  for(  size_t i=0; i< vars.size(); i++){
+    key[i].first=vars[i];
+    key[i].first=pows[i];
   }
   
-  $$->add_term(vars, 1);
+  Poly_t::Term  term(key, 1);
+  
+  $$->add_term(term);
   
   delete $1;
 }

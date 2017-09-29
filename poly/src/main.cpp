@@ -27,10 +27,9 @@ using namespace aiSat::poly;
 
 typedef Poly<coef_t, indice_t> Poly_t;
 
-int main(int argc, char *argv[]) {
-  
+int main(int argc, char* argv[]) {
   // VarTable<indice_t> Poly<double,indice_t>::VAR_TABLE;
-  
+
   // int length = 10;
   // const int dim = 7;
   // const int domain = 5;
@@ -41,14 +40,14 @@ int main(int argc, char *argv[]) {
   // printf("%d\n %s", relength, cand);
   // printf(" argc %d file %s\n", argc, argv[0]);
 
-  Poly_t p=parse("x+2");
-  cout<<p.toString()<<endl;
-  Poly_t p1=parse("y+1");
+  Poly_t p = parse("x+2");
+  cout << p.toString() << endl;
+  Poly_t p1 = parse("y+1");
 
-  VarTable<indice_t>& table= getVarTable<indice_t>();
+  VarTable<indice_t>& table = getVarTable<indice_t>();
   // table.clear();
-  cout<<table.getVarNum(p.getVarId())<<endl;
-  cout<<table.getVarNum(p1.getVarId())<<endl;
+  cout << table.getVarNum(p.getVarId()) << endl;
+  cout << table.getVarNum(p1.getVarId()) << endl;
   // Poly<coef_t, indice_t> p=parse("x+1");
   // string str=p.toString();
   // cout<<str<<endl;

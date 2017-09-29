@@ -11,10 +11,10 @@
 #define __POLY_H
 
 #include <iostream>
+#include <map>
+#include <sstream>
 #include <string>
 #include <vector>
-
-#include <sstream>
 
 #include <cmath>
 #include <iomanip>
@@ -23,23 +23,19 @@
 
 namespace aiSat {
 
-namespace psd{
+namespace psd {
 class SOSChecker;
 }
-
 
 namespace poly {
 static size_t POLY_ID = 0;
 
 using namespace std;
 
-
-
 template <typename C = double, typename T = int>
 class Poly {
-  
   friend class aiSat::psd::SOSChecker;
-  
+
  public:
   struct term {
     vector<T> key;
@@ -48,10 +44,24 @@ class Poly {
     term(const vector<T> &k, const C &c) : key(k), cf(c) {}
   };
 
+  struct Term {
+    vector<pair<T, T> > key; // var, power
+    C cf;
+    Term() {}
+    Term(const vector<pair<T, T> > &k, C c=1) : key(k), cf(c) {}
+  };
+  
+  struct assignElem {
+    int var;
+    C value;
+    assignElem() : var(0), value(0) {}
+
+    assignElem(int v, C c) : var(v), value(c) {}
+  };
+
   typedef Poly<C, T> poly_t;
 
   typedef Poly<C, T>::term term_t;
-
 
  private:
   size_t id;
@@ -60,6 +70,8 @@ class Poly {
   vector<T> indices;
   vector<C> coef;
 
+  C getCF(const int i) const { return coef[i]; }
+  
   void add_term_with_sort(const vector<T> &key, const C cf) {
     int i, j;
     int length = coef.size();
@@ -86,6 +98,30 @@ class Poly {
       }
       coef[location] = cf;
     }
+  }
+
+
+  void add_term(const term_t &t) {
+    indices.insert(indices.end(), t.key.begin(), t.key.begin() + varNum);
+    coef.push_back(t.cf);
+  }
+
+  void add_term(const vector<T> &key, const C cf) {
+    indices.insert(indices.end(), key.begin(), key.begin() + varNum);
+    coef.push_back(cf);
+  }
+
+  void add_term(const T *key, const C cf) {
+    for (int i = 0; i < varNum; i++) {
+      indices.push_back(key[i]);
+    }
+    coef.push_back(cf);
+  }
+
+  Poly<C, T> operator+(const term_t &t) const {
+    Poly<C, T> temp = *this;
+    temp.add_term(t);
+    return temp;
   }
 
   int compare(const int k1, const int k2) const {
@@ -273,7 +309,94 @@ class Poly {
     }
   }
 
-  C getCF(const int i) const { return coef[i]; }
+
+
+  C getCF( const Term &term) const{
+    map<int, int> mapIndex;
+    vector<T> vars;
+    getVarTable<T>().getVarElem(varId, vars);
+    for (int i = 0; i < varNum; i++) {
+      mapIndex[vars[i]] = i;
+    }
+    vector<indice_t> pow(varNum, 0);
+
+    for(size_t i=0; i< term.key.size(); i++){
+      pow[mapIndex[term.key[i].first]]=term.key[i].second;
+    }
+    int loc=findIndex(pow);
+    ASSERT(loc>-1, "There are no that term");
+    if(loc>-1){
+      return getCF(loc);
+    }
+
+  }
+
+  /**
+   * @brief obtain polynomal after assiginment value
+   *
+   * @param value  there are no twos elements in value have same var
+   *
+   * @return the polyomial after substitute variable as corresponding value
+   */
+
+  Poly<C, T> eval(const vector<assignElem> &value) const {
+    if (value.empty()) {
+      return *this;
+    }
+
+    vector<C> ncoef(coef);
+    map<int, int> mapIndex;
+    vector<int> vars;
+    getVarTable<T>().getVarElem(varId, vars);
+    vector<C> values(varNum);
+    vector<bool> haveAssign(varNum, false);
+    for (int i = 0; i < varNum; i++) {
+      values[i] = 1;
+      mapIndex[vars[i]] = i;
+    }
+
+    for (typename vector<assignElem>::const_iterator it = value.begin();
+         it != value.end(); it++) {
+      haveAssign[mapIndex[it->var]] = true;
+      values[mapIndex[it->var]] = it->value;
+    }
+
+    vector<T> nvars;
+    for (int i = 0; i < varNum; i++) {
+      if (!haveAssign[i]) {
+        nvars.push_back(vars[i]);
+      }
+    }
+
+    int nvarNum = nvars.size();
+    int nvid = getVarTable<T>().addVarElem(nvars);
+    Poly<C, T> re(nvid);
+    vector<indice_t> nindices(coef.size() * nvarNum);
+
+    for (size_t i = 0; i < coef.size(); i++) {
+      int h = 0;
+      for (int j = 0; j < varNum; j++) {
+        if (haveAssign[j]) {
+          if (values[j] == 0) {
+            ncoef[i] = 0;
+            break;
+          }
+
+          for (int k = 0; k < indices[i * varNum + j]; k++) {
+            ncoef[i] *= values[j];
+          }
+        } else {
+          nindices[nvarNum * i + h] = indices[i * varNum + j];
+          h++;
+        }
+      }
+    }
+
+    re.coef = ncoef;
+    re.nindices = indices;
+    re.update();
+    return re;
+  }
 
   /**
    * @brief  combine the terms whoes indices are same
@@ -338,13 +461,14 @@ class Poly {
 
   string toString(const float minValue, const int prec) const {
     vector<int> locs;
-    for(size_t i=0; i< coef.size(); i++){
+    for (size_t i = 0; i < coef.size(); i++) {
       locs.push_back(i);
     }
     return toString(locs, minValue, prec);
   }
 
-  string toString(const vector<int> &locs, float minValue=MIN_COEF,   int prec = 6 ) const {
+  string toString(const vector<int> &locs, float minValue = MIN_COEF,
+                  int prec = 6) const {
     int i, j;
     bool isFirst = true;
     stringstream str;
@@ -367,33 +491,32 @@ class Poly {
     for (i = 0; i < size; i += 1) {
       int loc = locs[i];
       if (coef[loc] > minValue || coef[loc] < -minValue) {
-        bool isConstant=true;
-        for(j=0; j< varNum; j++){
-          if((int)indices[loc * varNum + j]>0){
-            isConstant=false;
+        bool isConstant = true;
+        for (j = 0; j < varNum; j++) {
+          if ((int)indices[loc * varNum + j] > 0) {
+            isConstant = false;
             break;
           }
         }
-        
-        if(isConstant){
-          if (coef[loc] > 0.0) {
-            if(!isFirst){
-              str << "+";
-            }
-            str << std::setprecision(prec) << coef[loc];
-          }
-          else if (coef[loc] < 0.0) {
-            str << std::setprecision(prec) << coef[loc];
-          }
-          
-        }else{
-          bool isCeng=false;
+
+        if (isConstant) {
           if (coef[loc] > 0.0) {
             if (!isFirst) {
               str << "+";
             }
-            if(coef[loc]!=(C)1.0){
-              isCeng=true;
+            str << std::setprecision(prec) << coef[loc];
+          } else if (coef[loc] < 0.0) {
+            str << std::setprecision(prec) << coef[loc];
+          }
+
+        } else {
+          bool isCeng = false;
+          if (coef[loc] > 0.0) {
+            if (!isFirst) {
+              str << "+";
+            }
+            if (coef[loc] != (C)1.0) {
+              isCeng = true;
               str << std::setprecision(prec) << coef[loc];
             }
           }
@@ -403,11 +526,11 @@ class Poly {
           }
 
           for (j = 0; j < varNum; j += 1) {
-            if(indices[loc * varNum + j]!=0){
-              if(isCeng){
+            if (indices[loc * varNum + j] != 0) {
+              if (isCeng) {
                 str << "*";
               }
-              isCeng=true;
+              isCeng = true;
             }
             if (indices[loc * varNum + j] > 0) {
               if (indices[loc * varNum + j] > 1) {
@@ -415,7 +538,7 @@ class Poly {
               }
 
               else if (1 == indices[loc * varNum + j]) {
-                str <<varname[j];
+                str << varname[j];
               }
             }
           }
@@ -551,7 +674,6 @@ class Poly {
     const int oldSize = varNum;
     const int newSize = getVarTable<T>().getVarNum(vid);
 
-
     vector<int> mapIndex(oldSize);
     getVarTable<T>().getConvertMap(varId, vid, mapIndex);
     varId = vid;
@@ -594,8 +716,8 @@ class Poly {
         }
 
         for (j = 0; j < oldSize; j += 1) {
-          if (mapIndex [j] > -1) {
-            temp[mapIndex [j]] = indices[i * oldSize + j];
+          if (mapIndex[j] > -1) {
+            temp[mapIndex[j]] = indices[i * oldSize + j];
           }
         }
 
@@ -619,8 +741,8 @@ class Poly {
         }
 
         for (j = 0; j < newSize; j += 1) {
-          if (mapIndex [j] > -1) {
-            temp[mapIndex [j]] = indices[i * oldSize + j];
+          if (mapIndex[j] > -1) {
+            temp[mapIndex[j]] = indices[i * oldSize + j];
           }
         }
 
@@ -642,29 +764,28 @@ class Poly {
     return temp;
   }
 
-  void add_term(const term_t &t) {
-    indices.insert(indices.end(), t.key.begin(), t.key.begin() + varNum);
-    coef.push_back(t.cf);
-  }
-
-  void add_term(const vector<T> &key, const C cf) {
-    indices.insert(indices.end(), key.begin(), key.begin() + varNum);
-    coef.push_back(cf);
-  }
-  
-  void add_term(const T * key, const C cf){
-    for(int i=0; i< varNum; i++){
-      indices.push_back(key[i]);
+  void  add_term(const Term & term){
+    map<int, int> mapIndex;
+    vector<T> vars;
+    getVarTable<T>().getVarElem(varId, vars);
+    for (int i = 0; i < varNum; i++) {
+      mapIndex[vars[i]] = i;
     }
-    coef.push_back(cf);
+    coef.push_back(term.cf);
+    size_t last=indices.size();
+    for(int i=0; i< varNum; i++){
+      indices.push_back(0);
+    }
+    for(size_t i=0; i< term.key.size(); i++){
+      indices[last+mapIndex[term.key[i].first]]=term.key[i].second;
+    }
   }
   
-  Poly<C, T> operator+(const term_t &t) const {
+  Poly<C,T> operator +( const Term & term) const{
     Poly<C, T> temp = *this;
-    temp.add_term(t);
+    temp.add_term(term);
     return temp;
   }
-
   void mult(const C &cf) {
     for (int i = 0; i < coef.size(); i += 1) {
       coef[i] *= cf;
@@ -694,7 +815,6 @@ class Poly {
   }
 
   void add_poly(const poly_t &poly2) {
-
     int vid = varId;
     if (varId != poly2.varId) {
       vid = getVarTable<T>().mergeVar(varId, poly2.varId);
@@ -705,21 +825,19 @@ class Poly {
 
     const int p2Size = poly2.varNum;
 
-
     vector<int> mapIndex(p2Size);
     getVarTable<T>().getConvertMap(poly2.varId, varId, mapIndex);
 
     int size = poly2.coef.size();
 
     for (int i = 0; i < size; i += 1) {
-      if (0 == poly2.coef[i]){
+      if (0 == poly2.coef[i]) {
         continue;
       }
       fill(key.begin(), key.end(), 0);
 
-
       for (int j = 0; j < p2Size; j += 1) {
-        if (mapIndex [j] > -1) key[mapIndex[j]] = poly2.indices[i * p2Size + j];
+        if (mapIndex[j] > -1) key[mapIndex[j]] = poly2.indices[i * p2Size + j];
       }
       term_t tempt(key, poly2.coef[i]);
       add_term(tempt);  //  key, poly2.coef[i]);
@@ -751,8 +869,7 @@ class Poly {
 
       const int p2Size = poly2.varNum;
 
-
-      vector<int>  mapKey(p2Size);
+      vector<int> mapKey(p2Size);
       getVarTable<T>().getConvertMap(poly2.varId, vid, mapKey);
 
       for (i = 0; i < poly2.coef.size(); i += 1) {
@@ -760,7 +877,7 @@ class Poly {
         fill(mapKey.begin(), mapKey.begin() + varSize, 0);
 
         for (j = 0; j < p2Size; j += 1) {
-          if (mapKey[j] > -1) key[mapKey [j]] = poly2.indices[i * p2Size + j];
+          if (mapKey[j] > -1) key[mapKey[j]] = poly2.indices[i * p2Size + j];
         }
         vector<T> tempkey(key);
         term_t tempt(tempkey, poly2.coef[i]);
@@ -775,7 +892,7 @@ class Poly {
 
       const int p1Size = getVarTable<T>().getVarNum(varId);
 
-      vector<int>  mapKey(p1Size);
+      vector<int> mapKey(p1Size);
       getVarTable<T>().getConvertMap(varId, vid, mapKey);
 
       for (i = 0; i < coef.size(); i += 1) {
@@ -799,16 +916,15 @@ class Poly {
     temp.mult_poly(poly2);
     return temp;
   }
-  template<typename CC, typename  TT> 
-  friend ostream& operator<<(ostream& os, Poly<CC,TT>& p);
+  template <typename CC, typename TT>
+  friend ostream &operator<<(ostream &os, Poly<CC, TT> &p);
 };
 
-template<typename CC, typename  TT>
-ostream& operator<<(ostream& os, Poly<CC,TT>& p){
-  os<< p.toString();
+template <typename CC, typename TT>
+ostream &operator<<(ostream &os, Poly<CC, TT> &p) {
+  os << p.toString();
   return os;
 }
-
 }
 }
 #endif

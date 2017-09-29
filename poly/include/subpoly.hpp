@@ -9,11 +9,11 @@
  */
 #ifndef __SUB_OLY_H
 #define __SUB_OLY_H
+#include <cstring>
 #include "crypt_md5.h"
 #include "poly.hpp"
-#include <cstring>
 namespace aiSat {
-namespace psd{
+namespace psd {
 class SOSChecker;
 }
 namespace poly {
@@ -21,8 +21,8 @@ namespace poly {
 template <typename C = double, typename T = unsigned char>
 
 class Subpoly {
-  
   friend class aiSat::psd::SOSChecker;
+
  private:
   const Poly<C, T> &parent;
   uint8_t md5sum[DIGEST_SIZE];  /// the md5sum of this subpolynomial, when test
@@ -58,31 +58,24 @@ class Subpoly {
     getMd5sum(&ctx);
     memcpy(md5sum, MD5_DIGEST(&ctx), 16 * sizeof(uint8_t));
   }
-  
-  int size() const{
-    
-    return locs.size();
-  }
-  
-  const  uint8_t* getmd5() const{
-    return md5sum;
-  }
-  
-  int operator[] (const int i ) const{
-    return locs[i];
-  }
-  int getTotalDegree( ) {
-    
+
+  int size() const { return locs.size(); }
+
+  const uint8_t *getmd5() const { return md5sum; }
+
+  int operator[](const int i) const { return locs[i]; }
+  int getTotalDegree() {
     int re = 0;
     int temp, j;
 
-    int varNum = parent.getVarNum( );
+    int varNum = parent.getVarNum();
 
-    for (size_t i = 0; i <locs.size(); i += 1) {
+    for (size_t i = 0; i < locs.size(); i += 1) {
       temp = 0;
 
       for (j = 0; j < varNum; j += 1) {
-        temp += parent.getDegreeAt(locs[i], j);// poly->indices[sp->locs[i] * varNum + j];
+        temp += parent.getDegreeAt(
+            locs[i], j);  // poly->indices[sp->locs[i] * varNum + j];
       }
       if (temp > re) {
         re = temp;
@@ -90,8 +83,7 @@ class Subpoly {
     }
     return re;
   }
-  
-  
+
   string toString(void) const { return parent.toString(locs); }
 
   Poly<C, T> getPoly() const {
@@ -99,9 +91,7 @@ class Subpoly {
     parent.getSubpoly(locs, rep);
     return rep;
   }
-  const  Poly<C,T> & getParent() const{
-    return parent;
-  }
+  const Poly<C, T> &getParent() const { return parent; }
 };
 }
 }
