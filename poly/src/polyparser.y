@@ -4,7 +4,8 @@
 #include "poly.hpp"
 #include "vartable.hpp"
 #include<ctype.h>
-#include<set>  
+#include<set>
+#include<map>
 #include <cstdio>
 #include<iostream>
   using namespace aiSat;
@@ -13,6 +14,9 @@
   int yydebug=1;   
   using std::cerr;
   using std::endl;
+  using std::set;
+  using std::vector;
+  using std::map;
 
   typedef    Poly<coef_t, indice_t> Poly_t;
 
@@ -75,12 +79,13 @@ POLY:
   $$=$2;
 }
 |
-POLY '*' POLY
+'(' POLY ')' '*'   POLY
 {
-  $1->mult_poly(*($3));
-  $$=$1;
-  delete $3;
+  $2->mult_poly(*($5));
+  $$=$2;
+  delete $5;
 }
+
 |
 POLY '-' POLY
 {
@@ -98,32 +103,6 @@ POLY '+' POLY
 }
 
 |
-NUM '*' TERM
-{
-
-  $$=new Poly_t(varId);
-  
-  map<int, int> keyMap;
-  
-  VarTable<indice_t> &table=getVarTable<indice_t>();
-
-  vector<indice_t> vars;
-  table.getVarElem(varId, vars);
-  for(size_t i=0; i< vars.size(); i++){
-    keyMap[vars[i]]=i;
-  }
-  fill(vars.begin(), vars.end(), 0);
-
-  for(size_t i=0; i< $1->size(); i+2){
-    vars[ keyMap[(*$3)[i]]]+=(*$1)[i+1];
-  }
-  
-  $$->add_term(vars, $1);
-  
-  delete $3;
-  
-}
-|
 TERM
 {
   $$=new Poly_t(varId);
@@ -139,7 +118,7 @@ TERM
   }
   fill(vars.begin(), vars.end(), 0);
 
-  for(size_t i=0; i< $1->size(); i+2){
+  for(size_t i=0; i< $1->size(); i+=2){
     vars[ keyMap[(*$1)[i]]]+=(*$1)[i+1];
   }
   
@@ -167,6 +146,7 @@ TERM '*' TERM
 |
 VAR '^' INTEGER
 {
+  VarTable<indice_t> &table=getVarTable<indice_t>();
   int index=table.findVarIndex(*($1));
   $$=new  vector<indice_t> ();
   $$->push_back(index);
@@ -214,7 +194,7 @@ Poly_t parse(const string &str){
   int size=str.size();
   set<int>  vars;
   VarTable<indice_t> &table=getVarTable<indice_t>();
-  for(size_t i=0; i< size; i++){
+  for(int i=0; i< size; i++){
     k=0;
     while(k<size && isalpha(str[i]) ){
       buffer[k++]=str[i++];
@@ -228,9 +208,9 @@ Poly_t parse(const string &str){
       vars.insert(table.findVarIndex(vname));
     }
   }
-  vector<int> varsids(vars.begin(), vars.end());
+  vector<indice_t> varsids(vars.begin(), vars.end());
 
-  varId=table.addVarElem(varsids, varsids);
+  varId=table.addVarElem(varsids);
   yyin=tmpfile();
   fprintf(yyin, "%s",str.c_str());
   yyparse();

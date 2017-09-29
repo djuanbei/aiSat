@@ -21,10 +21,10 @@
 
 #include "vartable.hpp"
 
-namespace assiSat {
+namespace aiSat {
 
 namespace psd{
-class SOSChecsker;
+class SOSChecker;
 }
 
 
@@ -37,6 +37,7 @@ using namespace std;
 
 template <typename C = double, typename T = int>
 class Poly {
+  
   friend class aiSat::psd::SOSChecker;
   
  public:
@@ -759,8 +760,7 @@ class Poly {
     re.changeVarId(vid);
 
     const int varSize = re.varNum;
-
-    T key[varSize];
+    vector<T> key(varSize);
 
     if (coef.size() >= poly2.coef.size()) {
       poly_t poly11 = *this;
@@ -769,18 +769,18 @@ class Poly {
 
       const int p2Size = poly2.varNum;
 
-      int map[p2Size];
+      int mapKey[p2Size];
 
-      getVarTable<T>().getConvertMap(poly2.varId, vid, map);
+      getVarTable<T>().getConvertMap(poly2.varId, vid, mapKey);
 
       for (i = 0; i < poly2.coef.size(); i += 1) {
         if (poly2.coef[i] == 0) continue;
-        fill(key, key + varSize, 0);
+        fill(mapKey, mapKey + varSize, 0);
 
         for (j = 0; j < p2Size; j += 1) {
-          if (map[j] > -1) key[map[j]] = poly2.indices[i * p2Size + j];
+          if (mapKey[j] > -1) key[mapKey [j]] = poly2.indices[i * p2Size + j];
         }
-        vector<T> tempkey(key, key + varSize);
+        vector<T> tempkey(key);
         term_t tempt(tempkey, poly2.coef[i]);
 
         re.add_poly(poly11 + tempt);
@@ -792,8 +792,8 @@ class Poly {
       poly22.changeVarId(vid);
 
       const int p1Size = getVarTable<T>().getVarNum(varId);
-      int map[p1Size];
-      getVarTable<T>().getConvertMap(varId, vid, map);
+      int mapKey[p1Size];
+      getVarTable<T>().getConvertMap(varId, vid, mapKey);
 
       for (i = 0; i < coef.size(); i += 1) {
         if (coef[i] == 0) continue;
@@ -801,9 +801,9 @@ class Poly {
           key[j] = 0;
         }
         for (j = 0; j < p1Size; j += 1) {
-          if (map[j] > -1) key[map[j]] = indices[i * p1Size + j];
+          if (mapKey[j] > -1) key[mapKey[j]] = indices[i * p1Size + j];
         }
-        vector<T> tempkey(key, key + varSize);
+        vector<T> tempkey(key);
         term_t tempt(tempkey, coef[i]);
         re.add_poly(poly22 + tempt);
       }

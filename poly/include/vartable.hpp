@@ -134,7 +134,7 @@ class VarTable {
   }
 
   int addVarElem(const vector<T> &vars) {
-    int n =vasr.size();
+    int n =vars.size();
     if (0 == n) {
       return 0;
     }
@@ -157,7 +157,7 @@ class VarTable {
 
   int findVarElem(const vector<T> &vars) {
     int i, j, k, len;
-
+    int n=vars.size();
     i = 0;
     while (i+1 < startLocation.size()) {
       
@@ -194,7 +194,7 @@ class VarTable {
     if (id+1 >= startLocation.size()) {
       return -1;
     }
-    return starLocation[id+1]-starLocation[id];
+    return startLocation[id+1]-startLocation[id];
   }
 
   /**
