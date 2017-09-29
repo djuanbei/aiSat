@@ -1,8 +1,6 @@
 %{
-#include "extenttype.h"
+#include "polyparser.h"
   
-#include "poly.hpp"
-#include "vartable.hpp"
 #include<ctype.h>
 #include<set>
 #include<map>
@@ -46,14 +44,13 @@
 
  }
 
-%expect 0
+// %expect 0
 
 %token<dilVal> INTEGER
 %token<dblVal> NUM
 %token<varname> VAR
 
 
-%type<dilVal> REPOLY
 %type<iVec> TERM
 %type<poly> POLY
 
@@ -67,7 +64,7 @@
 %%
 
 REPOLY:
-POLY
+POLY 
 {
   gloabl_poly= Poly_t(*($1));
   delete $1;
@@ -79,11 +76,12 @@ POLY:
   $$=$2;
 }
 |
-'(' POLY ')' '*'   POLY
+
+POLY  '*'   POLY
 {
-  $2->mult_poly(*($5));
-  $$=$2;
-  delete $5;
+  $1->mult_poly(*($3));
+  $$=$1;
+  delete $3;
 }
 
 |
@@ -97,6 +95,7 @@ POLY '-' POLY
 |
 POLY '+' POLY
 {
+
   $1->add_poly(*($3));
   $$=$1;
   delete $3;
@@ -105,6 +104,7 @@ POLY '+' POLY
 |
 TERM
 {
+
   $$=new Poly_t(varId);
   
   map<int, int> keyMap;
@@ -132,18 +132,17 @@ NUM
   $$=new Poly_t(varId);
   $$->add($1);
 }
+|
+INTEGER
+{
+  
+  $$=new Poly_t(varId);
+  $$->add($1);
+}
 ;
 
 TERM:
-TERM '*' TERM
-{
-  for(size_t i=0; i< $3->size(); i++){
-    $1->push_back((*$3)[i]);
-  }
-  $$=$1;
-  delete $3;
-}
-|
+
 VAR '^' INTEGER
 {
   VarTable<indice_t> &table=getVarTable<indice_t>();
@@ -156,6 +155,7 @@ VAR '^' INTEGER
 |
 VAR
 {
+
   VarTable<indice_t> &table=getVarTable<indice_t>();
   int index=table.findVarIndex(*($1));
   $$=new  vector<indice_t> ();
@@ -187,7 +187,7 @@ int yyerror(string what)
   return 1;
 }
 
-Poly_t parse(const string &str){
+Poly_t aiSat::poly::parse(const string &str){
   
   char buffer[1024];
   int k=0;
@@ -212,7 +212,8 @@ Poly_t parse(const string &str){
 
   varId=table.addVarElem(varsids);
   yyin=tmpfile();
-  fprintf(yyin, "%s",str.c_str());
+  fputs( str.c_str(), yyin);
+  rewind(yyin);
   yyparse();
   fclose(yyin);
 

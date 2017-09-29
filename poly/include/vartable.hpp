@@ -14,6 +14,7 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#include<algorithm>
 
 #include "config.h"
 
@@ -70,14 +71,21 @@ class VarTable {
   VarTable() {
     startLocation.push_back(0);
     startLocation.push_back(0);
+    startLocation.push_back(0);
   }
 
   VarTable(const int n) { reset(n); }
 
-  
+  /** 
+   * 
+   * @param name  new variable name
+   * 
+   * @return true if  there is no same variable in the table, otherwise, false.
+   */  
   bool addVar(const string &name) {
     
     int varNum = variateSymbol.size();
+    
     for (int i = 0; i < varNum; i++) {
       if (name == variateSymbol[i]) {
         return false;
@@ -85,31 +93,36 @@ class VarTable {
     }
 
     variateSymbol.push_back( name);
-    
-
+   
     int start = varNum;
 
     int num = variateCombine.size() - varNum;
     variateCombine.push_back(0);
 
     for (int i = num; i > 0; i--) {
-      variateCombine[start + i+1] = variateCombine[start + i];
+      variateCombine[start + i] = variateCombine[start + i-1];
     }
-
+    variateCombine[varNum]=varNum;
+    
     /**
      * right shift one
      *
      */
 
-    for (int i = 1; i < startLocation.size(); i++) {
+    for (int i = 2; i < startLocation.size(); i++) {
       startLocation[i]++;
     }
-    
-
-    variateCombine[1] = varNum;
 
     return true;
   }
+
+  /** 
+   * 
+   * 
+   * @param name the variable name
+   * 
+   * @return nonnegative integer if --name-- in the table, otherwise, -1
+   */
 
   int findVarIndex(const string &name) const {
     int varNum = variateSymbol.size();
@@ -133,20 +146,29 @@ class VarTable {
     return variateSymbol[index];
   }
 
-  int addVarElem(const vector<T> &vars) {
+  /** 
+   * @brief the variables will be sorted  in descending order
+   * 
+   * @param evars 
+   * 
+   * @return id of variable set
+   */
+  
+  int addVarElem(const vector<T> &evars) {
+    vector<T> vars(evars);
+    sort(vars.begin(), vars.end());
+    
     int n =vars.size();
     if (0 == n) {
       return 0;
     }
     ASSERT(n <= variateSymbol.size(), "");
 
-
     int re = findVarElem(vars);
     if (re > -1) {
       return re;
     }
     
-
     for (int i = 0; i < n; i += 1) {
       ASSERT(vars[i] < variateSymbol.size(), "");
       variateCombine.push_back(vars[i]);
@@ -155,7 +177,19 @@ class VarTable {
     return startLocation.size() - 2;
   }
 
-  int findVarElem(const vector<T> &vars) {
+  /** 
+   * 
+   * 
+   * @param evars  the variables will be sorted  in descending order
+   * 
+   * @return  nonnegative integer if evars in the table
+   *, otherwise, -1
+   */
+
+  int findVarElem(const vector<T> &evars) {
+    vector<T> vars(evars);
+    sort(vars.begin(), vars.end());
+    
     int i, j, k, len;
     int n=vars.size();
     i = 0;
@@ -177,6 +211,13 @@ class VarTable {
 
     return -1;
   }
+
+  /** 
+   * @brief obtain varset id corresponding vars
+   * 
+   * @param id 
+   * @param re 
+   */
 
   void getVarElem(const int id, vector<T> &re) {
     re.clear();
@@ -203,56 +244,56 @@ class VarTable {
    */
   int getAllVarNum(void) { return variateSymbol.size(); }
 
+  
+  /** 
+   * @brief merge the two variable sets into one variable set
+   * 
+   * @param id1 
+   * @param id2 
+   * 
+   * @return new variable set id
+   */
   int mergeVar(const int id1, const int id2) {
+    
     int i, j, k;
-    i = j = 0;
-    k = 0;
-    if (id1 == id2) return id1;
+    i = j =k = 0;
+    if (id1 == id2){
+      return id1;
+    }
 
     vector<T> var1, var2;
 
     getVarElem(id1, var1);
 
     getVarElem(id2, var2);
+    
     int var1Len=getVarNum(id1);
     int var2Len=getVarNum(id2);
-    
-    
-    vector<T> var(var1Len + var2Len);
-
-    while (i < var1Len && j < var2Len) {
-      if (var1[i] < var2[j]) {
-        var[k] = var1[i++];
-      } else if (var1[i] > var2[j]) {
-        var[k] = var2[j++];
-      } else {
-        var[k] = var1[i];
-        i++;
-        j++;
-      }
-      k++;
-    }
-    while (i <= var1Len) {
-      var[k++] = var1[i++];
-    }
-    while (j <= var2Len) {
-      var[k++] = var2[j++];
-    }
-
+    std::vector<T> var(var1Len+var2Len);
+    typename vector<T>::iterator  it=std::set_union (var1.begin(), var1.end(), var2.begin(), var2.end(), var.begin());
+    var.resize(it-var.begin());
     return addVarElem(var);
   }
-
-  void getConvertMap(const int oId, const int nId, int mapIndex[]) {
-    if (oId != 0) ASSERT(varElemContain(oId, nId), "");
+  
+  /** 
+   * 
+   * 
+   * @param oldId  a variable set id
+   * @param newId  a variable set id which contain oldId
+   * @param after return  mapIndex  oldVar[i]==newVar[mapIndex[i]] invariant hold
+   */
+  void getConvertMap(const int oldId, const int newId, vector<int> & mapIndex) {
+    if (oldId != 0) ASSERT(varElemContain(oldId, newId), "");
 
     int i, j;
     vector<T> ovars, nvars;
-    getVarElem(oId, ovars);
-    getVarElem(nId, nvars);
+    getVarElem(oldId, ovars);
+    getVarElem(newId, nvars);
 
-    const int oSize = getVarNum(oId);
-    const int nSize =getVarNum(nId);
-    if (oId == nId) {
+    const int oSize = getVarNum(oldId);
+    const int nSize =getVarNum(newId);
+    
+    if (oldId == newId) {
       for (i = 0; i < oSize; i += 1) {
         mapIndex[i] = i;
       }
@@ -282,13 +323,16 @@ class VarTable {
     ASSERT(i > oSize, "");
   }
 
+  /** 
+   * @brief reset n variables table and clear original table
+   * 
+   * @param n  number of variable
+   */
+
   void reset(const int n) {
     clear();
 
     variateSymbol.resize(n);
-
-    variateCombine.push_back(0); /* const indices */
-    variateCombine.push_back(n);
 
     for (int i = 0; i < n; i += 1) {
       variateSymbol[i] = string("aa@\0");
@@ -298,15 +342,18 @@ class VarTable {
 
       variateCombine.push_back(i);
     }
+    
+    startLocation[2]=n;
 
-    startLocation.push_back(0);
-    startLocation.push_back(1);
   }
 
   void clear(void) {
     variateSymbol.clear();
     variateCombine.clear();
     startLocation.clear();
+    startLocation.push_back(0);
+    startLocation.push_back(0);
+    startLocation.push_back(0);
   }
 };
 

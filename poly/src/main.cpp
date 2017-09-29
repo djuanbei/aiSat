@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "poly.hpp"
+#include "polyparser.h"
 
 using namespace aiSat::poly;
 
@@ -37,6 +38,10 @@ int main(int argc, char *argv[]) {
   // indice_t *cand = overConvexHull(points, length, dim, &relength);
   // printf("%d\n %s", relength, cand);
   // printf(" argc %d file %s\n", argc, argv[0]);
+  Poly<coef_t, indice_t> p=parse("x^2+3*y+122");
+  string str=p.toString();
+  cout<<str<<endl;
+  
   Poly<double, indice_t> p1, p2;
   Poly<double, indice_t> p3 = p1 * p2;
   return EXIT_SUCCESS;

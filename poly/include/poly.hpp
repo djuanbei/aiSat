@@ -288,7 +288,7 @@ class Poly {
 
     j = 0;
     int size = coef.size();
-    for (i = 0; i < size; i++) {
+    for (i = 1; i < size; i++) {
       for (k = 0; k < varNum; k++) {
         if (indices[j * varNum + k] != indices[i * varNum + k]) {
           break;
@@ -373,7 +373,7 @@ class Poly {
         for (j = 0; j < varNum; j += 1) {
           if (indices[i * varNum + j] > 0) {
             if (indices[i * varNum + j] > 1) {
-              str << "*" << varname[j] << "^" << indices[i * varNum + j];
+              str << "*" << varname[j] << "^" <<(int) (indices[i * varNum + j]);
             }
 
             else if (1 == indices[i * varNum + j]) {
@@ -431,7 +431,7 @@ class Poly {
         for (j = 0; j < varNum; j += 1) {
           if (indices[loc * varNum + j] > 0) {
             if (indices[loc * varNum + j] > 1) {
-              str << "*" << varname[j] << "^" << indices[loc * varNum + j];
+              str << "*" << varname[j] << "^" << (int)indices[loc * varNum + j];
             }
 
             else if (1 == indices[loc * varNum + j]) {
@@ -570,8 +570,9 @@ class Poly {
     const int oldSize = varNum;
     const int newSize = getVarTable<T>().getVarNum(vid);
 
-    int map[oldSize];
-    getVarTable<T>().getConvertMap(varId, vid, map);
+
+    vector<int> mapIndex(oldSize);
+    getVarTable<T>().getConvertMap(varId, vid, mapIndex);
     varId = vid;
     varNum = newSize;
     if (coef.empty()) {
@@ -593,8 +594,8 @@ class Poly {
         }
 
         for (j = 0; j < oldSize; j += 1) {
-          if (map[j] > -1) {
-            temp[map[j]] = indices[i * oldSize + j];
+          if (mapIndex[j] > -1) {
+            temp[mapIndex[j]] = indices[i * oldSize + j];
           }
         }
 
@@ -612,8 +613,8 @@ class Poly {
         }
 
         for (j = 0; j < oldSize; j += 1) {
-          if (map[j] > -1) {
-            temp[map[j]] = indices[i * oldSize + j];
+          if (mapIndex [j] > -1) {
+            temp[mapIndex [j]] = indices[i * oldSize + j];
           }
         }
 
@@ -637,8 +638,8 @@ class Poly {
         }
 
         for (j = 0; j < newSize; j += 1) {
-          if (map[j] > -1) {
-            temp[map[j]] = indices[i * oldSize + j];
+          if (mapIndex [j] > -1) {
+            temp[mapIndex [j]] = indices[i * oldSize + j];
           }
         }
 
@@ -723,9 +724,9 @@ class Poly {
 
     const int p2Size = poly2.varNum;
 
-    int map[p2Size];
 
-    getVarTable<T>().getConvertMap(poly2.varId, varId, map);
+    vector<int> mapIndex(p2Size);
+    getVarTable<T>().getConvertMap(poly2.varId, varId, mapIndex);
 
     int size = coef.size();
 
@@ -737,7 +738,7 @@ class Poly {
       }
 
       for (j = 0; j < p2Size; j += 1) {
-        if (map[j] > -1) key[map[j]] = indices[i * p2Size + j];
+        if (mapIndex [j] > -1) key[mapIndex[j]] = indices[i * p2Size + j];
       }
       term_t tempt(key, poly2.coef[i]);
       add_term(tempt);  //  key, poly2.coef[i]);
@@ -769,13 +770,13 @@ class Poly {
 
       const int p2Size = poly2.varNum;
 
-      int mapKey[p2Size];
 
+      vector<int>  mapKey(p2Size);
       getVarTable<T>().getConvertMap(poly2.varId, vid, mapKey);
 
       for (i = 0; i < poly2.coef.size(); i += 1) {
         if (poly2.coef[i] == 0) continue;
-        fill(mapKey, mapKey + varSize, 0);
+        fill(mapKey.begin(), mapKey.begin() + varSize, 0);
 
         for (j = 0; j < p2Size; j += 1) {
           if (mapKey[j] > -1) key[mapKey [j]] = poly2.indices[i * p2Size + j];
@@ -792,7 +793,8 @@ class Poly {
       poly22.changeVarId(vid);
 
       const int p1Size = getVarTable<T>().getVarNum(varId);
-      int mapKey[p1Size];
+
+      vector<int>  mapKey(p1Size);
       getVarTable<T>().getConvertMap(varId, vid, mapKey);
 
       for (i = 0; i < coef.size(); i += 1) {
