@@ -56,8 +56,6 @@ enum polyConstraintType { EQ, GE, GT, NE };
 
 typedef enum polyConstraintType PolyConstraintType;
 
-
-
 struct polyConstraint {
   PolyConstraintType type;
   int supportId;
@@ -80,31 +78,25 @@ struct Support {
   int *consId;
   int constNum;
   int consCap;
-  Support(const int evarId, const indice_t *indices,
-                        const int size ){
-    
+  Support(const int evarId, const indice_t *indices, const int size) {
     type = INDICE;
     md5sumbyIndice(md5sum, evarId, indices, size);
     varId = evarId;
-
   }
-  Support(Subpoly_t *subpoly){
-
+  Support(Subpoly_t *subpoly) {
     type = SUB_POLY;
     subp = subpoly;
 
     memcpy(md5sum, subpoly->getmd5(), DIGEST_SIZE);
 
     deg = subpoly->getTotalDegree();
-    
+
     varId = subpoly->getParent().getVarId();
     constNum = 0;
     consId = NULL;
     consCap = 0;
-
   }
 };
-
 
 /*
   sum_{i=0}^{size-1} polys[i]*polyConstraints[i]=rhs

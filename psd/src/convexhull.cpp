@@ -30,8 +30,8 @@
 #include "util.h"
 #include "vartable.hpp"
 
-namespace aiSat{
-namespace psd{
+namespace aiSat {
+namespace psd {
 extern "C" {
 /* DGELSD prototype */
 extern void dgelsd_(int* m, int* n, int* nrhs, double* a, int* lda, double* b,
@@ -58,16 +58,16 @@ static size_t node_b_size;
  *
  * @return
  */
-POLY_SOS_T SOSChecker::checkThreeP(  const int dim,
-                        PointList* ans) {
+POLY_SOS_T SOSChecker::checkThreeP(const int dim, PointList* ans) {
   int i;
   int VA, VB, VM;
   vector<indice_t> key(dim);
-  const vector<coef_t>&  coefs=subpoly->getParent().coef;
-  const vector<int> & locs=subpoly->locs;
-  const vector<indice_t> & indices=subpoly->getParent().indices;
+  const vector<coef_t>& coefs = subpoly->getParent().coef;
+  const vector<int>& locs = subpoly->locs;
+  const vector<indice_t>& indices = subpoly->getParent().indices;
 
-  if (isSameLine( &(subpoly->getParent().indices)[0], &(locs)[0], 3, dim)) { /* on a same line */
+  if (isSameLine(&(subpoly->getParent().indices)[0], &(locs)[0], 3,
+                 dim)) { /* on a same line */
     if (coefs[locs[0]] < 0) {
       if (coefs[locs[1]] < 0 || coefs[locs[2]] < 0) {
         return NOSOS;
@@ -78,7 +78,7 @@ POLY_SOS_T SOSChecker::checkThreeP(  const int dim,
       }
     }
     i = 0;
-    while ((indices[locs[0] * dim + i] == indices[locs[1] * dim + i] )&&
+    while ((indices[locs[0] * dim + i] == indices[locs[1] * dim + i]) &&
            (indices[locs[1] * dim + i] == indices[locs[2] * dim + i]))
       i++;
 
@@ -106,19 +106,19 @@ POLY_SOS_T SOSChecker::checkThreeP(  const int dim,
       return NOSOS;
     }
     for (i = 0; i < dim; i += 1) {
-      if (indices[locs[VA] * dim + i] & 1){
+      if (indices[locs[VA] * dim + i] & 1) {
         return NOSOS;
       }
     }
 
     for (i = 0; i < dim; i += 1) {
-      if (indices[locs[VB] * dim + i] & 1){
+      if (indices[locs[VB] * dim + i] & 1) {
         return NOSOS;
       }
     }
 
     if (coefs[locs[VM]] < 0) {
-      if (fabs(coefs[locs[VM]]) > coefs[locs[VA]] + coefs[locs[VB]]){
+      if (fabs(coefs[locs[VM]]) > coefs[locs[VA]] + coefs[locs[VB]]) {
         return NOSOS;
       }
     } else {
@@ -132,17 +132,15 @@ POLY_SOS_T SOSChecker::checkThreeP(  const int dim,
           Poly_t* p = new Poly_t();
           p->changeVarId(subpoly->getParent().getVarId());
 
-
           for (i = 0; i < dim; i += 1) {
             key[i] = indices[locs[0] * dim + i] / 2;
           }
-          p->add_term(key, sqrtf(coefs[locs[0]])); 
+          p->add_term(key, sqrtf(coefs[locs[0]]));
 
           push_back_L(ans, p);
 
           Poly_t* p1 = new Poly_t();
           p1->changeVarId(subpoly->getParent().getVarId());
-
 
           for (i = 0; i < dim; i += 1) {
             key[i] = indices[locs[1] * dim + i] / 2;
@@ -152,19 +150,19 @@ POLY_SOS_T SOSChecker::checkThreeP(  const int dim,
           push_back_L(ans, p1);
 
           Poly_t* p2 = new Poly_t();
-          
-          p2->changeVarId( subpoly->getParent().getVarId());
+
+          p2->changeVarId(subpoly->getParent().getVarId());
 
           for (i = 0; i < dim; i += 1) {
             key[i] = indices[locs[2] * dim + i] / 2;
           }
-          p2->add_term( key, sqrtf(coefs[locs[2]]));
+          p2->add_term(key, sqrtf(coefs[locs[2]]));
 
           push_back_L(ans, p2);
         }
 
         return EXACTLY_SOS;
-      } else if (coefs[locs[VM]] > coefs[locs[VA]] + coefs[locs[VB]]){
+      } else if (coefs[locs[VM]] > coefs[locs[VA]] + coefs[locs[VB]]) {
         return NOSOS;
       }
     }
@@ -173,7 +171,7 @@ POLY_SOS_T SOSChecker::checkThreeP(  const int dim,
     if (coefs[locs[0]] < 0 || coefs[locs[1]] < 0 || coefs[locs[2]] < 0)
       return NOSOS;
     for (i = 0; i < dim; i += 1) {
-      if (indices[locs[0] * dim + i] & 1){
+      if (indices[locs[0] * dim + i] & 1) {
         return NOSOS;
       }
     }
@@ -183,40 +181,39 @@ POLY_SOS_T SOSChecker::checkThreeP(  const int dim,
       }
     }
     for (i = 0; i < dim; i += 1) {
-      if (indices[locs[2] * dim + i] & 1 ) {
+      if (indices[locs[2] * dim + i] & 1) {
         return NOSOS;
       }
     }
     if (NULL != ans) {
       Poly_t* p = new Poly_t();
-      p->changeVarId( subpoly->getParent().getVarId());
+      p->changeVarId(subpoly->getParent().getVarId());
 
       for (i = 0; i < dim; i += 1) {
         key[i] = indices[locs[0] * dim + i] / 2;
       }
-      p->add_term( key, sqrtf(coefs[locs[i]]));
+      p->add_term(key, sqrtf(coefs[locs[i]]));
 
       push_back_L(ans, p);
 
       Poly_t* p1 = new Poly_t();
-      p1->changeVarId( subpoly->getParent().getVarId());
+      p1->changeVarId(subpoly->getParent().getVarId());
 
       for (i = 0; i < dim; i += 1) {
         key[i] = indices[locs[1] * dim + i] / 2;
       }
-      p1->add_term( key, sqrtf(coefs[locs[i]]));
+      p1->add_term(key, sqrtf(coefs[locs[i]]));
 
       push_back_L(ans, p1);
 
       Poly_t* p2 = new Poly_t();
-      p2->changeVarId( subpoly->getParent().getVarId());
+      p2->changeVarId(subpoly->getParent().getVarId());
 
       for (i = 0; i < dim; i += 1) {
         key[i] = indices[locs[2] * dim + i] / 2;
       }
-      p2->add_term( key, sqrtf(coefs[locs[i]]));
+      p2->add_term(key, sqrtf(coefs[locs[i]]));
 
-      
       push_back_L(ans, p2);
     }
 
@@ -224,19 +221,19 @@ POLY_SOS_T SOSChecker::checkThreeP(  const int dim,
   }
 }
 
-POLY_SOS_T SOSChecker::easyCheck( PointList* ans) {
+POLY_SOS_T SOSChecker::easyCheck(PointList* ans) {
   const int size = subpoly->size();
-  
+
   const vector<int>& loc = subpoly->locs;
-  const Poly_t &poly=subpoly->getParent();
-  const vector<indice_t> & indices = poly.indices;
-  const  vector< coef_t>& pcoefs = poly.coef;
+  const Poly_t& poly = subpoly->getParent();
+  const vector<indice_t>& indices = poly.indices;
+  const vector<coef_t>& pcoefs = poly.coef;
 
   int dim = getVarTable<indice_t>().getVarNum(poly.getVarId());
 
   vector<indice_t> key(dim);
   vector<int> coefs(dim);
-  vector<char > convexSurf(size, 0);
+  vector<char> convexSurf(size, 0);
   vector<char> maxPoint(size);
   // int coefs[dim];
   // char convexSurf[size];
@@ -250,82 +247,79 @@ POLY_SOS_T SOSChecker::easyCheck( PointList* ans) {
   int second = 0;
   double planeSum;
 
-  int loc0=(*subpoly)[0];
-  int loc1=(*subpoly)[1];
+  int loc0 = (*subpoly)[0];
+  int loc1 = (*subpoly)[1];
 
-  
   if (size == 1) {
-    if (poly.getCF(loc0) < 0){
+    if (poly.getCF(loc0) < 0) {
       return NOSOS;
     }
     for (i = 0; i < dim; i += 1) {
-      if (poly.getDegreeAt(loc0, i) & 1){
+      if (poly.getDegreeAt(loc0, i) & 1) {
         return NOSOS;
       }
       key[i] = poly.getDegreeAt(loc0, i) / 2;
     }
     if (NULL != ans) {
-      Poly_t* p =new Poly_t();
-      p->changeVarId( poly.getVarId());
-      p->add_term( key, sqrtf(poly.getCF(loc0)));
+      Poly_t* p = new Poly_t();
+      p->changeVarId(poly.getVarId());
+      p->add_term(key, sqrtf(poly.getCF(loc0)));
 
       push_back_L(ans, p);
     }
 
     return EXACTLY_SOS;
   } else if (size == 2) {
-    if ((poly.getCF(loc0) < 0) || (poly.getCF(loc1) < 0)){
+    if ((poly.getCF(loc0) < 0) || (poly.getCF(loc1) < 0)) {
       return NOSOS;
     }
     for (i = 0; i < dim; i += 1) {
-      if (poly.getDegreeAt(loc0, i)  & 1){
+      if (poly.getDegreeAt(loc0, i) & 1) {
         return NOSOS;
       }
     }
     for (i = 0; i < dim; i += 1) {
-      if (poly.getDegreeAt(loc1,i)  & 1){
+      if (poly.getDegreeAt(loc1, i) & 1) {
         return NOSOS;
       }
     }
     if (NULL != ans) {
       Poly_t* p = new Poly_t();
-      p->changeVarId( poly.getVarId());
+      p->changeVarId(poly.getVarId());
       for (i = 0; i < dim; i += 1) {
-        key[i] = poly.getDegreeAt(loc0,i)  / 2;
+        key[i] = poly.getDegreeAt(loc0, i) / 2;
       }
-      p->add_term( key, sqrtf( poly.getCF(loc0)));
-
+      p->add_term(key, sqrtf(poly.getCF(loc0)));
 
       push_back_L(ans, p);
 
-      Poly_t* p1 =new Poly_t();
-      p1->changeVarId( poly.getVarId());
+      Poly_t* p1 = new Poly_t();
+      p1->changeVarId(poly.getVarId());
 
       for (i = 0; i < dim; i += 1) {
-        key[i] =poly.getDegreeAt(loc1,i) / 2;
+        key[i] = poly.getDegreeAt(loc1, i) / 2;
       }
-      p1->add_term( key, sqrtf(poly.getCF(loc1)));
+      p1->add_term(key, sqrtf(poly.getCF(loc1)));
 
       push_back_L(ans, p1);
     }
 
     return EXACTLY_SOS;
   } else if (size == 3) {
-    return checkThreeP(
-        dim,ans);
+    return checkThreeP(dim, ans);
   }
 
   for (i = 0; i < size; i += 1) {
-    if (pcoefs[loc[i]] < 0){
+    if (pcoefs[loc[i]] < 0) {
       break;
     }
 
     for (k = 0; k < dim; k += 1) {
-      if (indices[loc[i] * dim + k] & 1 ){
+      if (indices[loc[i] * dim + k] & 1) {
         break;
       }
     }
-    if (k != dim){
+    if (k != dim) {
       break;
     }
   }
@@ -333,12 +327,12 @@ POLY_SOS_T SOSChecker::easyCheck( PointList* ans) {
     if (NULL != ans)
       for (i = 0; i < size; i += 1) {
         Poly_t* p = new Poly_t();
-        p->changeVarId( poly.getVarId());
+        p->changeVarId(poly.getVarId());
 
         for (k = 0; k < dim; k += 1) {
           key[k] = indices[loc[i] * dim + k] / 2;
         }
-        p->add_term( key, sqrtf(pcoefs[loc[i]]));
+        p->add_term(key, sqrtf(pcoefs[loc[i]]));
 
         push_back_L(ans, p);
       }
@@ -392,30 +386,30 @@ POLY_SOS_T SOSChecker::easyCheck( PointList* ans) {
     }
     if (number == 1) {
       convexSurf[first] = 1;
-      if (pcoefs[loc[first]] < -1e-6){
+      if (pcoefs[loc[first]] < -1e-6) {
         return NOSOS;
       }
       for (j = 0; j < dim; j += 1) {
-        if (indices[loc[first] * dim + j] & 1){
+        if (indices[loc[first] * dim + j] & 1) {
           return NOSOS;
         }
       }
     } else if (number == 2) {
       convexSurf[first] = 1;
-      if (pcoefs[loc[first]] < -1e-6){
+      if (pcoefs[loc[first]] < -1e-6) {
         return NOSOS;
       }
       for (j = 0; j < dim; j += 1) {
-        if (indices[loc[first] * dim + j] & 1){
+        if (indices[loc[first] * dim + j] & 1) {
           return NOSOS;
         }
       }
       convexSurf[second] = 1;
-      if (pcoefs[loc[second]] < -1e-6){
+      if (pcoefs[loc[second]] < -1e-6) {
         return NOSOS;
       }
       for (j = 0; j < dim; j += 1) {
-        if (indices[loc[second] * dim + j] & 1){
+        if (indices[loc[second] * dim + j] & 1) {
           return NOSOS;
         }
       }
@@ -427,22 +421,21 @@ POLY_SOS_T SOSChecker::easyCheck( PointList* ans) {
           planeSum += pcoefs[loc[k]];
         }
       }
-      if (planeSum < -1e-6){
+      if (planeSum < -1e-6) {
         return NOSOS;
       }
     }
   }
   number = 0;
   for (i = 0; i < size; i += 1) {
-    if (0 == convexSurf[i]){
+    if (0 == convexSurf[i]) {
       number++;
     }
   }
   double base = 0.1;
-  if ((number + 0.0) / size < base){
+  if ((number + 0.0) / size < base) {
     return CONVEX_POLY;
-  }
-  else{
+  } else {
     return UNHNOW;
   }
 }
@@ -460,15 +453,15 @@ POLY_SOS_T SOSChecker::easyCheck( PointList* ans) {
  *
  * @return
  */
-int SOSChecker::onSameSurf( const int* checkPoints, const int size,
-               indice_t* rePoints, const int limit) {
+int SOSChecker::onSameSurf(const int* checkPoints, const int size,
+                           indice_t* rePoints, const int limit) {
   ASSERT(limit >= 1 && size >= limit,
          "candidate must greater or equal to limit");
 
   const vector<indice_t>& indices = subpoly->getParent().indices;
-  int dim =getVarTable<indice_t>().getVarNum(subpoly->getParent().getVarId());
-  
-  const vector< int> & loc = subpoly->locs;
+  int dim = getVarTable<indice_t>().getVarNum(subpoly->getParent().getVarId());
+
+  const vector<int>& loc = subpoly->locs;
   int i, j, m, k, maxSum, tempSum;
   int checkTime = dim * limit * size;
   int number = 0;
@@ -479,7 +472,7 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
   vector<int> coefsDen(dim);
   // int coefsNum[dim];
   // int coefsDen[dim];
-  vector<double> A(size*dim);
+  vector<double> A(size * dim);
   // double A[size * dim];
   double dummy;
   int info;
@@ -529,7 +522,7 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
 
         ASSERT(0 != bound, "");
 
-        if (0 == bound){
+        if (0 == bound) {
           continue;
         }
 
@@ -572,7 +565,6 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
     }
   }
 
-  
   int M = limit;
   int N = dim;
   int NRHS = 1;
@@ -603,13 +595,13 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
     while (1) {
       k++;
       if (k == size) k = 0;
-      if (rePoints[k]){
+      if (rePoints[k]) {
         continue;
       }
       if (rand() % size < limit) {
         rePoints[k] = 1;
         choose[number++] = k;
-        if (number >= limit){
+        if (number >= limit) {
           break;
         }
       }
@@ -639,7 +631,7 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
             iwork, &info);
     if (info == 0) { /* success */
       for (k = 0; k < dim; k += 1) {
-        f2rat(b[k], numBound, &coefsDen[ k], &coefsNum[ k]);
+        f2rat(b[k], numBound, &coefsDen[k], &coefsNum[k]);
       }
       numBound = 1;
 
@@ -653,14 +645,14 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
           numBound *= coefsNum[k];
         }
       }
-      if (0 == numBound){
+      if (0 == numBound) {
         continue;
       }
 
       for (k = 0; k < dim; k += 1) {
         if (coefsNum[k] != 0) {
           coefsDen[k] *= (numBound / coefsNum[k]);
-        } else{
+        } else {
           coefsDen[k] = 0;
         }
       }
@@ -671,12 +663,12 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
           tempSum +=
               coefsDen[j] * indices[loc[checkPoints[choose[k]]] * dim + j];
         }
-        if (tempSum != numBound){
+        if (tempSum != numBound) {
           break;
         }
       }
 
-      if (tempSum != numBound){
+      if (tempSum != numBound) {
         continue;
       }
 
@@ -684,8 +676,8 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
       number = limit;
       while (k < size) {
         while (1 == rePoints[k] && k < size) k++;
-        
-        if (k == size){
+
+        if (k == size) {
           return number;
         }
         tempSum = 0;
@@ -697,11 +689,11 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
           number++;
           rePoints[k - 1] = 1;
 
-        } else{
+        } else {
           break;
         }
       }
-      if (k == size){
+      if (k == size) {
         return number;
       }
 
@@ -712,16 +704,15 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
             for (j = 0; j < dim; j += 1) {
               tempSum += coefsDen[j] * indices[loc[checkPoints[k]] * dim + j];
             }
-            if (tempSum < numBound){
+            if (tempSum < numBound) {
               break;
-            }
-            else if (tempSum == numBound) {
+            } else if (tempSum == numBound) {
               rePoints[k] = 1;
               number++;
             }
           }
         }
-        if (tempSum < numBound){
+        if (tempSum < numBound) {
           continue;
         }
 
@@ -734,16 +725,15 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
             for (j = 0; j < dim; j += 1) {
               tempSum += coefsDen[j] * indices[loc[checkPoints[k]] * dim + j];
             }
-            if (tempSum > numBound){
+            if (tempSum > numBound) {
               break;
-            }
-            else if (tempSum == numBound) {
+            } else if (tempSum == numBound) {
               rePoints[k] = 1;
               number++;
             }
           }
         }
-        if (tempSum > numBound){
+        if (tempSum > numBound) {
           continue;
         }
 
@@ -756,8 +746,9 @@ int SOSChecker::onSameSurf( const int* checkPoints, const int size,
   return -1;
 }
 
-indice_t* SOSChecker::randPointSet(const int length, const int dim, const int domain) {
-  indice_t* re = (indice_t*) malloc_d(length * dim * sizeof(indice_t));
+indice_t* SOSChecker::randPointSet(const int length, const int dim,
+                                   const int domain) {
+  indice_t* re = (indice_t*)malloc_d(length * dim * sizeof(indice_t));
   int i, j;
 
   for (i = 0; i < length; i += 1) {
@@ -767,8 +758,6 @@ indice_t* SOSChecker::randPointSet(const int length, const int dim, const int do
   }
   return re;
 }
-
-
 
 /**
  * @brief reduce the point in candidateSet whose sum of index less or equal to
@@ -783,7 +772,7 @@ indice_t* SOSChecker::randPointSet(const int length, const int dim, const int do
  * @return
  */
 int SOSChecker::reduceByPlane(indice_t* candidateSet, const int length,
-                         const int dim, const int* coefs, int maxSum) {
+                              const int dim, const int* coefs, int maxSum) {
   int i, j;
   int tempSum = 0;
   int len = length;
@@ -806,8 +795,8 @@ int SOSChecker::reduceByPlane(indice_t* candidateSet, const int length,
 }
 
 int SOSChecker::reduceByLestEignV(indice_t* candidateSet, const int candLength,
-                      const int dim, const indice_t* genSet,
-                      const int genLength, const int max[]) {
+                                  const int dim, const indice_t* genSet,
+                                  const int genLength, const int max[]) {
   long int bound;
   int maxSum = 0;
   int minSum;
@@ -822,8 +811,6 @@ int SOSChecker::reduceByLestEignV(indice_t* candidateSet, const int candLength,
   int coefNum[dim];
   int coefDen[dim];
   double a[genLength * dim];
-
-
 
   for (i = 0; i < dim; i += 1) {
     for (j = 0; j < genLength; j += 1) {
@@ -946,8 +933,9 @@ int SOSChecker::reduceByLestEignV(indice_t* candidateSet, const int candLength,
   return re;
 }
 
-indice_t* SOSChecker::overConvexHull(const indice_t* genSet, const int genLength,
-                         const int dim, int* reLength) {
+indice_t* SOSChecker::overConvexHull(const indice_t* genSet,
+                                     const int genLength, const int dim,
+                                     int* reLength) {
   ASSERT(genLength > 0, "at least have one point");
   int i, j, k;
   if (1 == genLength) {
@@ -1098,7 +1086,7 @@ indice_t* SOSChecker::overConvexHull(const indice_t* genSet, const int genLength
   ASSERT(index >= genLength, "there some bugs occor in your this code");
   tempLength = index;
 
-  indice_t* candidateSet =(indice_t *) malloc_d(tempLength * node_b_size);
+  indice_t* candidateSet = (indice_t*)malloc_d(tempLength * node_b_size);
   memcpy(temp, min, dim * sizeof(int));
 
   j = 0;
@@ -1177,6 +1165,5 @@ indice_t* SOSChecker::overConvexHull(const indice_t* genSet, const int genLength
   }
   return candidateSet;
 }
-
 }
 }

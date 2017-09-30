@@ -16,11 +16,20 @@
 #include <string>
 #include <vector>
 
+#include "util.h"
 #include "config.h"
 
 #include "selfassert.h"
 
 #include "polytype.h"
+
+/**
+ * macro to string from the name x to string("x")
+ *
+ * 
+ */
+
+#define VAR(x) string(QUdi(x))
 
 namespace aiSat {
 
@@ -74,22 +83,24 @@ class VarTable {
 
   /**
    *
-   * @param name  new variable name
+   * @param vname  new variable name
    *
-   * @return true if  there is no same variable in the table, otherwise, false.
+   * @return the id of vname, if there are no vname in the table then
+   * vname will append in the table
    */
-  bool addVar(const string &name) {
+  
+  int addVar(const string &vname) {
     int varNum = variateSymbol.size();
 
     for (int i = 0; i < varNum; i++) {
-      if (name == variateSymbol[i]) {
-        return false;
+      if (vname == variateSymbol[i]) {
+        return i;
       }
     }
 
-    variateSymbol.push_back(name);
+    variateSymbol.push_back(vname);
 
-    return true;
+    return variateSymbol.size()-1;
   }
 
   /**
@@ -271,7 +282,7 @@ class VarTable {
 
     const int oSize = getVarNum(oldId);
     const int nSize = getVarNum(newId);
-
+    mapIndex.resize(oSize);
     if (oldId == newId) {
       for (i = 0; i < oSize; i += 1) {
         mapIndex[i] = i;
@@ -283,15 +294,16 @@ class VarTable {
 
     while (i < oSize && j < nSize) {
       if (ovars[i] < nvars[j]) {
-        ASSERT(0,
-               "every variable contain in ovars must aslo contain in novars ");
+        ASSERT(false,
+               "every variable contain in ovars must aslo contain in oldvars ");
 
         mapIndex[i] = -1;
         i++;
       }
 
-      else if (ovars[i] > nvars[j])
+      else if (ovars[i] > nvars[j]) {
         j++;
+      }
 
       else {
         mapIndex[i] = j;
@@ -299,7 +311,7 @@ class VarTable {
         j++;
       }
     }
-    ASSERT(i > oSize, "");
+    ASSERT(i >= oSize, "");
   }
 
   /**

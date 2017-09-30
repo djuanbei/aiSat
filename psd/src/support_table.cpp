@@ -99,8 +99,6 @@ void Supporttable::enlargetable(void) {
   }
 }
 
-
-
 int Supporttable::findSupElem(const int deg, const int varId, const int consNum,
                               const int *consIds) {
   int i, j;
@@ -175,7 +173,8 @@ int Supporttable::addSOSup(const int deg, const int varId, const int consNum,
 
 int Supporttable::addSOSsupByIndice(const int varId, indice_t *indices,
                                     const int esize) {
-  qsortM(indices, getVarTable<indice_t>().getVarNum(varId), 0, esize - 1, compare);
+  qsortM(indices, getVarTable<indice_t>().getVarNum(varId), 0, esize - 1,
+         compare);
 
   int re = findSupElemByIndice(varId, indices, esize);
 
@@ -247,7 +246,7 @@ int Supporttable::addconvexsosSup(Subpoly_t *poly) {
 
   int value_size = values.size();
 
-  values.push_back( new Support(poly));
+  values.push_back(new Support(poly));
 
   SOSsup.push_back(NULL);
   Gsup.push_back(NULL);

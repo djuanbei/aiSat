@@ -27,12 +27,9 @@ bool criteria(const Support *coefM, indice_t *key);
 
 indice_t *getAllMonByTd(const int supportId, int *const length);
 
-
-
 void getAllMonHomoTd(const int varNum, const int deg, const int length,
                      indice_t *indices);
 
-  
 ArrangeMatrix **createArrangeM(const int coefMonomiaId, indice_t const *SOSM,
                                int *const blockSize, int const lengthM);
 

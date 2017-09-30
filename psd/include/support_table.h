@@ -43,8 +43,6 @@ namespace psd {
 Support *createSupport(const int deg, const int varId, const int consNum,
                        int *consId);
 
-
-
 void deleteSupport(Support *S);
 
 class Supporttable {

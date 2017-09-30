@@ -340,7 +340,8 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
         lengthM[sosmMap[i]] * ENLARGE_RAT /
         (i * i * i + 1); /* here can have more smart method to deal with */
 
-    getVarTable<indice_t>().getVarElem(sys->polys[i]->getVarId(), polyVarMap[i]);
+    getVarTable<indice_t>().getVarElem(sys->polys[i]->getVarId(),
+                                       polyVarMap[i]);
 
     getVarTable<indice_t>().getVarElem(
         SUPPORT_TABLE.getSupElem((sys->polyConstraints[i])->supportId)->varId,
@@ -380,8 +381,11 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
       for (k = 0; k < psize; k += 1) { /* polynomial term size */
 
         if (index[k] < lengthM[sosmMap[p]]) {
-          polyVarSize = getVarTable<indice_t>().getVarNum(sys->polys[p]->getVarId()); 
-          sosVarSize = getVarTable<indice_t>().getVarNum(SUPPORT_TABLE.getSupElem((sys->polyConstraints[i])->supportId)->varId ); 
+          polyVarSize =
+              getVarTable<indice_t>().getVarNum(sys->polys[p]->getVarId());
+          sosVarSize = getVarTable<indice_t>().getVarNum(
+              SUPPORT_TABLE.getSupElem((sys->polyConstraints[i])->supportId)
+                  ->varId);
 
           pi = 0;
           si = 0;
@@ -401,11 +405,10 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
                 pi++;
 
               } else if (pi < polyVarSize &&
-                         polyVarMap[p][pi] == varMap[p][i ]) {
+                         polyVarMap[p][pi] == varMap[p][i]) {
                 temp1[i] = sys->polys[p]->getDegreeAt(k, pi);
                 pi++;
-              } else if (si < sosVarSize &&
-                         sosVarMap[p][si] == varMap[p][i]) {
+              } else if (si < sosVarSize && sosVarMap[p][si] == varMap[p][i]) {
                 temp1[i] = SOSM[sosmMap[p]][sosVarSize * index[k] + si];
                 si++;
               } else {
@@ -416,7 +419,7 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
           } else {
             for (i = 0; i < varSize[p]; i += 1) {
               if (pi < polyVarSize && si < sosVarSize &&
-                  polyVarMap[p][pi] == varMap[p][i ] &&
+                  polyVarMap[p][pi] == varMap[p][i] &&
                   sosVarMap[p][si] == varMap[p][i]) {
                 temp2[i] = sys->polys[p]->getDegreeAt(k, pi) +
                            SOSM[sosmMap[p]][sosVarSize * index[k] + si];
@@ -425,7 +428,7 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
                 pi++;
 
               } else if (pi < polyVarSize &&
-                         polyVarMap[p][pi ] == varMap[p][i ]) {
+                         polyVarMap[p][pi] == varMap[p][i]) {
                 temp2[i] = sys->polys[p]->getDegreeAt(k, pi);
                 pi++;
               } else {
@@ -623,7 +626,6 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
     vector<indice_t> rhsVars;
     getVarTable<indice_t>().getVarElem(rhs->getVarId(), rhsVars);
 
-
     int size = rhs->getSize();
     for (i = 0; i < size; i++) {
       vector<indice_t> key;
@@ -631,8 +633,9 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
       index = 0;
       k = 0;
       while (k < sys->size) {
-        tempIndex = findlocation(allM[k], everyConstraintSize[k], &key[0],  varMap[k].size(),
-                                 &(varMap[k])[0], rhsVars.size() ,  &rhsVars[0]);
+        tempIndex = findlocation(allM[k], everyConstraintSize[k], &key[0],
+                                 varMap[k].size(), &(varMap[k])[0],
+                                 rhsVars.size(), &rhsVars[0]);
         if (tempIndex > -1) {
           index += tempIndex;
           break;
@@ -685,15 +688,14 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
         mSize = varMap[p].size();
 
         for (k = 0; k < mSize; k += 1) {
-          if (pi < pSize && si < sSize &&
-              polyVarMap[p][pi ] == varMap[p][k ] &&
-              sosVarMap[p][si ] == varMap[p][k ]) {
+          if (pi < pSize && si < sSize && polyVarMap[p][pi] == varMap[p][k] &&
+              sosVarMap[p][si] == varMap[p][k]) {
             key[k] = sys->polys[p]->getDegreeAt(h, pi) +
                      SOSM[sosmMap[p]][sSize * j + si];
 
             si++;
             pi++;
-          } else if (pi < pSize && polyVarMap[p][pi ] == varMap[p][k ]) {
+          } else if (pi < pSize && polyVarMap[p][pi] == varMap[p][k]) {
             key[k] = sys->polys[p]->getDegreeAt(h, pi);
 
             pi++;
@@ -706,8 +708,9 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
         index = 0;
         k = 0;
         while (k < sys->size) {
-          tempIndex = findlocation(allM[k], everyConstraintSize[k], key, varMap[k].size(), 
-                                   &(varMap[k])[0], varMap[p].size(),  &(varMap[p])[0]);
+          tempIndex = findlocation(allM[k], everyConstraintSize[k], key,
+                                   varMap[k].size(), &(varMap[k])[0],
+                                   varMap[p].size(), &(varMap[p])[0]);
           if (tempIndex > -1) {
             index += tempIndex;
             break;

@@ -74,6 +74,7 @@ POLY:
 '(' POLY ')'
 {
   $$=$2;
+
 }
 |
 
@@ -126,7 +127,7 @@ TERM
   vector<pair< indice_t, indice_t> > key(vars.size());
   for(  size_t i=0; i< vars.size(); i++){
     key[i].first=vars[i];
-    key[i].first=pows[i];
+    key[i].second=pows[i];
   }
   
   Poly_t::Term  term(key, 1);

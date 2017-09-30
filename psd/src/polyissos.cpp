@@ -6,31 +6,32 @@
 #include "sdpsolver.h"
 #include "util.h"
 extern "C" {
-  void dsyev_(char* jobz, char* uplo, int* n, double* a, int* lda,
-                   double* w, double* work, int* lwork, int* info);
+void dsyev_(char* jobz, char* uplo, int* n, double* a, int* lda, double* w,
+            double* work, int* lwork, int* info);
 }
 
-namespace aiSat{
-namespace psd{
+namespace aiSat {
+namespace psd {
 
 void sosrepresent(PointList* sosList, double* X, const int blockSize,
                   const int sosMid, const float minV) {
   int i, j, l, lda = blockSize;
-  double* w =(double*) malloc_d(blockSize * sizeof(double));
+  double* w = (double*)malloc_d(blockSize * sizeof(double));
   int lwork = blockSize * blockSize * 2;
   double* work;
   int info;
   int n = blockSize;
   lwork = -1;
   double workopt;
-  
+
   dsyev_("V", "U", &n, X, &lda, w, &workopt, &lwork, &info);
   lwork = (int)workopt;
   work = (double*)malloc_d(lwork * sizeof(double));
 
   dsyev_("V", "U", &n, X, &lda, w, work, &lwork, &info);
 
-  const int varNum = getVarTable<indice_t>().getVarNum(SUPPORT_TABLE.getSupElem(sosMid)->varId);
+  const int varNum = getVarTable<indice_t>().getVarNum(
+      SUPPORT_TABLE.getSupElem(sosMid)->varId);
 
   indice_t* Z = SUPPORT_TABLE.getGsup(sosMid, &l);
 
@@ -48,13 +49,11 @@ void sosrepresent(PointList* sosList, double* X, const int blockSize,
 
   for (i = 0; i < blockSize; i += 1) {
     if (w[i] > minV) {
-      Poly_t* p1 =new  Poly_t();
+      Poly_t* p1 = new Poly_t();
       p1->changeVarId(SUPPORT_TABLE.getSupElem(sosMid)->varId);
 
       for (j = 0; j < blockSize; j += 1) {
-        p1->add_term( Z + j * varNum, X[ijtok(j + 1, i + 1, blockSize)]);
-        
-
+        p1->add_term(Z + j * varNum, X[ijtok(j + 1, i + 1, blockSize)]);
       }
       p1->mult(sqrtf(w[i]));
       // p_mult_cons_assign(p1, sqrtf(w[i]));

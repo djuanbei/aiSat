@@ -16,33 +16,27 @@
 #include "polytype.h"
 #include "psdtype.h"
 
-namespace aiSat{
-namespace psd{
+namespace aiSat {
+namespace psd {
 
-enum POLY_SOS_T{ NOSOS, CONVEX_POLY, EXACTLY_SOS, UNHNOW };
+enum POLY_SOS_T { NOSOS, CONVEX_POLY, EXACTLY_SOS, UNHNOW };
 
-class SOSChecker{
-
+class SOSChecker {
  private:
   const Subpoly_t* subpoly;
-  
-  POLY_SOS_T checkThreeP(const int dim,
-                                PointList* ans);
-  
-  
 
-  int reduceByPlane(indice_t* candidateSet, const int length,
-                    const int dim, const int* coefs, int maxSum);
-  
+  POLY_SOS_T checkThreeP(const int dim, PointList* ans);
+
+  int reduceByPlane(indice_t* candidateSet, const int length, const int dim,
+                    const int* coefs, int maxSum);
 
  public:
-  SOSChecker(  const Subpoly_t* subp):subpoly(subp){
-  }
-  
-  POLY_SOS_T easyCheck( PointList* ans);
+  SOSChecker(const Subpoly_t* subp) : subpoly(subp) {}
 
-  int onSameSurf( const int* checkPoints, const int size,
-                 indice_t* rePoints, const int limt);
+  POLY_SOS_T easyCheck(PointList* ans);
+
+  int onSameSurf(const int* checkPoints, const int size, indice_t* rePoints,
+                 const int limt);
 
   indice_t* randPointSet(const int length, const int dim, const int domain);
 
@@ -53,14 +47,9 @@ class SOSChecker{
                        const indice_t* genSet, const int lengthG);
 
   int reduceByLestEignV(indice_t* candidateSet, const int candLength,
-                      const int dim, const indice_t* genSet,
+                        const int dim, const indice_t* genSet,
                         const int genLength, const int max[]);
 };
-
-
-
-
-
 }
 }
 

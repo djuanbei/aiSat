@@ -1,7 +1,3 @@
 
 
-int main()
-{
-
-  
-}
+int main() {}
