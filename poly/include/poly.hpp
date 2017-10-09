@@ -325,6 +325,9 @@ class Poly {
 
   int getSize() const { return coef.size(); }
 
+  int getId() const{
+    return id;
+  }
   int getVarId() const { return varId; }
   int getVarNum() const { return varNum; }
 

@@ -32,8 +32,11 @@ class Subpoly {
 
   void getMd5sum(md5_ctx_t *ctx) {
     md5_init(ctx);
-    uint8_t varId = parent.getVarId();
-    md5_update(ctx, &varId, 1);
+    uint8_t id=parent.getId();
+    md5_update(ctx, &id, 1);
+    
+    // uint8_t varId = parent.getVarId();
+    // md5_update(ctx, &varId, 1);
 
     for (int i; i < locs.size(); i++) {
       uint8_t loc = locs[i];
@@ -92,7 +95,28 @@ class Subpoly {
     return rep;
   }
   const Poly<C, T> &getParent() const { return parent; }
+
+  template <typename CC, typename TT>
+  friend bool   operator==(Poly<CC,TT> & lhs, Poly<CC,TT> & rhs );
+
+  template <typename CC, typename TT>
+  friend ostream &operator<<(ostream &os, Poly<CC, TT> &p);
+  
+  
 };
+
+template <typename CC, typename TT>
+bool   operator==(Subpoly<CC,TT> & lhs, Subpoly<CC,TT> & rhs ){
+  if(0!=memcmp(lhs.getmd5(), rhs.getmd5(), DIGEST_SIZE )){
+    return false;
+  }
+  return true;
+}
+template <typename CC, typename TT>
+ostream &operator<<(ostream &os, Subpoly<CC, TT> &p) {
+  os << p.toString();
+  return os;
+}
 }
 }
 
