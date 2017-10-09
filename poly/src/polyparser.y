@@ -71,6 +71,15 @@ POLY
 };
 
 POLY:
+'(' POLY ')' '^' INTEGER
+{
+  $$=$2;
+  Poly_t temp(*($2));
+  for(int i=1; i< $5; i++){
+    $$->mult_poly(temp);
+  }
+}
+|
 '(' POLY ')'
 {
   $$=$2;

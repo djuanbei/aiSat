@@ -55,7 +55,7 @@ static int DIM;
 
 enum { SUCCESS = 1, FAILURE = 2, OTHER = 3 };
 
-static void delpoly(void *p) { free((Poly_t *)p); }
+static void delpoly(void *p) { delete ((Poly_t *)p); }
 
 void SOSChecker::sosrepresent(PointList *sosList, double *X,
                               const int blockSize, const int sosMid,
@@ -500,11 +500,11 @@ int SOSChecker::overConvexChecking(const Subpoly_t *subpoly,
           delete[] check;
           delete[] checked;
           delete[] choose;
-          free(tempSub);
+          delete tempSub;
 
           return FAILURE;
         }
-        free(tempSub);
+        delete  tempSub;
 
         k = 0;
 
@@ -542,7 +542,8 @@ int SOSChecker::overConvexChecking(const Subpoly_t *subpoly,
       delete[] checked;
       delete[] choose;
 
-      free(tempSub);
+      delete  tempSub;
+
       return FAILURE;
 
     } else {
@@ -550,7 +551,7 @@ int SOSChecker::overConvexChecking(const Subpoly_t *subpoly,
       delete[] choose;
       delete[] checked;
 
-      free(tempSub);
+      delete tempSub;
 
       return SUCCESS;
     }
@@ -595,10 +596,12 @@ bool SOSChecker::polyIsSOS(Subpoly_t *subpoly, PointList *ans,
   int check = generator.easyCheck(ans);
 
   if (CONVEX_POLY == check) {
+    
   } else if (NOSOS == check) {
     return false;
-  } else if (EXACTLY_SOS == check)
+  } else if (EXACTLY_SOS == check){
     return true;
+  }
 
   sosId = SUPPORT_TABLE.findSupByPoly(subpoly);
   const indice_t *indices = &(subpoly->parent.indices[0]);
@@ -739,8 +742,9 @@ bool SOSChecker::easychecksos() {
     sosPresent(subp, ans, par.printMinValue);
   }
   delList(ans);
-  free(subp);
-  free(poly);
+  delete subp;
+  delete poly;
+
 
   return re;
 }

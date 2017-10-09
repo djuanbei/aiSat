@@ -23,8 +23,8 @@ typedef Poly<coef_t, indice_t> Poly_t;
 typedef Subpoly<coef_t, indice_t> Subpoly_t;
 
 int main(int argc, char* argv[]) {
-
-  Poly_t  p = parse("(x+1)*(y+1)+x^2+x^2*y+2*j+33*z");
+  Poly_t  p=  parse("x^2+y^2+1+(x+23)^2");
+  // Poly_t  p = parse("(x+1)*(y+1)+x^2+x^2*y+2*j+33*z");
   
   vector<int>locs1,lcos2;
   locs1.push_back(1);

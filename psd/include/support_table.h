@@ -69,7 +69,7 @@ class Supporttable {
   vector<int> gLength;
 
   vector<ArrangeMatrix **> arrangeM;
-  // ArrangeMatrix ***arrangeM;
+
   /*-----------------------------------------------------------------------------
    *  monomial of p
    *-----------------------------------------------------------------------------*/
@@ -84,7 +84,7 @@ class Supporttable {
 
   vector<Support *> values;
 
-  void enlargetable(void);
+
 
   int findSupElem(const int deg, const int varId, const int consNum,
                   const int *consIds);
@@ -93,6 +93,7 @@ class Supporttable {
                           const int value_size);
 
  public:
+  Supporttable();
   ~Supporttable();
 
   int findSupByPoly(const Subpoly_t *subpoly);

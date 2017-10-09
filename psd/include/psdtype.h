@@ -96,6 +96,11 @@ struct Support {
     consId = NULL;
     consCap = 0;
   }
+  ~ Support(){
+    if (consId != NULL) {
+      free(consId);
+    }
+  }
 };
 }
 }

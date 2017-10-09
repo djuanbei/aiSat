@@ -247,9 +247,9 @@ int SOSP::addSOSsup(vector<Monomial *> *indices_vec) {
   SUPPORT_TABLE.setSOSsup(supportId, sosLength, SOSM);
 
   int AMlength = 0;
-  //  ArrangeMatrix **AM=
+
   createArrangeM(supportId, SOSM, &AMlength, sosLength);
-  //  setArrangeM(supportId, AM, AMlength );
+
 
   delete[] indices;
   delete[] tempG;
@@ -319,10 +319,12 @@ int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec) {
   int sosLength =
       reduceConvexHulll(varNum, Gsup, gLength, indices, length, &SOSM);
 
-  if (0 != gLength * varNum)
+  if (0 != gLength * varNum){
     GSUP = (indice_t *)realloc_d(Gsup, gLength * varNum * sizeof(indice_t));
-  else
+  }
+  else{
     GSUP = Gsup;
+  }
   qsortM(GSUP, varNum, 0, gLength - 1, compare);
 
   qsortM(SOSM, varNum, 0, sosLength - 1, compare);
@@ -331,9 +333,8 @@ int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec) {
   SUPPORT_TABLE.setSOSsup(supportId, sosLength, SOSM);
 
   int AMlength = 0;
-  //  ArrangeMatrix **AM=x
+
   createArrangeM(supportId, SOSM, &AMlength, sosLength);
-  //  setArrangeM(supportId, AM, AMlength );
 
   delete[] indices;
   delete[] tempG;
