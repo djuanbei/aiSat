@@ -14,6 +14,7 @@
 #include "poly.hpp"
 namespace aiSat {
 namespace psd {
+class ConvexGenerator;
 class SOSChecker;
 }
 namespace poly {
@@ -21,6 +22,7 @@ namespace poly {
 template <typename C = double, typename T = unsigned char>
 
 class Subpoly {
+  friend class aiSat::psd::ConvexGenerator;
   friend class aiSat::psd::SOSChecker;
 
  private:
@@ -47,7 +49,7 @@ class Subpoly {
   }
 
  public:
-  Subpoly(Poly<C, T> &p) : parent(p) {
+  Subpoly(const Poly<C, T> &p) : parent(p) {
     int size = parent.getSize();
     for (int i = 0; i < size; i++) {
       locs.push_back(i);
@@ -56,10 +58,14 @@ class Subpoly {
     getMd5sum(&ctx);
     memcpy(md5sum, MD5_DIGEST(&ctx), 16 * sizeof(uint8_t));
   }
-  Subpoly(Poly<C, T> &p, const vector<int> &loc) : parent(p), locs(loc) {
+  Subpoly(const Poly<C, T> &p, const vector<int> &loc) : parent(p), locs(loc) {
     md5_ctx_t ctx;
     getMd5sum(&ctx);
     memcpy(md5sum, MD5_DIGEST(&ctx), 16 * sizeof(uint8_t));
+  }
+  
+  Subpoly(const Poly<C, T> &p,const int num,  const vector<int> &loc) : parent(p), locs(loc) {
+    locs.resize(num);
   }
 
   int size() const { return locs.size(); }
@@ -97,7 +103,7 @@ class Subpoly {
   const Poly<C, T> &getParent() const { return parent; }
 
   template <typename CC, typename TT>
-  friend bool   operator==(Poly<CC,TT> & lhs, Poly<CC,TT> & rhs );
+  friend bool   operator==( Poly<CC,TT> & lhs,  Poly<CC,TT> & rhs );
 
   template <typename CC, typename TT>
   friend ostream &operator<<(ostream &os, Poly<CC, TT> &p);
@@ -106,7 +112,7 @@ class Subpoly {
 };
 
 template <typename CC, typename TT>
-bool   operator==(Subpoly<CC,TT> & lhs, Subpoly<CC,TT> & rhs ){
+bool   operator==( Subpoly<CC,TT> & lhs, Subpoly<CC,TT> & rhs ){
   if(0!=memcmp(lhs.getmd5(), rhs.getmd5(), DIGEST_SIZE )){
     return false;
   }

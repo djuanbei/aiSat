@@ -294,7 +294,9 @@ Poly_t *sosConvertPoly(Blockmatrix *const X, const int k, const int blockSize,
   coef_t cf;
   int i, j, row, col;
 
-  const int varSize = getVarTable<indice_t>().getVarNum(vid);
+  vector<indice_t> vars;
+  getVarTable<indice_t>().getVarElem(vid, vars);
+  const int varSize = vars.size();
 
   const int length = SUPPORT_TABLE.getsosSLength(supportId);
 
@@ -302,12 +304,14 @@ Poly_t *sosConvertPoly(Blockmatrix *const X, const int k, const int blockSize,
   indice_t *support = SUPPORT_TABLE.getSOSsup(supportId, &dummy);
 
   ArrangeMatrix **S = SUPPORT_TABLE.getAMIndex(supportId, &dummy);
-  Poly_t::term_t temp_term;
+
+  Poly_t::Term temp_term;
   temp_term.key.resize(varSize);
 
   for (i = 0; i < length; i += 1) {
     for (int k = 0; k < varSize; k++) {
-      temp_term.key[i] = support[i * varSize + k];
+      temp_term.key.push_back(make_pair(vars[k], support[i * varSize + k]));
+      // temp_term.key[i] = support[i * varSize + k];
     }
 
     cf = 0;
@@ -321,6 +325,7 @@ Poly_t *sosConvertPoly(Blockmatrix *const X, const int k, const int blockSize,
         cf += 2 * (X->blocks[k + 1].data.mat[ijtok(row, col, blockSize)]);
       }
     }
+
     temp_term.cf = cf;
     re->add_term(temp_term);
   }

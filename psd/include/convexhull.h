@@ -21,7 +21,7 @@ namespace psd {
 
 enum POLY_SOS_T { NOSOS, CONVEX_POLY, EXACTLY_SOS, UNHNOW };
 
-class SOSChecker {
+class ConvexGenerator {
  private:
   const Subpoly_t* subpoly;
 
@@ -31,7 +31,7 @@ class SOSChecker {
                     const int* coefs, int maxSum);
 
  public:
-  SOSChecker(const Subpoly_t* subp) : subpoly(subp) {}
+  ConvexGenerator(const Subpoly_t* subp) : subpoly(subp) {}
 
   POLY_SOS_T easyCheck(PointList* ans);
 

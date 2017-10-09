@@ -1,4 +1,3 @@
-
 /**
  * @file   sdpsolver.h
  * @author Liyun Dai <dlyun2009@gmail.com>
@@ -20,48 +19,33 @@
 #include "sparse.h"
 #include "support_table.h"
 #include "vartable.hpp"
+
+#include <vector>
+
 namespace aiSat {
 namespace psd {
+using namespace ::std;
 
-struct sparseSOSblock {
-  int size;
-  int capacity;
-  coef_t *value;
-  int *index; /* location of sosM */
+struct SparseSOSblock {
+  vector<coef_t> value;
+  vector<int> index; /* location of sosM */
+
+  void addSparse(const int index, const coef_t value);
+
+  SparseSOSblock() {}
 };
 
-typedef struct sparseSOSblock SparseSOSblock;
+typedef sparseblock Sparseblock;
 
-typedef struct blockrec Blockrec;
+typedef blockmatrix Blockmatrix;
 
-typedef struct blockmatrix Blockmatrix;
-
-typedef struct sparseblock Sparseblock;
-
-SparseSOSblock *createSparseSOSblock(void);
-
-void enlargeSparseSOSblock(SparseSOSblock *const bolck);
-
-void deleteSparseSOSblock(SparseSOSblock *block);
-
-void addSparse(SparseSOSblock *const block, const int index,
-               const coef_t value);
+typedef blockrec Blockrec;
 
 Sparseblock *createblock(const int bnum, const int consnum,
                          const ArrangeMatrix *s);
-/*
- * ===  FUNCTION
- * ======================================================================
- *         Name:  createSparseblock
- *  Description:
- * =====================================================================================
- */
+
 Sparseblock *createSparseblock(const int bnum, const int bsize,
                                const int consnum, const int nument);
-
-void wellform(SOSProblem *const sys, const int sep, const int sosMId[],
-              const int sosMap[], const int blockSize[], const int blockMap[],
-              Blockmatrix *X);
 
 typedef struct constraintmatrix Constraintmatrix;
 
@@ -74,26 +58,40 @@ void createBlockMatrixC(int blockSize[], const int bnum, Blockmatrix *);
 void addMonomial(indice_t **const array, const indice_t *element,
                  int *const capcity, int *const size, const int n);
 
-indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
-                            indice_t **const SOSM, int const *lengthM,
-                            int size[], vector<vector<indice_t> > &varMap,
-                            vector<vector<indice_t> > &pvarMap,
-                            vector<vector<indice_t> > &svarMap);
-
 void deleteAllIndices(indice_t **all, const int length);
 
-Constraintmatrix *createConstraintmatrx(SOSProblem *const sys, int *consSize,
-                                        int sosMId[], int sosMap[],
-                                        int blockSize[], int blockMap[],
-                                        int *bnum, double **);
+/*
+  sum_{i=0}^{size-1} polys[i]*polyConstraints[i]=rhs
+*/
+class SOSProblem {
+ private:
+  vector<Poly_t *> polys;
+  Poly_t *rhs;
+  vector<PolyConstraint *> polyConstraints;
 
-int inter_sdp(SOSProblem *const sys, const int sep, const char *fproname,
-              const char *fsolname);
+  void wellform(const int sep, const int sosMId[], const int sosMap[],
+                const int blockSize[], const int blockMap[], Blockmatrix *X);
 
-int sdp_solver(SOSProblem *const sys, Poly_t **resP, const char *fproname,
-               const char *fsolname);
+  indice_t **createAllIndices(int *const sosmMap, indice_t **const SOSM,
+                              int const *lengthM, int size[],
+                              vector<vector<indice_t> > &varMap,
+                              vector<vector<indice_t> > &pvarMap,
+                              vector<vector<indice_t> > &svarMap);
 
-int getSOSMsize(SOSProblem *const sys, int sosmMap[], int sosMId[]);
+  Constraintmatrix *createConstraintmatrx(int *consSize, int sosMId[],
+                                          int sosMap[], int blockSize[],
+                                          int blockMap[], int *bnum, double **);
+  int getSOSMsize(int sosmMap[], int sosMId[]);
+
+  Poly_t *getConstraintPoly(const int index, const int sosMId[],
+                            const int sosMap[], const int blockSize[],
+                            const int blockMap[], Blockmatrix *const X);
+
+ public:
+  int inter_sdp(const int sep, const char *fproname, const char *fsolname);
+
+  int sdp_solver(Poly_t **resP, const char *fproname, const char *fsolname);
+};
 }
 }
 #endif

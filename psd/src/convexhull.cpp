@@ -1,19 +1,12 @@
-/*
- * =====================================================================================
+
+/**
+ * @file   convexhull.cpp
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Mon Oct  9 16:36:43 2017
  *
- *       Filename:  convexhull.c
+ * @brief
  *
- *    Description:
  *
- *        Version:  1.0
- *        Created:  11/28/2013 10:47:29 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:
- *
- * =====================================================================================
  */
 
 #include "convexhull.h"
@@ -58,7 +51,7 @@ static size_t node_b_size;
  *
  * @return
  */
-POLY_SOS_T SOSChecker::checkThreeP(const int dim, PointList* ans) {
+POLY_SOS_T ConvexGenerator::checkThreeP(const int dim, PointList* ans) {
   int i;
   int VA, VB, VM;
   vector<indice_t> key(dim);
@@ -221,7 +214,7 @@ POLY_SOS_T SOSChecker::checkThreeP(const int dim, PointList* ans) {
   }
 }
 
-POLY_SOS_T SOSChecker::easyCheck(PointList* ans) {
+POLY_SOS_T ConvexGenerator::easyCheck(PointList* ans) {
   const int size = subpoly->size();
 
   const vector<int>& loc = subpoly->locs;
@@ -453,8 +446,8 @@ POLY_SOS_T SOSChecker::easyCheck(PointList* ans) {
  *
  * @return
  */
-int SOSChecker::onSameSurf(const int* checkPoints, const int size,
-                           indice_t* rePoints, const int limit) {
+int ConvexGenerator::onSameSurf(const int* checkPoints, const int size,
+                                indice_t* rePoints, const int limit) {
   ASSERT(limit >= 1 && size >= limit,
          "candidate must greater or equal to limit");
 
@@ -746,8 +739,8 @@ int SOSChecker::onSameSurf(const int* checkPoints, const int size,
   return -1;
 }
 
-indice_t* SOSChecker::randPointSet(const int length, const int dim,
-                                   const int domain) {
+indice_t* ConvexGenerator::randPointSet(const int length, const int dim,
+                                        const int domain) {
   indice_t* re = (indice_t*)malloc_d(length * dim * sizeof(indice_t));
   int i, j;
 
@@ -771,8 +764,9 @@ indice_t* SOSChecker::randPointSet(const int length, const int dim,
  *
  * @return
  */
-int SOSChecker::reduceByPlane(indice_t* candidateSet, const int length,
-                              const int dim, const int* coefs, int maxSum) {
+int ConvexGenerator::reduceByPlane(indice_t* candidateSet, const int length,
+                                   const int dim, const int* coefs,
+                                   int maxSum) {
   int i, j;
   int tempSum = 0;
   int len = length;
@@ -794,9 +788,10 @@ int SOSChecker::reduceByPlane(indice_t* candidateSet, const int length,
   return len;
 }
 
-int SOSChecker::reduceByLestEignV(indice_t* candidateSet, const int candLength,
-                                  const int dim, const indice_t* genSet,
-                                  const int genLength, const int max[]) {
+int ConvexGenerator::reduceByLestEignV(indice_t* candidateSet,
+                                       const int candLength, const int dim,
+                                       const indice_t* genSet,
+                                       const int genLength, const int max[]) {
   long int bound;
   int maxSum = 0;
   int minSum;
@@ -933,9 +928,9 @@ int SOSChecker::reduceByLestEignV(indice_t* candidateSet, const int candLength,
   return re;
 }
 
-indice_t* SOSChecker::overConvexHull(const indice_t* genSet,
-                                     const int genLength, const int dim,
-                                     int* reLength) {
+indice_t* ConvexGenerator::overConvexHull(const indice_t* genSet,
+                                          const int genLength, const int dim,
+                                          int* reLength) {
   ASSERT(genLength > 0, "at least have one point");
   int i, j, k;
   if (1 == genLength) {

@@ -1,22 +1,14 @@
-/*
- * =====================================================================================
- *
- *       Filename:  main.c
- *
- *    Description:
- *
- *        Version:  1.0
- *        Created:  11/29/2013 12:53:43 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Liyun Dai (pku), dlyun2009@gmail.com
- *        Company:
- *
- * =====================================================================================
+
+/**
+ * @file   main.cpp
+ * @author Liyun Dai <dlyun2009@gmail.com>
+ * @date   Mon Oct  9 19:45:03 2017
+ * 
+ * @brief  
+ * 
+ * 
  */
 
-// #include "convexhull.h"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -97,19 +97,6 @@ struct Support {
     consCap = 0;
   }
 };
-
-/*
-  sum_{i=0}^{size-1} polys[i]*polyConstraints[i]=rhs
-*/
-struct sosProblem {
-  int cap;
-  int size;
-  Poly_t **polys;
-  Poly_t *rhs;
-  PolyConstraint **polyConstraints;
-};
-
-typedef struct sosProblem SOSProblem;
 }
 }
 #endif

@@ -24,18 +24,26 @@
 namespace aiSat {
 
 namespace psd {
+class ConvexGenerator;
+
 class SOSChecker;
 }
 
 namespace poly {
+template <typename C, typename T >
+class Subpoly;
+
 static size_t POLY_ID = 0;
 
 using namespace std;
 
 template <typename C = double, typename T = int>
 class Poly {
+  
+  friend class aiSat::psd::ConvexGenerator;
+  
   friend class aiSat::psd::SOSChecker;
-
+  friend class Subpoly<C,T>;
  private:
   struct term {
     vector<T> key;
@@ -43,7 +51,8 @@ class Poly {
     term() {}
     term(const vector<T> &k, const C &c) : key(k), cf(c) {}
   };
-
+  typedef Poly<C, T>::term term_t;
+  
  public:
   struct Term {
     vector<pair<T, T> > key;  // var, power
@@ -62,7 +71,7 @@ class Poly {
 
   typedef Poly<C, T> poly_t;
 
-  typedef Poly<C, T>::term term_t;
+
 
  private:
   size_t id;
@@ -71,7 +80,7 @@ class Poly {
   vector<T> indices;
   vector<C> coef;
 
-  C getCF(const int i) const { return coef[i]; }
+
 
   void add_term_with_sort(const vector<T> &key, const C cf) {
     int i, j;
@@ -125,8 +134,8 @@ class Poly {
   }
 
   void mult_term(const term_t &t) {
-    int i, j;
-    for (i = 0; i < coef.size(); i++) {
+    int j;
+    for (size_t i = 0; i < coef.size(); i++) {
       for (j = 0; j < varNum; j++) {
         indices[i * varNum + j] += t.key[j];
       }
@@ -140,23 +149,6 @@ class Poly {
     return temp;
   }
 
-
-  /**
-   * @brief get the corresponding degree of k-th term i variate degree
-   *
-   * @param k term index
-   * @param i  variate index
-   *
-   * @return
-   */
-  int getDegreeAt(int k, int i) const { return indices[k * varNum + i]; }
-
-  void getDegreeAt(int k, vector<T> &re) const {
-    re.resize(varNum);
-    for (int i = 0; i < varNum; i++) {
-      re[i] = indices[k * varNum + i];
-    }
-  }
 
   
 
@@ -333,6 +325,25 @@ class Poly {
 
 
 
+    /**
+   * @brief get the corresponding degree of k-th term i variate degree
+   *
+   * @param k term index
+   * @param i  variate index
+   *
+   * @return
+   */
+  int getDegreeAt(int k, int i) const { return indices[k * varNum + i]; }
+
+  void getDegreeAt(int k, vector<T> &re) const {
+    re.resize(varNum);
+    for (int i = 0; i < varNum; i++) {
+      re[i] = indices[k * varNum + i];
+    }
+  }
+
+  C getCF(const int i) const { return coef[i]; }
+  
   C getCF(const Term &term) const {
     map<int, int> mapIndex;
     vector<T> vars;
@@ -424,14 +435,15 @@ class Poly {
    *
    */
   void update(void) {
-    int i, j, k;
+    size_t i, j;
+    int k;
     if (coef.empty()) {
       return;
     }
     qsort(0, coef.size() - 1);
 
     j = 0;
-    int size = coef.size();
+    size_t size = coef.size();
     for (i = 1; i < size; i++) {
       for (k = 0; k < varNum; k++) {
         if (indices[j * varNum + k] != indices[i * varNum + k]) {
@@ -763,7 +775,7 @@ class Poly {
     }
 
     if (newSize > oldSize) {
-      T temp[newSize];
+      vector<T> temp(newSize);
 
       indices.resize(coef.size() * newSize);
 
@@ -788,7 +800,7 @@ class Poly {
       }
 
     } else if (newSize < oldSize) {
-      T temp[newSize];
+      vector<T> temp(newSize);
 
       for (i = 0; i < coef.size(); i += 1) {
         for (j = 0; j < newSize; j += 1) {
@@ -813,7 +825,7 @@ class Poly {
       /*-----------------------------------------------------------------------------
        *  I can much better in here
        *-----------------------------------------------------------------------------*/
-      T temp[newSize];
+      vector<T> temp(newSize);
 
       for (i = 0; i < length; i += 1) {
         for (j = 0; j < newSize; j += 1) {
@@ -867,7 +879,7 @@ class Poly {
     return temp;
   }
   void mult(const C &cf) {
-    for (int i = 0; i < coef.size(); i += 1) {
+    for (size_t i = 0; i < coef.size(); i += 1) {
       coef[i] *= cf;
     }
   }
@@ -943,7 +955,7 @@ class Poly {
   }
 
   void mult_poly(const poly_t &poly2) {
-    int i, j;
+    int j;
 
     poly_t re;
 
@@ -964,7 +976,7 @@ class Poly {
 
       getVarTable<T>().getConvertMap(poly2.varId, vid, mapKey);
 
-      for (i = 0; i < poly2.coef.size(); i += 1) {
+      for (size_t i = 0; i < poly2.coef.size(); i += 1) {
         if (poly2.coef[i] == 0) continue;
         fill(key.begin(), key.begin() + varSize, 0);
 
@@ -986,7 +998,7 @@ class Poly {
 
       getVarTable<T>().getConvertMap(varId, vid, mapKey);
 
-      for (i = 0; i < coef.size(); i += 1) {
+      for (size_t i = 0; i < coef.size(); i += 1) {
         if (coef[i] == 0) continue;
         fill(key.begin(), key.end(), 0);
 

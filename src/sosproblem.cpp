@@ -243,8 +243,8 @@ int SOSP::addSOSsup(vector<Monomial *> *indices_vec) {
 
   qsortM(SOSM, exactVarNum, 0, sosLength - 1, compare);
 
-  setGsup(supportId, gLength, GSUP);
-  setSOSsup(supportId, sosLength, SOSM);
+  SUPPORT_TABLE.setGsup(supportId, gLength, GSUP);
+  SUPPORT_TABLE.setSOSsup(supportId, sosLength, SOSM);
 
   int AMlength = 0;
   //  ArrangeMatrix **AM=
@@ -327,8 +327,8 @@ int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec) {
 
   qsortM(SOSM, varNum, 0, sosLength - 1, compare);
 
-  setGsup(supportId, gLength, GSUP);
-  setSOSsup(supportId, sosLength, SOSM);
+  SUPPORT_TABLE.setGsup(supportId, gLength, GSUP);
+  SUPPORT_TABLE.setSOSsup(supportId, sosLength, SOSM);
 
   int AMlength = 0;
   //  ArrangeMatrix **AM=x

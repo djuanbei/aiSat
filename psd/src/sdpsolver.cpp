@@ -20,27 +20,17 @@
 namespace aiSat {
 namespace psd {
 
-SparseSOSblock *createSparseSOSblock(void) {
-  SparseSOSblock *re;
-  re = (SparseSOSblock *)malloc_d(sizeof(SparseSOSblock));
-  re->capacity = 8; /* initialize capacity */
-  re->value = (coef_t *)malloc_d(re->capacity * sizeof(coef_t));
-  re->index = (int *)malloc_d(re->capacity * sizeof(int));
-  re->size = 0;
-
-  return re;
-}
-
-static Poly_t *getConstraintPoly(SOSProblem *const sys, const int index,
-                                 const int sosMId[], const int sosMap[],
-                                 const int blockSize[], const int blockMap[],
-                                 Blockmatrix *const X) {
-  ASSERT(index < sys->size && index >= 0, "overflow ");
+Poly_t *SOSProblem::getConstraintPoly(const int index, const int sosMId[],
+                                      const int sosMap[], const int blockSize[],
+                                      const int blockMap[],
+                                      Blockmatrix *const X) {
+  int size = polys.size();
+  ASSERT(index < size && index >= 0, "overflow ");
   int i, k;
   k = 0;
-  for (i = 0; i < sys->size; ++i) {
+  for (i = 0; i < size; ++i) {
     if (index == i) {
-      if (sys->polyConstraints[i]->type == EQ) {
+      if (polyConstraints[i]->type == EQ) {
         Poly_t *posPoly = sosConvertPoly(X, k, blockSize[k],
                                          sosMId[sosMap[abs(blockMap[k]) - 1]]);
 
@@ -62,7 +52,7 @@ static Poly_t *getConstraintPoly(SOSProblem *const sys, const int index,
       }
     }
 
-    if (sys->polyConstraints[i]->type == EQ) {
+    if (polyConstraints[i]->type == EQ) {
       k += 2;
     } else {
       k++;
@@ -74,7 +64,6 @@ static Poly_t *getConstraintPoly(SOSProblem *const sys, const int index,
 /**
  * @brief  interpolant:= -( 1/2+1/2f0+\sum_{f\in T_2}) >0
  *
- * @param sys
  * @param sep
  * @param sosMId
  * @param sosMap
@@ -82,23 +71,23 @@ static Poly_t *getConstraintPoly(SOSProblem *const sys, const int index,
  * @param blockMap
  * @param X
  */
-void wellform(SOSProblem *const sys, const int sep, const int sosMId[],
-              const int sosMap[], const int blockSize[], const int blockMap[],
-              Blockmatrix *const X) {
+void SOSProblem::wellform(const int sep, const int sosMId[], const int sosMap[],
+                          const int blockSize[], const int blockMap[],
+                          Blockmatrix *const X) {
   int i, k;
 
   Poly_t check;
 
-  Poly_t interpolant = (*(sys->rhs)) * (0.5);
+  Poly_t interpolant = (*(rhs)) * (0.5);
 
   cout << std::endl;
   k = 0;
-  for (i = 0; i < sys->size; i += 1) {
+  for (i = 0; i < polys.size(); i += 1) {
     cout << endl
          << i + 1 << "............................... " << i + 1 << endl;
     cout << "....................................." << endl;
 
-    if (sys->polyConstraints[i]->type == EQ) {
+    if (polyConstraints[i]->type == EQ) {
       Poly_t *posPoly = sosConvertPoly(X, k, blockSize[k],
                                        sosMId[sosMap[abs(blockMap[k]) - 1]]);
 
@@ -113,7 +102,7 @@ void wellform(SOSProblem *const sys, const int sep, const int sosMId[],
       cout << i + 1 << " normal polynomial :" << endl;
       string str = posPoly->toString();
       cout << str;
-      Poly_t mult = (*(sys->polys[i])) * (*posPoly);
+      Poly_t mult = (*(polys[i])) * (*posPoly);
 
       if (i + 1 >= sep) {
         interpolant.add_poly(mult);
@@ -125,7 +114,7 @@ void wellform(SOSProblem *const sys, const int sep, const int sosMId[],
       Poly_t *poly = sosConvertPoly(X, k, blockSize[k],
                                     sosMId[sosMap[abs(blockMap[k]) - 1]]);
 
-      Poly_t mult = (*sys->polys[i]) * (*poly);
+      Poly_t mult = (*polys[i]) * (*poly);
 
       if (i + 1 >= sep) {
         interpolant.add_poly(mult);
@@ -147,7 +136,7 @@ void wellform(SOSProblem *const sys, const int sep, const int sosMId[],
   }
   cout << endl << "check: 1+sum_i(fi*si)=0:::::::::::::::::;" << endl;
 
-  Poly_t dummy(*sys->rhs);
+  Poly_t dummy(*rhs);
 
   dummy.mult(-1);
   check.add_poly(dummy);
@@ -164,70 +153,46 @@ void wellform(SOSProblem *const sys, const int sep, const int sosMId[],
   cout << " > 0" << endl;
 }
 
-void enlargeSparseSOSblock(SparseSOSblock *const block) {
-  block->capacity = ENLARGE_RAT * (block->capacity) + 1;
-  block->value = (coef_t *)realloc_d(block->value,
-                                     (size_t)block->capacity * sizeof(coef_t));
-  block->index =
-      (int *)realloc_d(block->index, (size_t)block->capacity * sizeof(int));
-}
-
-void deleteSparseSOSblock(SparseSOSblock *block) {
-  free(block->index);
-  free(block->value);
-  free(block);
-
-  return;
-}
-
-void addSparse(SparseSOSblock *const block, const int index,
-               const coef_t value) {
-  if (block->size == block->capacity) {
-    enlargeSparseSOSblock(block);
-  }
-  block->index[block->size] = index;
-  block->value[block->size] = value;
-  block->size++;
+void SparseSOSblock::addSparse(const int eindex, const coef_t evalue) {
+  index.push_back(eindex);
+  value.push_back(evalue);
 }
 
 Sparseblock *createblock(const int blockNum, const int consnum,
                          ArrangeMatrix const *s) {
-  int i;
-  Sparseblock *re;
+  sparseblock *block = (sparseblock *)malloc_d(sizeof(Sparseblock));
 
-  re = (Sparseblock *)malloc_d(sizeof(Sparseblock));
-
-  re->blocknum = blockNum;
-  re->blocksize = s->getRowLength();
-  re->constraintnum = consnum;
-  re->next = NULL;
-  re->nextbyblock = NULL;
-  re->entries = (double *)malloc_d((s->size() + 1) * sizeof(double));
-  re->iindices = (int *)malloc_d((s->size() + 1) * sizeof(int));
-  re->jindices = (int *)malloc_d((s->size() + 1) * sizeof(int));
-  re->numentries = s->size();
-  for (i = 0; i < s->size(); i += 1) {
-    re->iindices[i] = (*s)[i].row;
-    re->jindices[i] = (*s)[i].col;
-    re->entries[i] = s->getCF();
+  block->blocknum = blockNum;
+  block->blocksize = s->getRowLength();
+  block->constraintnum = consnum;
+  block->next = NULL;
+  block->nextbyblock = NULL;
+  block->entries = (double *)malloc_d((s->size() + 1) * sizeof(double));
+  block->iindices = (int *)malloc_d((s->size() + 1) * sizeof(int));
+  block->jindices = (int *)malloc_d((s->size() + 1) * sizeof(int));
+  block->numentries = s->size();
+  for (int i = 0; i < s->size(); i += 1) {
+    block->iindices[i] = (*s)[i].row;
+    block->jindices[i] = (*s)[i].col;
+    block->entries[i] = s->getCF();
   }
-
-  return re;
+  return block;
 }
 
 Sparseblock *createSparseblock(const int blockNum, const int bsize,
                                const int consnum, const int nument) {
-  Sparseblock *re = (Sparseblock *)malloc_d(sizeof(Sparseblock));
-  re->blocknum = blockNum;
-  re->blocksize = bsize;
-  re->constraintnum = consnum;
-  re->next = NULL;
-  re->nextbyblock = NULL;
-  re->entries = (double *)malloc_d((nument + 1) * sizeof(double));
-  re->iindices = (int *)malloc_d((nument + 1) * sizeof(int));
-  re->jindices = (int *)malloc_d((nument + 1) * sizeof(int));
-  re->numentries = nument;
-  return re;
+  sparseblock *block = (sparseblock *)malloc_d(sizeof(Sparseblock));
+  block->blocknum = blockNum;
+  block->blocksize = bsize;
+  block->constraintnum = consnum;
+  block->next = NULL;
+  block->nextbyblock = NULL;
+  block->entries = (double *)malloc_d((nument + 1) * sizeof(double));
+  block->iindices = (int *)malloc_d((nument + 1) * sizeof(int));
+  block->jindices = (int *)malloc_d((nument + 1) * sizeof(int));
+  block->numentries = nument;
+
+  return block;
 }
 
 Constraintmatrix *createNconstraintmatrix(const int n) {
@@ -276,17 +241,6 @@ void createBlockMatrixC(int blockSize[], int const blockNum, Blockmatrix *C) {
       fprintf(stderr, "\ndynamic memory allocation failed\n");
       exit(EXIT_FAILURE);
     }
-
-    /*      for ( j = 1; j < blockSize[i]+1; j += 1 ) {
-     *
-     *          for ( k = 1; k <=j; k += 1 ) {
-     *              C->blocks[i+1].data.mat[ijtok(j,k,blockSize[i])]=rand()%10-5;
-     *              if(k!=j)
-     *C->blocks[i+1].data.mat[ijtok(k,j,blockSize[i])]=C->blocks[i+1].data.mat[ijtok(j,k,blockSize[i])];
-     *
-     *          }
-     *      }
-     */
   }
 }
 
@@ -306,11 +260,12 @@ void createBlockMatrixC(int blockSize[], int const blockNum, Blockmatrix *C) {
  *
  * @return
  */
-indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
-                            indice_t **const SOSM, int const *lengthM,
-                            int reSize[], vector<vector<indice_t> > &varMap,
-                            vector<vector<indice_t> > &polyVarMap,
-                            vector<vector<indice_t> > &sosVarMap) {
+indice_t **SOSProblem::createAllIndices(int *const sosmMap,
+                                        indice_t **const SOSM,
+                                        int const *lengthM, int reSize[],
+                                        vector<vector<indice_t> > &varMap,
+                                        vector<vector<indice_t> > &polyVarMap,
+                                        vector<vector<indice_t> > &sosVarMap) {
   int i, k, p, pi, si;
   int choose;
   int psize;
@@ -323,48 +278,47 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
   indice_t temp2[n];
   /*    indice_t index[n];
    */
-
-  int varSize[sys->size];
-  int multVarId[sys->size];
-  int capacity[sys->size];
+  int size = polys.size();
+  int varSize[size];
+  int multVarId[size];
+  int capacity[size];
 
   indice_t **re;
-  varMap.resize(sys->size);
-  polyVarMap.resize(sys->size);
-  sosVarMap.resize(sys->size);
+  varMap.resize(size);
+  polyVarMap.resize(size);
+  sosVarMap.resize(size);
 
-  for (i = 0; i < sys->size; i += 1) {
+  for (i = 0; i < size; i += 1) {
     reSize[i] = 0;
 
     capacity[i] =
         lengthM[sosmMap[i]] * ENLARGE_RAT /
         (i * i * i + 1); /* here can have more smart method to deal with */
 
-    getVarTable<indice_t>().getVarElem(sys->polys[i]->getVarId(),
-                                       polyVarMap[i]);
+    getVarTable<indice_t>().getVarElem(polys[i]->getVarId(), polyVarMap[i]);
 
     getVarTable<indice_t>().getVarElem(
-        SUPPORT_TABLE.getSupElem((sys->polyConstraints[i])->supportId)->varId,
+        SUPPORT_TABLE.getSupElem((polyConstraints[i])->supportId)->varId,
         sosVarMap[i]);
 
     multVarId[i] = getVarTable<indice_t>().mergeVar(
-        sys->polys[i]->getVarId(),
-        SUPPORT_TABLE.getSupElem((sys->polyConstraints[i])->supportId)->varId);
+        polys[i]->getVarId(),
+        SUPPORT_TABLE.getSupElem((polyConstraints[i])->supportId)->varId);
 
     getVarTable<indice_t>().getVarElem(multVarId[i], varMap[i]);
 
     varSize[i] = getVarTable<indice_t>().getVarNum(multVarId[i]);
   }
 
-  re = (indice_t **)malloc_d((sys->size) * sizeof(indice_t *));
+  re = (indice_t **)malloc_d((size) * sizeof(indice_t *));
 
-  for (i = 0; i < sys->size; i += 1) {
+  for (i = 0; i < size; i += 1) {
     re[i] = (indice_t *)malloc_d(varSize[i] * capacity[i] * sizeof(indice_t));
   }
 
-  for (p = 0; p < sys->size; p += 1) { /* polynomial index */
+  for (p = 0; p < size; p += 1) { /* polynomial index */
 
-    psize = sys->polys[p]->getSize(); /* psize polynomial term size */
+    psize = polys[p]->getSize(); /* psize polynomial term size */
 
     int index[psize];
     int jump[psize];
@@ -381,11 +335,9 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
       for (k = 0; k < psize; k += 1) { /* polynomial term size */
 
         if (index[k] < lengthM[sosmMap[p]]) {
-          polyVarSize =
-              getVarTable<indice_t>().getVarNum(sys->polys[p]->getVarId());
+          polyVarSize = getVarTable<indice_t>().getVarNum(polys[p]->getVarId());
           sosVarSize = getVarTable<indice_t>().getVarNum(
-              SUPPORT_TABLE.getSupElem((sys->polyConstraints[i])->supportId)
-                  ->varId);
+              SUPPORT_TABLE.getSupElem((polyConstraints[i])->supportId)->varId);
 
           pi = 0;
           si = 0;
@@ -398,7 +350,7 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
               if (pi < polyVarSize && si < sosVarSize &&
                   polyVarMap[p][pi] == varMap[p][i] &&
                   sosVarMap[p][si] == varMap[p][i]) {
-                temp1[i] = sys->polys[p]->getDegreeAt(k, pi) +
+                temp1[i] = polys[p]->getDegreeAt(k, pi) +
                            SOSM[sosmMap[p]][sosVarSize * index[k] + si];
 
                 si++;
@@ -406,7 +358,7 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
 
               } else if (pi < polyVarSize &&
                          polyVarMap[p][pi] == varMap[p][i]) {
-                temp1[i] = sys->polys[p]->getDegreeAt(k, pi);
+                temp1[i] = polys[p]->getDegreeAt(k, pi);
                 pi++;
               } else if (si < sosVarSize && sosVarMap[p][si] == varMap[p][i]) {
                 temp1[i] = SOSM[sosmMap[p]][sosVarSize * index[k] + si];
@@ -421,7 +373,7 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
               if (pi < polyVarSize && si < sosVarSize &&
                   polyVarMap[p][pi] == varMap[p][i] &&
                   sosVarMap[p][si] == varMap[p][i]) {
-                temp2[i] = sys->polys[p]->getDegreeAt(k, pi) +
+                temp2[i] = polys[p]->getDegreeAt(k, pi) +
                            SOSM[sosmMap[p]][sosVarSize * index[k] + si];
 
                 si++;
@@ -429,7 +381,7 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
 
               } else if (pi < polyVarSize &&
                          polyVarMap[p][pi] == varMap[p][i]) {
-                temp2[i] = sys->polys[p]->getDegreeAt(k, pi);
+                temp2[i] = polys[p]->getDegreeAt(k, pi);
                 pi++;
               } else {
                 temp2[i] = SOSM[sosmMap[p]][sosVarSize * index[k] + si];
@@ -460,7 +412,8 @@ indice_t **createAllIndices(SOSProblem *const sys, int *const sosmMap,
 
       if (choose) {
         for (i = 0; i < p; i += 1) {
-          if (findlocation(re[i], reSize[i], temp1, &(varMap[i])[0],
+          if (findlocation(re[i], reSize[i], temp1, varMap[i].size(),
+                           &(varMap[i])[0], varMap[p].size(),
                            &(varMap[p])[0]) > -1)
             break;  // check whether have added
         }
@@ -529,11 +482,11 @@ void addMonomial(indice_t **const array, const indice_t *element,
  *
  * @return
  */
-Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
-                                        int *const numofCons, int sosMId[],
-                                        int sosmMap[], int blockSize[],
-                                        int blockMap[], int *blockNum,
-                                        double **b) {
+Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
+                                                    int sosMId[], int sosmMap[],
+                                                    int blockSize[],
+                                                    int blockMap[],
+                                                    int *blockNum, double **b) {
   int i, j, k, h, p, pi, si, sum, tempI;
   int pSize, sSize, mSize;
   int index, tempIndex;
@@ -541,11 +494,12 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
   Sparseblock *blockptr;
   /*    int sosMId[sys->size];
    */
+  int size = polys.size();
   int diffSOSMIdSize;
-  int everyConstraintSize[sys->size];
-  vector<vector<indice_t> > varMap(sys->size);
-  vector<vector<indice_t> > polyVarMap(sys->size);
-  vector<vector<indice_t> > sosVarMap(sys->size);
+  int everyConstraintSize[size];
+  vector<vector<indice_t> > varMap(size);
+  vector<vector<indice_t> > polyVarMap(size);
+  vector<vector<indice_t> > sosVarMap(size);
 
   /*-----------------------------------------------------------------------------
    *  At now  multiplied sos polynomials to difference polynomials are same.
@@ -553,7 +507,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
    *12/03/2012 04:34:54 PM
    *-----------------------------------------------------------------------------*/
 
-  diffSOSMIdSize = getSOSMsize(sys, sosmMap, sosMId);
+  diffSOSMIdSize = getSOSMsize(sosmMap, sosMId);
 
   indice_t *SOSM[diffSOSMIdSize];
 
@@ -588,8 +542,8 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
   }
 
   *blockNum = 0;
-  for (i = 0; i < sys->size; i += 1) {
-    if (sys->polyConstraints[i]->type == EQ) {
+  for (i = 0; i < size; i += 1) {
+    if (polyConstraints[i]->type == EQ) {
       blockSize[*blockNum] = tempblockSize[sosmMap[i]];
       blockMap[*blockNum] = i + 1; /* more attention on +1 */
       blockSize[*blockNum + 1] = tempblockSize[sosmMap[i]];
@@ -608,19 +562,19 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
    * multiplied sos polynomials. delete repeat
    */
   indice_t **allM =
-      createAllIndices(sys, sosmMap, SOSM, lengthM, everyConstraintSize, varMap,
+      createAllIndices(sosmMap, SOSM, lengthM, everyConstraintSize, varMap,
                        polyVarMap, sosVarMap);
 
   (*numofCons) = 0;
 
-  for (i = 0; i < sys->size; i += 1) {
+  for (i = 0; i < size; i += 1) {
     (*numofCons) += everyConstraintSize[i];
   }
 
   *b = (double *)calloc_d(((*numofCons) + 1), sizeof(double));
 
-  if (NULL != sys->rhs) {
-    Poly_t *rhs = sys->rhs;
+  if (NULL != rhs) {
+    Poly_t *rhs = rhs;
     rhs->update();
 
     vector<indice_t> rhsVars;
@@ -632,7 +586,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
       rhs->getDegreeAt(i, key);
       index = 0;
       k = 0;
-      while (k < sys->size) {
+      while (k < size) {
         tempIndex = findlocation(allM[k], everyConstraintSize[k], &key[0],
                                  varMap[k].size(), &(varMap[k])[0],
                                  rhsVars.size(), &rhsVars[0]);
@@ -644,7 +598,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
 
         k++;
       }
-      if (k < sys->size) {
+      if (k < size) {
         (*b)[index + 1] = rhs->getCF(i);  // b start from 1
       }
     }
@@ -666,8 +620,8 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
        *block has a
        *  sosM polynomial respective.
        *-----------------------------------------------------------------------------*/
-      block[i][j] = createSparseSOSblock(); /* every polynomial with regard to a
-                                               constraint block */
+      block[i][j] = new SparseSOSblock(); /* every polynomial with regard to a
+                                                constraint block */
     }
   }
 
@@ -676,7 +630,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
     if (p < 0) p = -p;
     p--; /* p  sys polynomial index */
 
-    int size = sys->polys[p]->getSize();
+    int size = polys[p]->getSize();
     for (h = 0; h < size; h += 1) {
       for (j = 0; j < lengthM[sosmMap[p]];
            j += 1) { /*lengthM is the length of  SOS's Monomial */
@@ -690,13 +644,13 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
         for (k = 0; k < mSize; k += 1) {
           if (pi < pSize && si < sSize && polyVarMap[p][pi] == varMap[p][k] &&
               sosVarMap[p][si] == varMap[p][k]) {
-            key[k] = sys->polys[p]->getDegreeAt(h, pi) +
-                     SOSM[sosmMap[p]][sSize * j + si];
+            key[k] =
+                polys[p]->getDegreeAt(h, pi) + SOSM[sosmMap[p]][sSize * j + si];
 
             si++;
             pi++;
           } else if (pi < pSize && polyVarMap[p][pi] == varMap[p][k]) {
-            key[k] = sys->polys[p]->getDegreeAt(h, pi);
+            key[k] = polys[p]->getDegreeAt(h, pi);
 
             pi++;
           } else {
@@ -707,7 +661,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
 
         index = 0;
         k = 0;
-        while (k < sys->size) {
+        while (k < size) {
           tempIndex = findlocation(allM[k], everyConstraintSize[k], key,
                                    varMap[k].size(), &(varMap[k])[0],
                                    varMap[p].size(), &(varMap[p])[0]);
@@ -721,13 +675,13 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
         }
 
         if (blockMap[i] > 0) {
-          addSparse(block[index][i], j, sys->polys[p]->getCF(h));
+          block[index][i]->addSparse(j, polys[p]->getCF(h));
         }
         /* >= index is the constraints
            location and i is the number of
            block, j is the index of SOSM. */
         else {
-          addSparse(block[index][i], j, (-1) * (sys->polys[p]->getCF(h)));
+          block[index][i]->addSparse(j, (-1) * (polys[p]->getCF(h)));
         }
         /* <= index is the constraints location
            and j is the number of polynomial it
@@ -750,7 +704,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
        *-----------------------------------------------------------------------------*/
       p = sosmMap[abs(blockMap[j]) - 1]; /* which sosM */
 
-      for (k = 0; k < block[i][j]->size; k += 1) {
+      for (k = 0; k < block[i][j]->index.size(); k += 1) {
         sum += AM[p][block[i][j]->index[k]]->size();
       }
 
@@ -760,7 +714,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
 
       tempI = 1;
 
-      for (k = 0; k < block[i][j]->size; k += 1) {
+      for (k = 0; k < block[i][j]->index.size(); k += 1) {
         for (h = 0; h < AM[p][block[i][j]->index[k]]->size(); h += 1) {
           blockptr->iindices[tempI] = (*(AM[p][block[i][j]->index[k]]))[h].row +
                                       1; /* row start form 1 */
@@ -784,7 +738,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
 
   for (i = 0; i < *numofCons; i += 1) {
     for (j = 0; j < *blockNum; j += 1) {
-      deleteSparseSOSblock(block[i][j]);
+      delete block[i][j];
     }
     free(block[i]);
   }
@@ -793,7 +747,7 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
   /*    deleteW(W, diffSOSMIdSize, lengthM );
    */
 
-  deleteAllIndices(allM, sys->size);
+  deleteAllIndices(allM, size);
 
   return re;
 } /* -----  end of function createConstraintmatrix  ----- */
@@ -826,14 +780,15 @@ Constraintmatrix *createConstraintmatrx(SOSProblem *const sys,
  * @return 0 if success
  *   otherwise failure
  */
-int inter_sdp(SOSProblem *const sys, const int sep, char const *fprobname,
-              char const *fsolname) {
+int SOSProblem::inter_sdp(const int sep, char const *fprobname,
+                          char const *fsolname) {
   int ret = 0;
   int numofCons;
-  int blockSize[2 * (sys->size)]; /* the blockmatrix size */
-  int blockMap[2 * (sys->size)];  /* block -> poly map */
-  int sosMId[sys->size];          /* sosMId: coefPoly-> sosMid*/
-  int sosMap[sys->size];          /* every coefpoly has a sosM */
+  int size = polys.size();
+  int blockSize[2 * (size)]; /* the blockmatrix size */
+  int blockMap[2 * (size)];  /* block -> poly map */
+  int sosMId[size];          /* sosMId: coefPoly-> sosMid*/
+  int sosMap[size];          /* every coefpoly has a sosM */
   int blockNum = 0;
   int i;
   /**
@@ -871,9 +826,9 @@ int inter_sdp(SOSProblem *const sys, const int sep, char const *fprobname,
    * the key step for me
    *
    */
-  constraints = createConstraintmatrx(sys, &numofCons, sosMId, sosMap,
-                                      blockSize, blockMap, &blockNum,
-                                      &b); /* this place has some problem */
+  constraints =
+      createConstraintmatrx(&numofCons, sosMId, sosMap, blockSize, blockMap,
+                            &blockNum, &b); /* this place has some problem */
 
   createBlockMatrixC(blockSize, blockNum,
                      &C); /* 1 is a default polynomial we want to notice  */
@@ -905,7 +860,7 @@ int inter_sdp(SOSProblem *const sys, const int sep, char const *fprobname,
                  &pobj, &dobj);
 
   if (ret < 2) {
-    wellform(sys, sep, sosMId, sosMap, blockSize, blockMap, &X);
+    wellform(sep, sosMId, sosMap, blockSize, blockMap, &X);
 
   } else {
     printf("SDP failed.\n");
@@ -915,22 +870,7 @@ int inter_sdp(SOSProblem *const sys, const int sep, char const *fprobname,
    * Write out the problem solution.
    *
    */
-  /*
-    int bo,row,col;
 
-    for ( bo = 1; bo < sys->size+1; bo += 1 ) {
-
-    for ( row = 1; row < blockSize+1; row += 1 ) {
-
-    for ( col = 1; col < blockSize+1; col += 1 ) {
-    printf ( "%.3e  ",X.blocks[bo].data.mat[ijtok(row,col,blockSize)] );
-    }
-    printf ( "\n" );
-    }
-    printf ( "=======================\n" );
-    }
-
-  */
   write_sol(fsolname, numofblock, numofCons, X, y, Z);
 
   /*
@@ -965,15 +905,16 @@ int inter_sdp(SOSProblem *const sys, const int sep, char const *fprobname,
  *
  * @return
  */
-int sdp_solver(SOSProblem *const sys, Poly_t **resP, char const *fprobname,
-               char const *fsolname) {
+int SOSProblem::sdp_solver(Poly_t **resP, char const *fprobname,
+                           char const *fsolname) {
   int ret = 0;
   int numofCons;
+  int size = polys.size();
 
-  int blockSize[2 * (sys->size)]; /* the blockmatrix size */
-  int blockMap[2 * (sys->size)];  /* block -> poly map */
-  int sosMId[sys->size];          /* sosMId: coefPoly-> sosMid*/
-  int sosMap[sys->size];          /* every coefpoly has a sosM */
+  int blockSize[2 * (size)]; /* the blockmatrix size */
+  int blockMap[2 * (size)];  /* block -> poly map */
+  int sosMId[size];          /* sosMId: coefPoly-> sosMid*/
+  int sosMap[size];          /* every coefpoly has a sosM */
   int blockNum = 0;
   int i;
   /*
@@ -1004,9 +945,9 @@ int sdp_solver(SOSProblem *const sys, Poly_t **resP, char const *fprobname,
 
   double *b = NULL;
 
-  constraints = createConstraintmatrx(sys, &numofCons, sosMId, sosMap,
-                                      blockSize, blockMap, &blockNum,
-                                      &b); /* this place has some problem */
+  constraints =
+      createConstraintmatrx(&numofCons, sosMId, sosMap, blockSize, blockMap,
+                            &blockNum, &b); /* this place has some problem */
 
   createBlockMatrixC(blockSize, blockNum,
                      &C); /* 1 is a default polynomial we want to notice  */
@@ -1029,9 +970,8 @@ int sdp_solver(SOSProblem *const sys, Poly_t **resP, char const *fprobname,
 
   //  wellform(sys , sep , sosMId, sosMap, blockSize, blockNum, blockMap ,&X);
   if (ret == 0) {
-    for (i = 0; i < sys->size; i++) {
-      resP[i] =
-          getConstraintPoly(sys, i, sosMId, sosMap, blockSize, blockMap, &X);
+    for (i = 0; i < size; i++) {
+      resP[i] = getConstraintPoly(i, sosMId, sosMap, blockSize, blockMap, &X);
     }
 
     /*      wellform(sys , sep , sosMId, sosMap, blockSize, blockNum, blockMap
@@ -1068,29 +1008,36 @@ int sdp_solver(SOSProblem *const sys, Poly_t **resP, char const *fprobname,
  * @return the different support if accour in sys
  */
 
-int getSOSMsize(SOSProblem *const sys, int sosmMap[], int sosMId[]) {
+int SOSProblem::getSOSMsize(int sosmMap[], int sosMId[]) {
+  int size = polys.size();
   int re = 0;
   int i = 0;
   int j = 0;
 
-  for (i = 0; i < sys->size; i += 1) {
+  for (i = 0; i < size; i += 1) {
     j = 0;
 
     while (j < re) {
-      /// different  sys->polyConstraints[i] may use
-      /// sosMId[j]==sys->polyConstraints[i]->supportId.
-      /// Since the same monomial bases will definite different constrains such
-      /// as c_00+c_10x+c_01y==0 and
-      /// b_00+b_10x+b_01y >=0
-      // This stretegy avoid repeat computing
-      if (sosMId[j] == sys->polyConstraints[i]->supportId) break;
+      /**
+       * different  sys->polyConstraints[i] may use
+       * sosMId[j]==sys->polyConstraints[i]->supportId.
+       * Since the same monomial bases will definite different constrains such
+       * as c_00+c_10x+c_01y==0 and
+       * b_00+b_10x+b_01y >=0
+       * This stretegy avoid repeat computing
+       *
+       */
+
+      if (sosMId[j] == polyConstraints[i]->supportId) {
+        break;
+      }
       j++;
     }
 
     sosmMap[i] = j;
 
     if (re == j) {
-      sosMId[j] = sys->polyConstraints[i]->supportId;
+      sosMId[j] = polyConstraints[i]->supportId;
       re++;
     }
   }
