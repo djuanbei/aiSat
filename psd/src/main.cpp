@@ -9,7 +9,7 @@ int main() {
   Poly_t  p = parse("(x+2)^2+y^2+3");
   
   SOSChecker checker(p);
-  if(checker.easychecksos()){
+  if(checker.checksos()){
     cout<<"ok"<<endl;
   }
   

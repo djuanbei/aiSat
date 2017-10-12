@@ -67,7 +67,6 @@ typedef enum supportType SupportType;
 
 struct Support {
   SupportType type;
-  //    BOOL isPoly;
 
   Subpoly_t *subp;
 

@@ -17,22 +17,42 @@
 
 namespace aiSat {
 namespace psd {
+
+enum { SUCCESS = 1, FAILURE = 2, OTHER = 3 };
+struct Params {
+  double mineignvalue;
+  int printPrec;
+  Params() : mineignvalue(1e-6), printPrec(6) {}
+};
+
 class SOSChecker {
  private:
+  int dim;
+  Params para;
   Poly_t &p;
 
   bool polyIsSOS(Subpoly_t &subpoly, PointList *ans, const int verbose = 0);
 
-  void sosrepresent(PointList *sosList, double *X, const int blockSize,
-                    const int sosMid, const float minv);
+  /** 
+   * 
+   * 
+   * @param sosList 
+   * @param X 
+   * @param blockSize 
+   * @param sosMid 
+   * 
+   * @return  true if success find a sos presentation for given polynomial, flase otherwise
+   */
+  bool sosrepresent(PointList *sosList, double *X, const int blockSize,
+                    const int sosMid);
 
   int overConvexChecking(const Subpoly_t &subpoly, const indice_t *indices,
                          const vector<int> &loc, const int size,
                          const map<Monomial, Monomialvalue> &monMap,
                          PointList *ans);
 
-  void sosPresent(Subpoly_t &subpoly, const PointList *sosList,
-                  const double printMin);
+  void sosPresent(Subpoly_t &subpoly, const PointList *sosList);
+
 
   int exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
                     int &candidateLength, const indice_t *genSet,
@@ -47,8 +67,25 @@ class SOSChecker {
 
  public:
   SOSChecker(Poly_t& poly) : p(poly) {}
-
-  bool easychecksos();
+  void setPara(const Params &p){
+    para=p;
+  }
+  /** 
+   * 
+   * 
+   * @param polyvec the sos representaion polynomials
+   * 
+   * @return true if find SOS presentation for a given polynomial, otherwise, false
+   */
+  bool checksos(bool print=true);
+  /** 
+   * 
+   * 
+   * @param polyvec the sos representaion polynomials
+   * 
+   * @return true if find SOS presentation for a given polynomial, otherwise, false
+   */
+  bool findSOS(vector<Poly_t> & polyvec);
 };
 }
 }

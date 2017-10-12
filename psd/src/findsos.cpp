@@ -1,5 +1,3 @@
-
-
 /**
  * @file   findsos.cpp
  * @author Liyun Dai <dlyun2009@gmail.com>
@@ -42,24 +40,13 @@ using std::map;
 using std::cout;
 using std::endl;
 
-struct params {
-  double mineignvalue;
-  float printMinValue;
-  params() : mineignvalue(1e-2), printMinValue(1e-2) {}
-};
-
-static params par;
 static clock_t start;
 
-static int DIM;
-
-enum { SUCCESS = 1, FAILURE = 2, OTHER = 3 };
 
 static void delpoly(void *p) { delete ((Poly_t *)p); }
 
-void SOSChecker::sosrepresent(PointList *sosList, double *X,
-                              const int blockSize, const int sosMid,
-                              const float minV) {
+bool SOSChecker::sosrepresent(PointList *sosList, double *X,
+                              const int blockSize, const int sosMid) {
   int i, j, l, lda = blockSize;
   double *w = (double *)malloc_d(blockSize * sizeof(double));
   int lwork = blockSize * blockSize * 2;
@@ -68,12 +55,23 @@ void SOSChecker::sosrepresent(PointList *sosList, double *X,
   int n = blockSize;
   lwork = -1;
   double workopt;
-
-  dsyev_("V", "U", &n, X, &lda, w, &workopt, &lwork, &info);
+  char V[2],U[2];
+  V[0]='V'; U[0]='U';  V[1]=U[1]='\0';
+  /**
+   * try get best work space
+   * 
+   */
+  dsyev_(V, U, &n, X, &lda, w, &workopt, &lwork, &info);
+  if(0!=info){
+    return false;
+  }
   lwork = (int)workopt;
   work = (double *)malloc_d(lwork * sizeof(double));
 
-  dsyev_("V", "U", &n, X, &lda, w, work, &lwork, &info);
+  dsyev_(V, U, &n, X, &lda, w, work, &lwork, &info);
+  if(0!=info){
+    return false;
+  }
 
   const int varNum = getVarTable<indice_t>().getVarNum(
       SUPPORT_TABLE.getSupElem(sosMid)->varId);
@@ -81,7 +79,7 @@ void SOSChecker::sosrepresent(PointList *sosList, double *X,
   indice_t *Z = SUPPORT_TABLE.getGsup(sosMid, &l);
 
   for (i = 0; i < blockSize; i += 1) {
-    if (w[i] > minV) {
+    if (w[i] > para.mineignvalue) {
       Poly_t *p1 = new Poly_t();
       p1->changeVarId(SUPPORT_TABLE.getSupElem(sosMid)->varId);
       vector<indice_t> vars;
@@ -106,10 +104,11 @@ void SOSChecker::sosrepresent(PointList *sosList, double *X,
 
   free(w);
   free(work);
+  return true;
 }
 
-void SOSChecker::sosPresent( Subpoly_t &subpoly, const PointList *sosList,
-                            const double printMin) {
+void SOSChecker::sosPresent( Subpoly_t &subpoly, const PointList *sosList
+                          ) {
   cout << subpoly<<"="<< endl;
 
   PointElem *temp = sosList->head;
@@ -122,7 +121,7 @@ void SOSChecker::sosPresent( Subpoly_t &subpoly, const PointList *sosList,
         tp->mult(-1);
       }
       cout << "(";
-      string str = tp->toString(printMin, 4);
+      string str = tp->toString(para.mineignvalue, para.printPrec);
       cout << str;
 
       temp = temp->next;
@@ -136,12 +135,13 @@ void SOSChecker::sosPresent( Subpoly_t &subpoly, const PointList *sosList,
       tp->mult(-1);
     }
     cout << "(";
-    string str = tp->toString(0.0001, printMin);
+    string str = tp->toString(para.mineignvalue, para.printPrec);
     cout << str;
 
     cout << ")^2" << endl;
   }
 }
+
 
 int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
                               int &candidateLength, const indice_t *genSet,
@@ -158,39 +158,39 @@ int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
 
   const indice_t *indices = &(subpoly.parent.indices[0]);
 
-  size_t node_size = DIM * sizeof(indice_t);
-  vector<indice_t> key(DIM);
-  vector<indice_t> key1(DIM);
+  size_t node_size = dim * sizeof(indice_t);
+  vector<indice_t> key(dim);
+  vector<indice_t> key1(dim);
   
   map<Monomial, Monomialvalue> monMap;
   indice_t *indiceValues =
-      new indice_t[candidateLength * candidateLength * DIM];
+      new indice_t[candidateLength * candidateLength * dim];
 
   valueIndex = 0;
   for (i = 0; i < genLength; i += 1) {
-    for (j = 0; j < DIM; j += 1) {
-      key[j] = 2 * genSet[i * DIM + j];
+    for (j = 0; j < dim; j += 1) {
+      key[j] = 2 * genSet[i * dim + j];
     }
-    memcpy(indiceValues + valueIndex * DIM, &key[0], node_size);
+    memcpy(indiceValues + valueIndex * dim, &key[0], node_size);
     Monomialvalue dummy;
     dummy.value = 1;
-    monMap[Monomial(indiceValues + valueIndex * DIM, DIM)] = dummy;
+    monMap[Monomial(indiceValues + valueIndex * dim, dim)] = dummy;
     valueIndex++;
   }
 
   for (i = 0; i < currCandLen; i += 1) {
     for (j = i; j < currCandLen; j += 1) {
-      for (k = 0; k < DIM; k += 1) {
-        key[k] = candidateSet[i * DIM + k] + candidateSet[j * DIM + k];
+      for (k = 0; k < dim; k += 1) {
+        key[k] = candidateSet[i * dim + k] + candidateSet[j * dim + k];
       }
-      if (monMap.find(Monomial(&key[0], DIM)) != monMap.end()) {
-        monMap[Monomial(&key[0], DIM)].value++;
+      if (monMap.find(Monomial(&key[0], dim)) != monMap.end()) {
+        monMap[Monomial(&key[0], dim)].value++;
 
       } else {
-        memcpy(indiceValues + valueIndex * DIM, &key[0], node_size);
+        memcpy(indiceValues + valueIndex * dim, &key[0], node_size);
         Monomialvalue dummy;
         dummy.value = 1;
-        monMap[Monomial(indiceValues + valueIndex * DIM, DIM)] = dummy;
+        monMap[Monomial(indiceValues + valueIndex * dim, dim)] = dummy;
         valueIndex++;
       }
     }
@@ -208,21 +208,21 @@ int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
     lastre = currCandLen;
 
     for (i = 0; i < currCandLen; i += 1) {
-      for (j = 0; j < DIM; j += 1) {
-        key[j] = 2 * candidateSet[i * DIM + j];
+      for (j = 0; j < dim; j += 1) {
+        key[j] = 2 * candidateSet[i * dim + j];
       }
-      if (monMap[Monomial(&key[0], DIM)].value ==
-          1) { /* expect 2*candidateSet[i*DIM+j], no other combines
+      if (monMap[Monomial(&key[0], dim)].value ==
+          1) { /* expect 2*candidateSet[i*dim+j], no other combines
                   of Monomial has value key*/
         for (j = 0; j < currCandLen; j += 1) {
-          for (k = 0; k < DIM; k += 1) {
-            key1[k] = candidateSet[i * DIM + k] + candidateSet[j * DIM + k];
+          for (k = 0; k < dim; k += 1) {
+            key1[k] = candidateSet[i * dim + k] + candidateSet[j * dim + k];
           }
-          monMap[Monomial(&key1[0], DIM)].value--;
+          monMap[Monomial(&key1[0], dim)].value--;
         }
-        monMap.erase(Monomial(&key[0], DIM));
+        monMap.erase(Monomial(&key[0], dim));
         if (i + 1 < currCandLen)
-          memmove(candidateSet + i * DIM, candidateSet + (i + 1) * DIM,
+          memmove(candidateSet + i * dim, candidateSet + (i + 1) * dim,
                   (currCandLen - i - 1) * node_size);
 
         i--;
@@ -255,33 +255,33 @@ int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
   }
 
   for (i = 0; i < genLength; i += 1) {
-    for (j = 0; j < DIM; j += 1) {
-      key[j] = 2 * genSet[i * DIM + j];
+    for (j = 0; j < dim; j += 1) {
+      key[j] = 2 * genSet[i * dim + j];
     }
-    monMap[Monomial(&key[0], DIM)].value--;
+    monMap[Monomial(&key[0], dim)].value--;
   }
 
   k = 0;
 
   for (j = 0; j < genLength; j += 1) {
-    for (i = 0; i < DIM; i += 1) {
-      key[i] = 2 * genSet[j * DIM + i];
+    for (i = 0; i < dim; i += 1) {
+      key[i] = 2 * genSet[j * dim + i];
     }
-    v = monMap[Monomial(&key[0], DIM)].value;
+    v = monMap[Monomial(&key[0], dim)].value;
 
     if (v == 1) {
       for (i = 0; i < currCandLen; i += 1) {
-        for (m = 0; m < DIM; m += 1) {
-          key1[m] = key[m] / 2 + candidateSet[i * DIM + m];
+        for (m = 0; m < dim; m += 1) {
+          key1[m] = key[m] / 2 + candidateSet[i * dim + m];
         }
         map<Monomial, Monomialvalue>::iterator it =
-            monMap.find(Monomial(&key1[0], DIM));
+            monMap.find(Monomial(&key1[0], dim));
 
         it->second.add(k);
       }
 
       k++;
-      monMap.find(Monomial(&key[0], DIM))->second.change = false;
+      monMap.find(Monomial(&key[0], dim))->second.change = false;
     }
   }
   ASSERT(k <= VERTEX_BOUND, "");
@@ -292,21 +292,21 @@ int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
   while (run) {
     run = false;
     for (i = 0; i < currCandLen; i += 1) {
-      for (j = 0; j < DIM; j += 1) {
-        key[j] = 2 * candidateSet[i * DIM + j];
+      for (j = 0; j < dim; j += 1) {
+        key[j] = 2 * candidateSet[i * dim + j];
       }
-      if (monMap.find(Monomial(&key[0], DIM))->second.change) {
-        monMap.find(Monomial(&key[0], DIM))->second.change = false;
+      if (monMap.find(Monomial(&key[0], dim))->second.change) {
+        monMap.find(Monomial(&key[0], dim))->second.change = false;
 
         for (j = 0; j < currCandLen; j += 1) {
-          for (m = 0; m < DIM; m += 1) {
-            key1[m] = key[m] / 2 + candidateSet[j * DIM + m];
+          for (m = 0; m < dim; m += 1) {
+            key1[m] = key[m] / 2 + candidateSet[j * dim + m];
           }
-          if (!(monMap.find(Monomial(&key1[0], DIM))
+          if (!(monMap.find(Monomial(&key1[0], dim))
                     ->second.contain(
-                        monMap.find(Monomial(&key[0], DIM))->second))) {
-            monMap.find(Monomial(&key1[0], DIM))
-                ->second.add(monMap.find(Monomial(&key[0], DIM))->second);
+                        monMap.find(Monomial(&key[0], dim))->second))) {
+            monMap.find(Monomial(&key1[0], dim))
+                ->second.add(monMap.find(Monomial(&key[0], dim))->second);
             run = true;
           }
         }
@@ -318,14 +318,14 @@ int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
   /*-----------------------------------------------------------------------------
    *  necessary check
    *-----------------------------------------------------------------------------*/
-  if (monMap.find(Monomial(indices + loc[0] * DIM, DIM)) == monMap.end()) {
+  if (monMap.find(Monomial(indices + loc[0] * dim, dim)) == monMap.end()) {
     if (NULL != ans) cout << "Corollary 3" << endl;
     delete[] indiceValues;
     return FAILURE;
   }
 
   for (i = 1; i < size; i += 1) {
-    if (monMap.find(Monomial(indices + loc[i] * DIM, DIM)) == monMap.end()) {
+    if (monMap.find(Monomial(indices + loc[i] * dim, dim)) == monMap.end()) {
       if (NULL != ans) cout << "Corollary 3" << endl;
       delete[] indiceValues;
       return FAILURE;
@@ -348,7 +348,7 @@ int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
   for (map<Monomial, Monomialvalue>::const_iterator it = monMap.begin();
        it != monMap.end(); ++it) {
     if (it->second.value > 0) {
-      memcpy((*SOSM) + i * DIM, it->first.indice, node_size);
+      memcpy((*SOSM) + i * dim, it->first.indice, node_size);
       i++;
     }
   }
@@ -386,7 +386,7 @@ Constraintmatrix *SOSChecker::createConstraintMatrix(
          gLength * gLength, sosLength, gLength);
 
   int temploc;
-  *b = (double *)calloc_d((sosLength + 1), sizeof(double));
+  b[0] = (double *)calloc_d((sosLength + 1), sizeof(double));
 
 
   for (i = 0; i < size; i += 1) {
@@ -397,7 +397,7 @@ Constraintmatrix *SOSChecker::createConstraintMatrix(
       return NULL;
     }
     /* b index start form 1 */
-    (*b)[temploc + 1] = coef[loc[i]];
+    b[0][temploc + 1] = coef[loc[i]];
     /* printf(" %d %f",loc, poly->coef[i]);  */
   }
 
@@ -416,15 +416,7 @@ Constraintmatrix *SOSChecker::createConstraintMatrix(
    *-----------------------------------------------------------------------------*/
 
   for (i = 0; i < sosLength; i += 1) {
-    /* 		sum=0;
-     *
-     * 		for ( k = 0; k < block[i]->size; k += 1 ) {
-     * 			sum+=W[block[i]->index[k]]->size;
-     * 		}
-     */
-    /* assert(sum==1); */
 
-    /* printf("b size %d",*blockSize);; */
 
     blockptr = createSparseblock(1, gLength, i + 1, AM[i]->size());
     tempI = 1;
@@ -468,7 +460,7 @@ int SOSChecker::overConvexChecking(const Subpoly_t &subpoly,
       set[3] = 0u;
       fill(choose.begin(), choose.end(), 0);
       Monomialvalue curr =
-          monMap.find(Monomial(indices + loc[check[i]] * DIM, DIM))->second;
+          monMap.find(Monomial(indices + loc[check[i]] * dim, dim))->second;
       num = 0;
       Monomialvalue::add(set, curr);
       checked[check[i]] = 1;
@@ -479,7 +471,7 @@ int SOSChecker::overConvexChecking(const Subpoly_t &subpoly,
         tempNum = num;
         for (j = 0; j < checkSize; j += 1) {
           Monomialvalue temp =
-              monMap.find(Monomial(indices + loc[check[j]] * DIM, DIM))->second;
+              monMap.find(Monomial(indices + loc[check[j]] * dim, dim))->second;
           if (Monomialvalue::conjunction(set, temp) && !choose[j]) {
             Monomialvalue::add(set, temp);
             checked[check[j]] = 1;
@@ -594,20 +586,20 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
   if (NULL == SOSM || NULL == GSUP) {
     start = clock();
     sosId = SUPPORT_TABLE.addconvexsosSup(subpoly);
-    indice_t *temp = new indice_t[size * DIM];
+    indice_t *temp = new indice_t[size * dim];
     j = 0;
 
     for (i = 0; i < size; i += 1) {
       even = true;
-      for (k = 0; k < DIM; k += 1) {
-        if ((indices[loc[i] * DIM + k] & 1) == 1) {
+      for (k = 0; k < dim; k += 1) {
+        if ((indices[loc[i] * dim + k] & 1) == 1) {
           even = false;
           break;
         }
       }
       if (even) {
-        for (k = 0; k < DIM; k += 1) {
-          temp[j * DIM + k] = indices[loc[i] * DIM + k] / 2;
+        for (k = 0; k < dim; k += 1) {
+          temp[j * dim + k] = indices[loc[i] * dim + k] / 2;
         }
         j++;
       }
@@ -615,7 +607,7 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
     genLength = j;
 
     indice_t *candidate =
-        generator.overConvexHull(temp, genLength, DIM, &tempLength);
+        generator.overConvexHull(temp, genLength, dim, &tempLength);
 
     int dummy = exactConvHull(subpoly, candidate, tempLength, temp, genLength,
                               &SOSM, sosLength, ans);
@@ -633,11 +625,11 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
     }
 
     GSUP =
-        (indice_t *)realloc_d(candidate, tempLength * DIM * sizeof(indice_t));
-    qsortM(GSUP, DIM, 0, tempLength - 1, compare);
+        (indice_t *)realloc_d(candidate, tempLength * dim * sizeof(indice_t));
+    qsortM(GSUP, dim, 0, tempLength - 1, compare);
     gLength = tempLength;
 
-    qsortM(SOSM, DIM, 0, sosLength - 1, compare);
+    qsortM(SOSM, dim, 0, sosLength - 1, compare);
     SUPPORT_TABLE.setGsup(sosId, gLength, GSUP);
     SUPPORT_TABLE.setSOSsup(sosId, sosLength, SOSM);
     delete[] temp;
@@ -645,7 +637,7 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
 
   Blockmatrix *C = (Blockmatrix *)malloc_d(sizeof(Blockmatrix));
 
-  double **b = (double **)malloc_d(sizeof(double *));
+  double *b[1];// = (double **)malloc_d(sizeof(double *));
 
   Constraintmatrix *constraints;
   Blockmatrix X, Z;
@@ -679,26 +671,31 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
     if (0 == easy_sdp(gLength, sosLength, *C, *b, constraints, 0.0, &X, &y, &Z,
                       &pobj, &dobj)) {
       if (NULL != ans){
-        sosrepresent(ans, X.blocks[1].data.mat, gLength, sosId, 1e-2);
+        if(sosrepresent(ans, X.blocks[1].data.mat, gLength, sosId)){
+          free_prob(gLength, sosLength, *C, *b, constraints, X, y, Z);
+          free(C);
+          return true;          
+        }
+
+        free_prob(gLength, sosLength, *C, *b, constraints, X, y, Z);
+        free(C);
+        
+        return false;          
       }
-      free_prob(gLength, sosLength, *C, *b, constraints, X, y, Z);
-      free(C);
-      free(b);
-      return true;
+
     } else {
       free_prob(gLength, sosLength, *C, *b, constraints, X, y, Z);
       free(C);
-      free(b);
+
       return false;
     }
   } else {
     free(*b);
-    free(b);
     return false;
   }
 }
 
-bool SOSChecker::easychecksos() {
+bool SOSChecker::checksos(bool print) {
   if (p.getTotalDegree() <= 0) {
     if (p.isZero() || p.isPositive()){
       return true;
@@ -708,7 +705,7 @@ bool SOSChecker::easychecksos() {
     }
   }
 
-  DIM = getVarTable<indice_t>().getVarNum(p.varId);
+  dim = getVarTable<indice_t>().getVarNum(p.varId);
 
 
   Subpoly_t subp (p);
@@ -717,14 +714,45 @@ bool SOSChecker::easychecksos() {
 
   bool re = polyIsSOS(subp, ans, 1);
 
-  if (re) {
-    sosPresent(subp, ans, par.printMinValue);
+  if (re&& print) {
+    sosPresent(subp, ans);
   }
   delList(ans);
 
 
-
   return re;
 }
+
+
+bool SOSChecker::findSOS(vector<Poly_t> & polyvec){
+  
+  if (p.getTotalDegree() <= 0) {
+    if (p.isZero() || p.isPositive()){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
+  dim = getVarTable<indice_t>().getVarNum(p.varId);
+
+  Subpoly_t subp (p);
+
+  PointList *ans = createList(delpoly);
+
+  bool re = polyIsSOS(subp, ans, 1);
+  if(re){
+    PointElem *temp = ans->head;
+    while (temp != NULL) {
+      polyvec.push_back(*((Poly_t *)temp->value));
+      temp=temp->next;
+    }
+  }
+  delList(ans);
+  return re;
+  
+}
+
 }
 }
