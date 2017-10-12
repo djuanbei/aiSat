@@ -79,10 +79,13 @@ struct Support {
   int constNum;
   int consCap;
   Support(const int evarId, const indice_t *indices, const int size) {
+    subp=NULL;
     type = INDICE;
     md5sumbyIndice(md5sum, evarId, indices, size);
     varId = evarId;
+    consId = NULL;
   }
+  
   Support(Subpoly_t *subpoly) {
     type = SUB_POLY;
     subp = subpoly;

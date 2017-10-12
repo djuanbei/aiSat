@@ -6,9 +6,9 @@ typedef Poly<coef_t, indice_t> Poly_t;
 
 
 int main() {
-  Poly_t  p = parse("x^2+y^2+1+(x+23)^2");
+  Poly_t  p = parse("(x+2)^2+y^2+3");
   
-  SOSChecker checker(&p);
+  SOSChecker checker(p);
   if(checker.easychecksos()){
     cout<<"ok"<<endl;
   }

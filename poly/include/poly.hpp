@@ -667,6 +667,15 @@ class Poly {
 
     return false;
   }
+  bool isAllCoefNegative()const{
+    for(size_t i=0; i< coef.size(); i++){
+      if(coef[i]>0){
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   bool isOne() {
     update();

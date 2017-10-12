@@ -19,7 +19,7 @@
 #include "pca.h"
 #include "selfassert.h"
 #include "selfmemutil.h"
-// #include "subpoly.h"
+
 #include "util.h"
 #include "vartable.hpp"
 
@@ -55,11 +55,11 @@ POLY_SOS_T ConvexGenerator::checkThreeP(const int dim, PointList* ans) {
   int i;
   int VA, VB, VM;
   vector<indice_t> key(dim);
-  const vector<coef_t>& coefs = subpoly->getParent().coef;
-  const vector<int>& locs = subpoly->locs;
-  const vector<indice_t>& indices = subpoly->getParent().indices;
+  const vector<coef_t>& coefs = subpoly.getParent().coef;
+  const vector<int>& locs = subpoly.locs;
+  const vector<indice_t>& indices = subpoly.getParent().indices;
 
-  if (isSameLine(&(subpoly->getParent().indices)[0], &(locs)[0], 3,
+  if (isSameLine(&(subpoly.getParent().indices)[0], &(locs)[0], 3,
                  dim)) { /* on a same line */
     if (coefs[locs[0]] < 0) {
       if (coefs[locs[1]] < 0 || coefs[locs[2]] < 0) {
@@ -123,7 +123,7 @@ POLY_SOS_T ConvexGenerator::checkThreeP(const int dim, PointList* ans) {
       if (i == dim) {
         if (NULL != ans) {
           Poly_t* p = new Poly_t();
-          p->changeVarId(subpoly->getParent().getVarId());
+          p->changeVarId(subpoly.getParent().getVarId());
 
           for (i = 0; i < dim; i += 1) {
             key[i] = indices[locs[0] * dim + i] / 2;
@@ -133,7 +133,7 @@ POLY_SOS_T ConvexGenerator::checkThreeP(const int dim, PointList* ans) {
           push_back_L(ans, p);
 
           Poly_t* p1 = new Poly_t();
-          p1->changeVarId(subpoly->getParent().getVarId());
+          p1->changeVarId(subpoly.getParent().getVarId());
 
           for (i = 0; i < dim; i += 1) {
             key[i] = indices[locs[1] * dim + i] / 2;
@@ -144,7 +144,7 @@ POLY_SOS_T ConvexGenerator::checkThreeP(const int dim, PointList* ans) {
 
           Poly_t* p2 = new Poly_t();
 
-          p2->changeVarId(subpoly->getParent().getVarId());
+          p2->changeVarId(subpoly.getParent().getVarId());
 
           for (i = 0; i < dim; i += 1) {
             key[i] = indices[locs[2] * dim + i] / 2;
@@ -180,7 +180,7 @@ POLY_SOS_T ConvexGenerator::checkThreeP(const int dim, PointList* ans) {
     }
     if (NULL != ans) {
       Poly_t* p = new Poly_t();
-      p->changeVarId(subpoly->getParent().getVarId());
+      p->changeVarId(subpoly.getParent().getVarId());
 
       for (i = 0; i < dim; i += 1) {
         key[i] = indices[locs[0] * dim + i] / 2;
@@ -190,7 +190,7 @@ POLY_SOS_T ConvexGenerator::checkThreeP(const int dim, PointList* ans) {
       push_back_L(ans, p);
 
       Poly_t* p1 = new Poly_t();
-      p1->changeVarId(subpoly->getParent().getVarId());
+      p1->changeVarId(subpoly.getParent().getVarId());
 
       for (i = 0; i < dim; i += 1) {
         key[i] = indices[locs[1] * dim + i] / 2;
@@ -200,7 +200,7 @@ POLY_SOS_T ConvexGenerator::checkThreeP(const int dim, PointList* ans) {
       push_back_L(ans, p1);
 
       Poly_t* p2 = new Poly_t();
-      p2->changeVarId(subpoly->getParent().getVarId());
+      p2->changeVarId(subpoly.getParent().getVarId());
 
       for (i = 0; i < dim; i += 1) {
         key[i] = indices[locs[2] * dim + i] / 2;
@@ -215,10 +215,10 @@ POLY_SOS_T ConvexGenerator::checkThreeP(const int dim, PointList* ans) {
 }
 
 POLY_SOS_T ConvexGenerator::easyCheck(PointList* ans) {
-  const int size = subpoly->size();
+  const int size = subpoly.size();
 
-  const vector<int>& loc = subpoly->locs;
-  const Poly_t& poly = subpoly->getParent();
+  const vector<int>& loc = subpoly.locs;
+  const Poly_t& poly = subpoly.getParent();
   const vector<indice_t>& indices = poly.indices;
   const vector<coef_t>& pcoefs = poly.coef;
 
@@ -228,9 +228,7 @@ POLY_SOS_T ConvexGenerator::easyCheck(PointList* ans) {
   vector<int> coefs(dim);
   vector<char> convexSurf(size, 0);
   vector<char> maxPoint(size);
-  // int coefs[dim];
-  // char convexSurf[size];
-  // char maxPoint[size];
+
   int i, j, k;
   int coefDomain = 1;
   int maxSum = 0;
@@ -240,8 +238,8 @@ POLY_SOS_T ConvexGenerator::easyCheck(PointList* ans) {
   int second = 0;
   double planeSum;
 
-  int loc0 = (*subpoly)[0];
-  int loc1 = (*subpoly)[1];
+  int loc0 = subpoly[0];
+  int loc1 = subpoly[1];
 
   if (size == 1) {
     if (poly.getCF(loc0) < 0) {
@@ -451,10 +449,10 @@ int ConvexGenerator::onSameSurf(const int* checkPoints, const int size,
   ASSERT(limit >= 1 && size >= limit,
          "candidate must greater or equal to limit");
 
-  const vector<indice_t>& indices = subpoly->getParent().indices;
-  int dim = getVarTable<indice_t>().getVarNum(subpoly->getParent().getVarId());
+  const vector<indice_t>& indices = subpoly.getParent().indices;
+  int dim = getVarTable<indice_t>().getVarNum(subpoly.getParent().getVarId());
 
-  const vector<int>& loc = subpoly->locs;
+  const vector<int>& loc = subpoly.locs;
   int i, j, m, k, maxSum, tempSum;
   int checkTime = dim * limit * size;
   int number = 0;
@@ -1137,26 +1135,17 @@ indice_t* ConvexGenerator::overConvexHull(const indice_t* genSet,
     *reLength = genLength;
 
   } else {
-    //		printf ( "%d\n",tempLength );
+
     tempLength = reduceByLestEignV(candidateSet, tempLength, dim, genSet,
                                    genLength, max);
 
-    //		printf ( "%d\n",tempLength );
     if (tempLength == genLength) {
       *reLength = tempLength;
       return candidateSet;
     }
-    //		tempLength=reduceByRandPlane(candidateSet, tempLength, dim,
-    // genSet,
-    // genLength,max);
-    //		if(tempLength==genLength){
-    //			*reLength=tempLength;
-    //			return candidateSet;
-    //		}
-    //
+
     *reLength = tempLength;
-    //		*reLength=refine(candidateSet,tempLength,dim,genSet,
-    // genLength,max);
+
   }
   return candidateSet;
 }

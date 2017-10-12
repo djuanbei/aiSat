@@ -101,11 +101,11 @@ int Supporttable::findSupElem(const int deg, const int varId, const int consNum,
   return -1;
 }
 
-int Supporttable::findSupByPoly(const Subpoly_t *subpoly) {
+int Supporttable::findSupByPoly(const Subpoly_t &subpoly) {
   int i = 0;
   for (i = 0; i < values.size(); i += 1) {
     if (values[i]->type == SUB_POLY) {
-      if (0 == memcmp(values[i]->md5sum, subpoly->getmd5(), DIGEST_SIZE)){
+      if (0 == memcmp(values[i]->md5sum, subpoly.getmd5(), DIGEST_SIZE)){
         return findBimapByValue(loc, i);
       }
     }
@@ -218,7 +218,7 @@ void Supporttable::setGsup(const int id, const int len, indice_t *value) {
   Gsup[index] = value;
 }
 
-int Supporttable::addconvexsosSup(Subpoly_t *poly) {
+int Supporttable::addconvexsosSup(Subpoly_t &poly) {
   int re = findSupByPoly(poly);
   if (re > -1) {
     return re;
@@ -226,7 +226,7 @@ int Supporttable::addconvexsosSup(Subpoly_t *poly) {
 
   int value_size = values.size();
 
-  values.push_back(new Support(poly));
+  values.push_back(new Support(&poly));
 
   SOSsup.push_back(NULL);
   sosLength.push_back(0);
@@ -255,11 +255,11 @@ void Supporttable::setArrangeM(const int id, ArrangeMatrix **value,
   arrangeM[index] = value;
 }
 
-ArrangeMatrix **Supporttable::getAMIndex(const int id, int *gLength) {
+ArrangeMatrix **Supporttable::getAMIndex(const int id, int *egLength) {
   int index = findBimapByKey(loc, id);
   if (index < 0) return NULL;
 
-  *gLength = gLength[index];
+  *egLength = gLength[index];
   return arrangeM[index];
 }
 

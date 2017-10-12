@@ -247,7 +247,7 @@ ArrangeMatrix **createArrangeM(const int supportId, indice_t const *SOSM,
    *  |  a00 a10 a20  |
    *  |  a10 a11 a12  |
    *  |  a20 a21 a22  |
-   *  As (Z^T) Z is a systematic matrix, we only need to compute the lower
+   *  As (Z^T) Z is a symmetric matrix, we only need to compute the lower
    *triangle
    *  of it.
    *-----------------------------------------------------------------------------*/

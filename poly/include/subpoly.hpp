@@ -63,6 +63,9 @@ class Subpoly {
   
   Subpoly(const Poly<C, T> &p,const int num,  const vector<int> &loc) : parent(p), locs(loc) {
     locs.resize(num);
+    md5_ctx_t ctx;
+    getMd5sum(&ctx);
+    memcpy(md5sum, MD5_DIGEST(&ctx), 16 * sizeof(uint8_t));
   }
 
   int size() const { return locs.size(); }

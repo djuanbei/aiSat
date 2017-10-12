@@ -23,7 +23,7 @@ enum POLY_SOS_T { NOSOS, CONVEX_POLY, EXACTLY_SOS, UNHNOW };
 
 class ConvexGenerator {
  private:
-  const Subpoly_t* subpoly;
+  const Subpoly_t& subpoly;
 
   POLY_SOS_T checkThreeP(const int dim, PointList* ans);
 
@@ -31,7 +31,7 @@ class ConvexGenerator {
                     const int* coefs, int maxSum);
 
  public:
-  ConvexGenerator(const Subpoly_t* subp) : subpoly(subp) {}
+  ConvexGenerator(const Subpoly_t& subp) : subpoly(subp) {}
 
   POLY_SOS_T easyCheck(PointList* ans);
 

@@ -19,34 +19,34 @@ namespace aiSat {
 namespace psd {
 class SOSChecker {
  private:
-  Poly_t *p;
+  Poly_t &p;
 
-  bool polyIsSOS(Subpoly_t *subpoly, PointList *ans, const int verbose = 0);
+  bool polyIsSOS(Subpoly_t &subpoly, PointList *ans, const int verbose = 0);
 
   void sosrepresent(PointList *sosList, double *X, const int blockSize,
                     const int sosMid, const float minv);
 
-  int overConvexChecking(const Subpoly_t *subpoly, const indice_t *indices,
+  int overConvexChecking(const Subpoly_t &subpoly, const indice_t *indices,
                          const vector<int> &loc, const int size,
-                         const map<monomial, monomialvalue> &monMap,
+                         const map<Monomial, Monomialvalue> &monMap,
                          PointList *ans);
 
-  void sosPresent(Subpoly_t *subpoly, const PointList *sosList,
+  void sosPresent(Subpoly_t &subpoly, const PointList *sosList,
                   const double printMin);
 
-  int exactConvHull(const Subpoly_t *subpoly, indice_t *candidateSet,
+  int exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
                     int &candidateLength, const indice_t *genSet,
                     const int genLength, indice_t **SOSM, int &sosLength,
                     PointList *ans);
 
-  Constraintmatrix *createConstraintMatrix(const Subpoly_t *subpoly,
+  Constraintmatrix *createConstraintMatrix(const Subpoly_t &subpoly,
                                            const int sosId, double **b,
                                            const indice_t *SOSM,
                                            const int sosLength,
                                            const int gLength);
 
  public:
-  SOSChecker(Poly_t *poly) : p(poly) {}
+  SOSChecker(Poly_t& poly) : p(poly) {}
 
   bool easychecksos();
 };
