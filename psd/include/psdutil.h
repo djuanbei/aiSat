@@ -39,6 +39,8 @@ void deleteSparseA(ArrangeMatrix **s, const int len);
 
 Poly_t *sosConvertPoly(Blockmatrix *const X, const int blockId,
                        const int blockSize, const int sosmId);
+
+
 }
 }
 

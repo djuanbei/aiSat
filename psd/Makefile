@@ -48,7 +48,7 @@ endif
 COPTIMIZE ?= -O3
 
 CFLAGS    +=  -I include -I  ../include -I ../util/include   -I ../poly/include -I ../sdp/include -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS  #-std=c99
-LFLAGS    += -lz   -L ../lib -lutil -lpoly -lsdp  -lm    -llapack -lblas    
+LFLAGS    += -lz   -L ../lib -lpoly -lsdp -lutil  -llapack -lblas   -lm
 
 
 .PHONY : s p d r rs clean 

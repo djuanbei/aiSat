@@ -29,8 +29,8 @@ ifeq ($(SRCSUF),cpp)
 	CC=g++
 	CLANG=clang++
 
-	CFLAGS     =  -pedantic -W -Wall      -DHAVE_CONFIG_H -Wlong-long
-	LFLAGS    =   -pedantic -W -Wall 
+	CFLAGS     =  -pedantic -W -Wall -std=c++11   -DHAVE_CONFIG_H -Wlong-long
+	LFLAGS    =   -pedantic -W -Wall -std=c++11  
 else
 	CC=gcc
 	CLANG=clang
@@ -52,7 +52,7 @@ COPTIMIZE ?= -O3
 
 CFLAGS    += -I  include -I  util/include -I poly/include -I sdp/include -I psd/include
 
-LFLAGS    +=  -L lib/ -lutil  -lpoly -lsdp  -lpsd  -lm    -llapack -lblas    
+LFLAGS    +=  -L lib/  -lpsd  -lpoly -lsdp    -lutil     -llapack -lblas   -lm
   
 
 

@@ -52,18 +52,24 @@ struct MonomialConstraint {
   MonomialConstraint() { linCoefs = NULL; }
 };
 
-enum polyConstraintType { EQ, GE, GT, NE };
+enum PolyConstraintType { EQ, GE, GT, NE };
 
-typedef enum polyConstraintType PolyConstraintType;
 
-struct polyConstraint {
+
+struct PolyConstraint {
   PolyConstraintType type;
   int supportId;
+  PolyConstraint(){
+  }
+  PolyConstraint(PolyConstraint *other){
+    type=other->type;
+    supportId=other->supportId;
+  }
 };
-typedef struct polyConstraint PolyConstraint;
 
-enum supportType { NORMAL, SUB_POLY, INDICE };
-typedef enum supportType SupportType;
+
+enum SupportType { NORMAL, SUB_POLY, INDICE };
+
 
 struct Support {
   SupportType type;

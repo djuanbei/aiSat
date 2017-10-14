@@ -39,6 +39,373 @@ static long int BOUND = INT_MAX;
 static int node_dim;
 static size_t node_b_size;
 
+
+
+indice_t* overConvexHull(const indice_t* genSet,
+                                          const int genLength, const int dim,
+                                          int* reLength) {
+  ASSERT(genLength > 0, "at least have one point");
+  int i, j, k;
+  if (1 == genLength) {
+    indice_t* candidateSet = (indice_t*)malloc_d(dim);
+    for (i = 0; i < dim; i++) candidateSet[i] = genSet[i];
+    *reLength = 1;
+
+    return candidateSet;
+  }
+
+  node_dim = dim;
+  node_b_size = dim * sizeof(indice_t);
+  int max[dim];
+  int min[dim];
+  int temp[dim];
+  int maxSum = 0;
+  int minSum = 0;
+  int tempsum = 0;
+  int index;
+  int tempLength = 0;
+  int pairNum = (dim * (dim - 1)) / 2;
+  int threeNum = (dim * (dim - 1) * (dim - 2)) / 6;
+  int pair[pairNum * 2];
+  int pairMax[pairNum];
+  int pairMin[pairNum];
+
+  int three[threeNum * 3];
+  int threeMax[threeNum];
+  int threeMin[threeNum];
+  //	printf ( "genLength %d\n",genLength );
+
+  k = 0;
+  for (i = 0; i < dim; i += 1) {
+    for (j = i + 1; j < dim; j += 1) {
+      pair[2 * k] = i;
+      pairMax[k] = genSet[pair[2 * k]];
+      pair[2 * k + 1] = j;
+      pairMax[k] += genSet[pair[2 * k + 1]];
+      pairMin[k] = pairMax[k];
+      k++;
+    }
+  }
+  index = 0;
+
+  for (i = 0; i < dim; i += 1) {
+    for (j = i + 1; j < dim; j += 1) {
+      for (k = j + 1; k < dim; k += 1) {
+        three[3 * index] = i;
+        threeMax[index] = genSet[i];
+        three[3 * index + 1] = j;
+        threeMax[index] += genSet[j];
+        three[3 * index + 2] = k;
+        threeMax[index] += genSet[k];
+        threeMin[index] = threeMax[index];
+        index++;
+      }
+    }
+  }
+
+  for (i = 0; i < dim; i += 1) {
+    max[i] = genSet[i];
+    min[i] = genSet[i];
+    maxSum += genSet[i];
+    minSum += genSet[i];
+  }
+
+  for (i = 1; i < genLength; i += 1) {
+    tempsum = 0;
+    for (j = 0; j < dim; j += 1) {
+      tempsum += genSet[i * dim + j];
+      if (genSet[i * dim + j] > max[j]) {
+        max[j] = genSet[i * dim + j];
+      } else if (genSet[i * dim + j] < min[j]) {
+        min[j] = genSet[i * dim + j];
+      }
+    }
+    if (tempsum > maxSum)
+      maxSum = tempsum;
+    else if (tempsum < minSum)
+      minSum = tempsum;
+
+    for (j = 0; j < pairNum; j += 1) {
+      tempsum = genSet[i * dim + pair[2 * j]];
+      tempsum += genSet[i * dim + pair[2 * j + 1]];
+      if (tempsum > pairMax[j])
+        pairMax[j] = tempsum;
+      else if (tempsum < pairMin[j])
+        pairMin[j] = tempsum;
+    }
+
+    for (j = 0; j < threeNum; j += 1) {
+      tempsum = genSet[i * dim + three[3 * j]];
+      tempsum += genSet[i * dim + three[3 * j + 1]];
+      tempsum += genSet[i * dim + three[3 * j + 2]];
+      if (tempsum > threeMax[j])
+        threeMax[j] = tempsum;
+      else if (tempsum < threeMin[j])
+        threeMin[j] = tempsum;
+    }
+  }
+  memcpy(temp, min, sizeof(int) * dim);
+
+  j = 0;
+  index = 0;
+
+  while (1) {
+    if (temp[0] > max[0]) {
+      j = 1;
+      while (j < dim && temp[j] == max[j]) j++;
+      if (j == dim) {
+        break;
+      }
+      temp[j]++;
+      memcpy(temp, min, j * sizeof(int));
+    }
+
+    tempsum = 0;
+
+    for (k = 0; k < dim; k += 1) {
+      tempsum += temp[k];
+    }
+    if (tempsum <= maxSum && tempsum >= minSum) {
+      for (k = 0; k < pairNum; k += 1) {
+        tempsum = temp[pair[2 * k]];
+        tempsum += temp[pair[2 * k + 1]];
+        if (tempsum > pairMax[k])
+          break;
+        else if (tempsum < pairMin[k])
+          break;
+      }
+      if (k == pairNum) {
+        for (k = 0; k < threeNum; k += 1) {
+          tempsum = temp[three[3 * k]];
+          tempsum += temp[three[3 * k + 1]];
+          tempsum += temp[three[3 * k + 2]];
+          if (tempsum > threeMax[k]) {
+            break;
+          } else if (tempsum < threeMin[k])
+            break;
+        }
+        if (k == threeNum) index++;
+      }
+    }
+
+    temp[0]++;
+  }
+
+  ASSERT(index >= genLength, "there some bugs occor in your this code");
+  tempLength = index;
+
+  indice_t* candidateSet = (indice_t*)malloc_d(tempLength * node_b_size);
+  memcpy(temp, min, dim * sizeof(int));
+
+  j = 0;
+  index = 0;
+
+  while (1) {
+    if (temp[0] > max[0]) {
+      j = 1;
+      while (j < dim && temp[j] == max[j]) j++;
+      if (j == dim) {
+        break;
+      }
+      temp[j]++;
+      memcpy(temp, min, j * sizeof(int));
+    }
+
+    tempsum = 0;
+
+    for (k = 0; k < dim; k += 1) {
+      tempsum += temp[k];
+    }
+
+    if (tempsum <= maxSum && tempsum >= minSum) {
+      for (k = 0; k < pairNum; k += 1) {
+        tempsum = temp[pair[2 * k]];
+        tempsum += temp[pair[2 * k + 1]];
+        if (tempsum > pairMax[k])
+          break;
+        else if (tempsum < pairMin[k])
+          break;
+      }
+      if (k == pairNum) {
+        for (k = 0; k < threeNum; k += 1) {
+          tempsum = temp[three[3 * k]];
+          tempsum += temp[three[3 * k + 1]];
+          tempsum += temp[three[3 * k + 2]];
+          if (tempsum > threeMax[k]) {
+            break;
+          } else if (tempsum < threeMin[k])
+            break;
+        }
+        if (k == threeNum) {
+          for (k = 0; k < dim; k += 1) {
+            candidateSet[index * dim + k] = temp[k];
+          }
+          index++;
+        }
+      }
+    }
+    temp[0]++;
+  }
+  if (tempLength == genLength) {
+    *reLength = genLength;
+
+  } else {
+
+    tempLength = reduceByLestEignV(candidateSet, tempLength, dim, genSet,
+                                   genLength, max);
+
+    if (tempLength == genLength) {
+      *reLength = tempLength;
+      return candidateSet;
+    }
+
+    *reLength = tempLength;
+
+  }
+  return candidateSet;
+}
+
+
+int reduceByLestEignV(indice_t* candidateSet,
+                                       const int candLength, const int dim,
+                                       const indice_t* genSet,
+                                       const int genLength, const int max[]) {
+  long int bound;
+  int maxSum = 0;
+  int minSum;
+  double dummy;
+  int temp;
+  int re = candLength;
+  int cutNum = dim;
+  int j, i, n, m, r, k = 0;
+  int origLength = candLength;
+
+  int DUM_DOMAIN = 1;
+  int coefNum[dim];
+  int coefDen[dim];
+  double a[genLength * dim];
+
+  for (i = 0; i < dim; i += 1) {
+    for (j = 0; j < genLength; j += 1) {
+      a[ijtok(j + 1, i + 1, genLength)] = genSet[j * dim + i];
+    }
+  }
+  double VT1[dim * dim];
+  double eigenvector[dim];
+  int info = lpca(a, genLength, dim, VT1, TRUE);
+
+  for (r = 0; r < 1 + RANDTIME; r += 1) {
+    if (info != -1) {
+      for (k = 0; k < dim; k += 1) {
+        for (i = 0; i < dim; i += 1) {
+          eigenvector[i] = VT1[ijtok(dim - k, i + 1, dim)];
+        }
+        dummy = 0;
+
+        for (i = 0; i < dim; i += 1) {
+          dummy += eigenvector[i] * eigenvector[i];
+        }
+        dummy = sqrt(dummy);
+        dummy /= 16;
+        if (dummy < 1e-6) continue; /* the norm2 of eigenvector is too small */
+        DUM_DOMAIN = 1;
+
+        for (m = 0; m < DUN_DOMAIN_BOUND; m += 1) {
+          for (i = 0; i < dim; i += 1) {
+            f2rat(eigenvector[i] / dummy, DUM_DOMAIN, coefDen + i, coefNum + i);
+          }
+          bound = 1;
+
+          for (i = 0; i < dim; i += 1) {
+            if (coefNum[i] != 0) {
+              dummy = bound * coefNum[i];
+              if (fabs(dummy) >
+                  BOUND) { /* the all norm of the coefs must be in a bound */
+                bound = 0;
+                break;
+              }
+              bound *= coefNum[i];
+            }
+          }
+
+          if (0 == bound)
+            break; /* the all norm of the coefs must be in a bound */
+
+          for (i = 0; i < dim; i += 1) {
+            if (coefNum[i] != 0) {
+              coefDen[i] *= bound / coefNum[i];
+            } else
+              coefDen[i] = 0;
+          }
+
+          for (n = 0; n < 10 * cutNum * sqrt(re); n += 1) {
+            dummy = 0;
+            bound = 0;
+            for (i = 0; i < dim; i += 1) {
+              dummy += abs(coefDen[i]) * max[i];
+              bound += abs(coefDen[i]) * max[i];
+            }
+            /* the all norm of the coefs must be in a bound */
+
+            if (dummy > BOUND || bound > BOUND ||
+                fabs(dummy - bound) > BOUND / 10)
+              break;
+
+            maxSum = 0;
+
+            for (i = 0; i < dim; i += 1) {
+              maxSum += coefDen[i] * genSet[i];
+            }
+            minSum = maxSum;
+
+            for (i = 1; i < genLength; i += 1) {
+              temp = 0;
+              for (j = 0; j < dim; j += 1) {
+                temp += coefDen[j] * genSet[i * dim + j];
+              }
+              if (temp > maxSum) {
+                maxSum = temp;
+              } else if (temp < minSum) {
+                minSum = temp;
+              }
+            }
+
+            re = reduceByPlane(candidateSet, re, dim, coefDen, maxSum);
+
+            for (i = 0; i < dim; i += 1) {
+              coefDen[i] *= -1;
+            }
+
+            re = reduceByPlane(candidateSet, re, dim, coefDen, -minSum);
+            if (re == origLength) break;
+            origLength = re;
+
+            i = rand() % dim;
+            if (rand() % 2 == 1) {
+              coefDen[i]++;
+            } else
+              coefDen[i]--;
+          }
+          if (re == genLength) return re;
+
+          DUM_DOMAIN++;
+        }
+      }
+    }
+
+    for (i = 0; i < dim; i += 1) {
+      for (j = 0; j < genLength; j += 1) {
+        a[ijtok(j + 1, i + 1, genLength)] =
+            candidateSet[(rand() % re) * dim + i];
+      }
+    }
+
+    info = lpca(a, genLength, dim, VT1, TRUE);
+  }
+
+  return re;
+}
+
 /**
  * @brief the three points in indices are Different from each other
  *
@@ -762,7 +1129,7 @@ indice_t* ConvexGenerator::randPointSet(const int length, const int dim,
  *
  * @return
  */
-int ConvexGenerator::reduceByPlane(indice_t* candidateSet, const int length,
+int reduceByPlane(indice_t* candidateSet, const int length,
                                    const int dim, const int* coefs,
                                    int maxSum) {
   int i, j;
@@ -786,368 +1153,8 @@ int ConvexGenerator::reduceByPlane(indice_t* candidateSet, const int length,
   return len;
 }
 
-int ConvexGenerator::reduceByLestEignV(indice_t* candidateSet,
-                                       const int candLength, const int dim,
-                                       const indice_t* genSet,
-                                       const int genLength, const int max[]) {
-  long int bound;
-  int maxSum = 0;
-  int minSum;
-  double dummy;
-  int temp;
-  int re = candLength;
-  int cutNum = dim;
-  int j, i, n, m, r, k = 0;
-  int origLength = candLength;
 
-  int DUM_DOMAIN = 1;
-  int coefNum[dim];
-  int coefDen[dim];
-  double a[genLength * dim];
 
-  for (i = 0; i < dim; i += 1) {
-    for (j = 0; j < genLength; j += 1) {
-      a[ijtok(j + 1, i + 1, genLength)] = genSet[j * dim + i];
-    }
-  }
-  double VT1[dim * dim];
-  double eigenvector[dim];
-  int info = lpca(a, genLength, dim, VT1, TRUE);
 
-  for (r = 0; r < 1 + RANDTIME; r += 1) {
-    if (info != -1) {
-      for (k = 0; k < dim; k += 1) {
-        for (i = 0; i < dim; i += 1) {
-          eigenvector[i] = VT1[ijtok(dim - k, i + 1, dim)];
-        }
-        dummy = 0;
-
-        for (i = 0; i < dim; i += 1) {
-          dummy += eigenvector[i] * eigenvector[i];
-        }
-        dummy = sqrt(dummy);
-        dummy /= 16;
-        if (dummy < 1e-6) continue; /* the norm2 of eigenvector is too small */
-        DUM_DOMAIN = 1;
-
-        for (m = 0; m < DUN_DOMAIN_BOUND; m += 1) {
-          for (i = 0; i < dim; i += 1) {
-            f2rat(eigenvector[i] / dummy, DUM_DOMAIN, coefDen + i, coefNum + i);
-          }
-          bound = 1;
-
-          for (i = 0; i < dim; i += 1) {
-            if (coefNum[i] != 0) {
-              dummy = bound * coefNum[i];
-              if (fabs(dummy) >
-                  BOUND) { /* the all norm of the coefs must be in a bound */
-                bound = 0;
-                break;
-              }
-              bound *= coefNum[i];
-            }
-          }
-
-          if (0 == bound)
-            break; /* the all norm of the coefs must be in a bound */
-
-          for (i = 0; i < dim; i += 1) {
-            if (coefNum[i] != 0) {
-              coefDen[i] *= bound / coefNum[i];
-            } else
-              coefDen[i] = 0;
-          }
-
-          for (n = 0; n < 10 * cutNum * sqrt(re); n += 1) {
-            dummy = 0;
-            bound = 0;
-            for (i = 0; i < dim; i += 1) {
-              dummy += abs(coefDen[i]) * max[i];
-              bound += abs(coefDen[i]) * max[i];
-            }
-            /* the all norm of the coefs must be in a bound */
-
-            if (dummy > BOUND || bound > BOUND ||
-                fabs(dummy - bound) > BOUND / 10)
-              break;
-
-            maxSum = 0;
-
-            for (i = 0; i < dim; i += 1) {
-              maxSum += coefDen[i] * genSet[i];
-            }
-            minSum = maxSum;
-
-            for (i = 1; i < genLength; i += 1) {
-              temp = 0;
-              for (j = 0; j < dim; j += 1) {
-                temp += coefDen[j] * genSet[i * dim + j];
-              }
-              if (temp > maxSum) {
-                maxSum = temp;
-              } else if (temp < minSum) {
-                minSum = temp;
-              }
-            }
-
-            re = reduceByPlane(candidateSet, re, dim, coefDen, maxSum);
-
-            for (i = 0; i < dim; i += 1) {
-              coefDen[i] *= -1;
-            }
-
-            re = reduceByPlane(candidateSet, re, dim, coefDen, -minSum);
-            if (re == origLength) break;
-            origLength = re;
-
-            i = rand() % dim;
-            if (rand() % 2 == 1) {
-              coefDen[i]++;
-            } else
-              coefDen[i]--;
-          }
-          if (re == genLength) return re;
-
-          DUM_DOMAIN++;
-        }
-      }
-    }
-
-    for (i = 0; i < dim; i += 1) {
-      for (j = 0; j < genLength; j += 1) {
-        a[ijtok(j + 1, i + 1, genLength)] =
-            candidateSet[(rand() % re) * dim + i];
-      }
-    }
-
-    info = lpca(a, genLength, dim, VT1, TRUE);
-  }
-
-  return re;
-}
-
-indice_t* ConvexGenerator::overConvexHull(const indice_t* genSet,
-                                          const int genLength, const int dim,
-                                          int* reLength) {
-  ASSERT(genLength > 0, "at least have one point");
-  int i, j, k;
-  if (1 == genLength) {
-    indice_t* candidateSet = (indice_t*)malloc_d(dim);
-    for (i = 0; i < dim; i++) candidateSet[i] = genSet[i];
-    *reLength = 1;
-
-    return candidateSet;
-  }
-
-  node_dim = dim;
-  node_b_size = dim * sizeof(indice_t);
-  int max[dim];
-  int min[dim];
-  int temp[dim];
-  int maxSum = 0;
-  int minSum = 0;
-  int tempsum = 0;
-  int index;
-  int tempLength = 0;
-  int pairNum = (dim * (dim - 1)) / 2;
-  int threeNum = (dim * (dim - 1) * (dim - 2)) / 6;
-  int pair[pairNum * 2];
-  int pairMax[pairNum];
-  int pairMin[pairNum];
-
-  int three[threeNum * 3];
-  int threeMax[threeNum];
-  int threeMin[threeNum];
-  //	printf ( "genLength %d\n",genLength );
-
-  k = 0;
-  for (i = 0; i < dim; i += 1) {
-    for (j = i + 1; j < dim; j += 1) {
-      pair[2 * k] = i;
-      pairMax[k] = genSet[pair[2 * k]];
-      pair[2 * k + 1] = j;
-      pairMax[k] += genSet[pair[2 * k + 1]];
-      pairMin[k] = pairMax[k];
-      k++;
-    }
-  }
-  index = 0;
-
-  for (i = 0; i < dim; i += 1) {
-    for (j = i + 1; j < dim; j += 1) {
-      for (k = j + 1; k < dim; k += 1) {
-        three[3 * index] = i;
-        threeMax[index] = genSet[i];
-        three[3 * index + 1] = j;
-        threeMax[index] += genSet[j];
-        three[3 * index + 2] = k;
-        threeMax[index] += genSet[k];
-        threeMin[index] = threeMax[index];
-        index++;
-      }
-    }
-  }
-
-  for (i = 0; i < dim; i += 1) {
-    max[i] = genSet[i];
-    min[i] = genSet[i];
-    maxSum += genSet[i];
-    minSum += genSet[i];
-  }
-
-  for (i = 1; i < genLength; i += 1) {
-    tempsum = 0;
-    for (j = 0; j < dim; j += 1) {
-      tempsum += genSet[i * dim + j];
-      if (genSet[i * dim + j] > max[j]) {
-        max[j] = genSet[i * dim + j];
-      } else if (genSet[i * dim + j] < min[j]) {
-        min[j] = genSet[i * dim + j];
-      }
-    }
-    if (tempsum > maxSum)
-      maxSum = tempsum;
-    else if (tempsum < minSum)
-      minSum = tempsum;
-
-    for (j = 0; j < pairNum; j += 1) {
-      tempsum = genSet[i * dim + pair[2 * j]];
-      tempsum += genSet[i * dim + pair[2 * j + 1]];
-      if (tempsum > pairMax[j])
-        pairMax[j] = tempsum;
-      else if (tempsum < pairMin[j])
-        pairMin[j] = tempsum;
-    }
-
-    for (j = 0; j < threeNum; j += 1) {
-      tempsum = genSet[i * dim + three[3 * j]];
-      tempsum += genSet[i * dim + three[3 * j + 1]];
-      tempsum += genSet[i * dim + three[3 * j + 2]];
-      if (tempsum > threeMax[j])
-        threeMax[j] = tempsum;
-      else if (tempsum < threeMin[j])
-        threeMin[j] = tempsum;
-    }
-  }
-  memcpy(temp, min, sizeof(int) * dim);
-
-  j = 0;
-  index = 0;
-
-  while (1) {
-    if (temp[0] > max[0]) {
-      j = 1;
-      while (j < dim && temp[j] == max[j]) j++;
-      if (j == dim) {
-        break;
-      }
-      temp[j]++;
-      memcpy(temp, min, j * sizeof(int));
-    }
-
-    tempsum = 0;
-
-    for (k = 0; k < dim; k += 1) {
-      tempsum += temp[k];
-    }
-    if (tempsum <= maxSum && tempsum >= minSum) {
-      for (k = 0; k < pairNum; k += 1) {
-        tempsum = temp[pair[2 * k]];
-        tempsum += temp[pair[2 * k + 1]];
-        if (tempsum > pairMax[k])
-          break;
-        else if (tempsum < pairMin[k])
-          break;
-      }
-      if (k == pairNum) {
-        for (k = 0; k < threeNum; k += 1) {
-          tempsum = temp[three[3 * k]];
-          tempsum += temp[three[3 * k + 1]];
-          tempsum += temp[three[3 * k + 2]];
-          if (tempsum > threeMax[k]) {
-            break;
-          } else if (tempsum < threeMin[k])
-            break;
-        }
-        if (k == threeNum) index++;
-      }
-    }
-
-    temp[0]++;
-  }
-
-  ASSERT(index >= genLength, "there some bugs occor in your this code");
-  tempLength = index;
-
-  indice_t* candidateSet = (indice_t*)malloc_d(tempLength * node_b_size);
-  memcpy(temp, min, dim * sizeof(int));
-
-  j = 0;
-  index = 0;
-
-  while (1) {
-    if (temp[0] > max[0]) {
-      j = 1;
-      while (j < dim && temp[j] == max[j]) j++;
-      if (j == dim) {
-        break;
-      }
-      temp[j]++;
-      memcpy(temp, min, j * sizeof(int));
-    }
-
-    tempsum = 0;
-
-    for (k = 0; k < dim; k += 1) {
-      tempsum += temp[k];
-    }
-
-    if (tempsum <= maxSum && tempsum >= minSum) {
-      for (k = 0; k < pairNum; k += 1) {
-        tempsum = temp[pair[2 * k]];
-        tempsum += temp[pair[2 * k + 1]];
-        if (tempsum > pairMax[k])
-          break;
-        else if (tempsum < pairMin[k])
-          break;
-      }
-      if (k == pairNum) {
-        for (k = 0; k < threeNum; k += 1) {
-          tempsum = temp[three[3 * k]];
-          tempsum += temp[three[3 * k + 1]];
-          tempsum += temp[three[3 * k + 2]];
-          if (tempsum > threeMax[k]) {
-            break;
-          } else if (tempsum < threeMin[k])
-            break;
-        }
-        if (k == threeNum) {
-          for (k = 0; k < dim; k += 1) {
-            candidateSet[index * dim + k] = temp[k];
-          }
-          index++;
-        }
-      }
-    }
-    temp[0]++;
-  }
-  if (tempLength == genLength) {
-    *reLength = genLength;
-
-  } else {
-
-    tempLength = reduceByLestEignV(candidateSet, tempLength, dim, genSet,
-                                   genLength, max);
-
-    if (tempLength == genLength) {
-      *reLength = tempLength;
-      return candidateSet;
-    }
-
-    *reLength = tempLength;
-
-  }
-  return candidateSet;
-}
 }
 }

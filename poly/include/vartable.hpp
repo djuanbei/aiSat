@@ -103,6 +103,10 @@ class VarTable {
     return variateSymbol.size()-1;
   }
 
+  int addVar(const string * vname){
+    return addVar(*vname);
+  }
+
   /**
    *
    *
@@ -119,6 +123,11 @@ class VarTable {
       }
     }
     return -1;
+  }
+  
+  int findVarIndex(const string *name) const {
+    return findVarIndex(*name);
+
   }
 
   void setVarName(const int index, const string &name) {
@@ -162,6 +171,32 @@ class VarTable {
     }
     startLocation.push_back(variateCombine.size());
     return startLocation.size() - 2;
+  }
+
+  
+  int addVarElem(const vector<T> &evars, const int num) {
+
+    vector<T> vars(evars.begin(), evars.begin()+num);
+    sort(vars.begin(), vars.end());
+
+    int n = vars.size();
+    if (0 == n) {
+      return 0;
+    }
+    ASSERT(n <= variateSymbol.size(), "");
+
+    int re = findVarElem(vars);
+    if (re > -1) {
+      return re;
+    }
+
+    for (int i = 0; i < n; i += 1) {
+      ASSERT(vars[i] < variateSymbol.size(), "");
+      variateCombine.push_back(vars[i]);
+    }
+    startLocation.push_back(variateCombine.size());
+    return startLocation.size() - 2;
+
   }
 
   /**

@@ -606,8 +606,7 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
     }
     genLength = j;
 
-    indice_t *candidate =
-        generator.overConvexHull(temp, genLength, dim, &tempLength);
+    indice_t *candidate =overConvexHull(temp, genLength, dim, &tempLength);
 
     int dummy = exactConvHull(subpoly, candidate, tempLength, temp, genLength,
                               &SOSM, sosLength, ans);

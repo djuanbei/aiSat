@@ -65,8 +65,10 @@ void deleteAllIndices(indice_t **all, const int length);
 */
 class SOSProblem {
  private:
-  vector<Poly_t *> polys;
   Poly_t *rhs;
+  
+  vector<Poly_t *> polys;
+
   vector<PolyConstraint *> polyConstraints;
 
   void wellform(const int sep, const int sosMId[], const int sosMap[],
@@ -88,10 +90,65 @@ class SOSProblem {
                             const int blockMap[], Blockmatrix *const X);
 
  public:
+  SOSProblem(){
+    rhs=NULL;
+  }
+  ~SOSProblem(){
+    clear();
+
+  }
+
+  void clear(){
+    if(NULL!=rhs){
+      delete rhs;
+      rhs=NULL;
+    }
+    for(size_t i=0; i< polys.size(); i++){
+      delete polys[i];
+      delete polyConstraints[i];
+    }
+    polys.clear();
+    polyConstraints.clear();
+  }
+  void setRhs(Poly_t *r) {
+    rhs=r;
+  }
+  
+  Poly_t* getRhs(void){
+    return rhs;
+  }
+  
+  void deleteRhs(void){
+    if(NULL!=rhs){
+      delete rhs;
+      rhs=NULL;
+    }
+  }
+  int size()const {
+    return polys.size();
+  }
+
+  Poly_t *getPoly(const int id){
+    return polys[id];
+  }
+
+  PolyConstraint* getPolyConstraint(const int id){
+    return polyConstraints[id];
+  }
+  
+  int addElem(Poly_t * poly, PolyConstraint * polycons){
+    int re=polys.size();
+    polys.push_back(poly);
+    polyConstraints.push_back(polycons);
+    return re;
+  }
+  
   int inter_sdp(const int sep, const char *fproname, const char *fsolname);
 
-  int sdp_solver(Poly_t **resP, const char *fproname, const char *fsolname);
+  int sdp_solver(vector<Poly_t *>& resP, const char *fproname, const char *fsolname);
 };
 }
 }
 #endif
+
+

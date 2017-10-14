@@ -118,7 +118,7 @@ int Supporttable::findSupElemByIndice(const int varId, const indice_t *indices,
   int i;
   uint8_t md5sum[DIGEST_SIZE];
   md5sumbyIndice(md5sum, varId, indices, value_size);
-  for (i = 0; i < value_size; i++) {
+  for (i = 0; i < values.size(); i++) {
     if (values[i]->type == INDICE &&
         0 == memcmp(values[i]->md5sum, md5sum, DIGEST_SIZE)) {
       return findBimapByValue(loc, i);

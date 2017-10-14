@@ -1,13 +1,11 @@
 %{
-
-#include "sosproblem.h"
-#include "poly.h"
-#include "vartable.h"
+#include "psdproblem.h"
 #include "sosproblemparser.h"
-#include "sosproblem.h"
-  
+#include "psdtype.h"
+#include "psdutil.h"
 #include <cstdio>
 #include<iostream>
+  using namespace  aiSat::psd;
   int yydebug=1;   
   using std::cerr;
   using std::endl;
@@ -34,11 +32,11 @@
   double dblVal;
   int  dilVal; 
   string * identifier;
-  Poly *poly;
+  Poly_t *poly;
   vector<int> *iVec;
-  vector<Monomial*> *mVec;
-  Monomial * mon;
-  polyConstraint* polycons;
+  vector<SOSMonomial*> *mVec;
+  SOSMonomial * mon;
+  PolyConstraint* polycons;
   SOSProblem *prob;
  }
 %expect 0
@@ -131,7 +129,7 @@ IDENT '=' '{'  monomial_list '}'
   problem.monoMap[*($1)]=SOSP::addSOSsup( $4);
   delete $1;
   
-  vector<Monomial*>::iterator it=$4->begin();
+  vector<SOSMonomial*>::iterator it=$4->begin();
   for(;it!=$4->end();it++){
     delete (*it);
   }
@@ -166,7 +164,7 @@ unknow_poly:
 
 IDENT '=' SOS '(' MONOMIAL ')'
 {
-  $$=createPolyConstraint();
+  $$=new PolyConstraint();
   $$->type=GE;
   $$->supportId= $5;
   problem.polyConsMap[*($1)]=$$;
@@ -175,7 +173,7 @@ IDENT '=' SOS '(' MONOMIAL ')'
 |
 IDENT '=' EQPOLY '(' MONOMIAL ')'
 {
-  $$=createPolyConstraint();
+  $$=new PolyConstraint();
   $$->type=EQ;
   $$->supportId=$5;
   problem.polyConsMap[*($1)]=$$;
@@ -229,9 +227,9 @@ var_list2
 var_list1:
 var_list1 ',' IDENT
 {
-  addVar($3->c_str() );
+  getVarTable<indice_t>().addVar($3);
   
-  int varIndex=findVarIndex($3->c_str());
+  int varIndex=getVarTable<indice_t>().findVarIndex($3);
   $1->push_back(varIndex);
   delete $3;
   $$=$1;
@@ -246,13 +244,14 @@ var_list1 ',' VAR
 }
 |
 IDENT ',' IDENT {
-  addVar($1->c_str() );
-  addVar($3->c_str() );
+  getVarTable<indice_t>().addVar($1);
+  getVarTable<indice_t>().addVar($3);
+
 
   $$=new vector<int>();
-  int varIndex=findVarIndex($1->c_str());
+  int varIndex=getVarTable<indice_t>().findVarIndex($1);
   $$->push_back(varIndex );
-  varIndex=findVarIndex($3->c_str());
+  varIndex=getVarTable<indice_t>().findVarIndex($3);
   $$->push_back(varIndex);
   delete $1;
   delete $3;
@@ -260,19 +259,19 @@ IDENT ',' IDENT {
 |
 VAR ',' IDENT {
 
-  addVar($3->c_str() );
+  getVarTable<indice_t>().addVar($3 );
   $$=new vector<int>();
   $$->push_back($1 );
-  int  varIndex=findVarIndex($3->c_str());
+  int  varIndex=getVarTable<indice_t>().findVarIndex($3);
   $$->push_back(varIndex);
   delete $3;
 }
 |
 IDENT ',' VAR {
 
-  addVar($1->c_str() );
+  getVarTable<indice_t>().addVar($1 );
   $$=new vector<int>();
-  int  varIndex=findVarIndex($1->c_str());
+  int  varIndex=getVarTable<indice_t>().findVarIndex($1);
   $$->push_back(varIndex);
   $$->push_back($3 );
   delete $1;
@@ -280,7 +279,7 @@ IDENT ',' VAR {
 |
 VAR ',' VAR {
   $$=new vector<int>();
-    $$->push_back($1);
+  $$->push_back($1);
   $$->push_back($3 );
   
 }
@@ -288,8 +287,8 @@ VAR ',' VAR {
 var_list2:
 var_list2   IDENT 
 {
-  addVar($2->c_str() );
-  int varIndex=findVarIndex($2->c_str());
+  getVarTable<indice_t>().addVar($2 );
+  int varIndex=getVarTable<indice_t>().findVarIndex($2);
   $1->push_back(varIndex);
   delete $2;
   $$=$1;
@@ -302,8 +301,8 @@ var_list2   VAR
 }
 |
 IDENT  {
-  addVar($1->c_str() );
-  int varIndex=findVarIndex($1->c_str());
+  getVarTable<indice_t>().addVar($1 );
+  int varIndex=getVarTable<indice_t>().findVarIndex($1);
   $$=new vector<int>();
   $$->push_back(varIndex);
   delete $1;
@@ -327,34 +326,33 @@ poly:
 |
 poly '+' poly
 {
-  p_add_Poly_assign_del($1,$3); 
+  $1->add_poly($3);
   $$=$1;
+  delete $3;
 
 }
 |
 poly '-' poly
 {
-  p_mult_cons_assign($3,-1); 
-  p_add_Poly_assign_del($1,$3); 
+  $3->mult(-1);
+  $1->add_poly($3);
   $$=$1;
-
+  delete $3;
   
 }
 |
 poly '*' poly
 {
+  $1->mult_poly($3);
 
-  p_mult_Poly_assign_del($1,$3);
   $$=$1;
-
+  delete $3;
 
 }
 | 
 poly '^' INTEGER
 {
-    
-  p_pow_assign($1,$3);
-  
+  $1->pow($3);
   $$=$1;
 
 }
@@ -362,43 +360,34 @@ poly '^' INTEGER
 |
 POLY
 {
-  $$=copyPoly($1);
+  $$=new Poly_t(*($1));
 }
 
 |
 
 INTEGER
 {
+  $$=new Poly_t(true);
 
-  $$=createPoly();
-  polyChangeVarId($$,1);
-  p_add_cons_assign($$,$1);
-
-
+  $$->add($1);
 }
 
 |
 NUM{
+  $$=new Poly_t(true);
+  $$->add($1);
 
-  $$=createPoly();
-  polyChangeVarId($$,1);
-  p_add_cons_assign($$,$1);
 
 }
 |
 VAR
 {
-  $$=createPoly();
-  polyChangeVarId($$,1);
-  int varNum=getAllVarNum();//varNum(1);
+  $$=new Poly_t(true);
 
-  indice_t *key=new indice_t[varNum];
-  int i;	
-  for(i=0;i<varNum;i++)
-    key[i]=0;
-  key[$1]=1;
-  internal_addTerm($$,key,1);
-  delete[  ] key;
+  Poly_t::Term term;
+  term.key.push_back(make_pair($1,1));
+  term.cf=1;
+  $$->add_term(term);
 
 }
 
@@ -421,7 +410,7 @@ monomial_list1 ',' monomial
 |
 monomial ',' monomial
 {
-  $$=new vector<Monomial*>();
+  $$=new vector<SOSMonomial*>();
   $$->push_back($1);
   $$->push_back($3);
 }
@@ -436,7 +425,7 @@ monomial_list2  monomial
 |
 monomial
 {
-  $$=new vector<Monomial*>();
+  $$=new vector<SOSMonomial*>();
   $$->push_back($1);
 
 }
@@ -457,22 +446,22 @@ monomial '*' VAR
 }
 |
 VAR '^' INTEGER {
-  int varNum=getAllVarNum();//getvarNum(1);
-  $$=new Monomial(varNum);
+  int varNum=getVarTable<indice_t>().getAllVarNum();
+  $$=new SOSMonomial(varNum);
 
   $$->addIndices($1,$3);
 }
 |
 VAR
 { 
-  int varNum=getAllVarNum();//varNum(1);
-  $$=new Monomial(varNum);
+  int varNum=getVarTable<indice_t>().getAllVarNum();
+  $$=new SOSMonomial(varNum);
   $$->addIndices($1,1);
 }
 |
 INTEGER{
-  int varNum=getAllVarNum();//varNum(1);
-  $$=new Monomial(varNum);
+  int varNum=getVarTable<indice_t>().getAllVarNum();
+  $$=new SOSMonomial(varNum);
 }
 ;
 
@@ -492,19 +481,20 @@ constraint_left  SOSEQ  poly
 {
 
   $$=$1;
-
   
-  if(NULL!=$$->rhs){
+  if(NULL!=$$->getRhs()){
     
-    if(NULL!= $3)
-      p_add_Poly_assign_del($$->rhs, $3 );
+    if(NULL!= $3){
+      $$->getRhs()->add_poly($3);
+      delete $3;
+    }
   }else{
 
-      setSOSRhs($$, $3);
+    $$->setRhs( $3);
   }
   
   
-  if(problem.problem->size>0){
+  if(problem.problem->size()>0){
 
     problem.solve();
 
@@ -519,22 +509,24 @@ constraint_left  SOSEQ  '-' poly
 {
 
   $$=$1;
+  Poly_t *rhs=$$->getRhs();
 
-    if(NULL!=$$->rhs){
+  if(NULL!=rhs){
     
     if(NULL!= $4){
-      p_mult_cons_assign($4,-1); 
-      p_add_Poly_assign_del($$->rhs, $4 );
-      
+      $4->mult(-1);
+
+      rhs->add_poly($4);
+      delete $4;
     }
 
   }else{
-      p_mult_cons_assign($4,-1); 
-      setSOSRhs($$, $4);
+    $4->mult(-1);
+    $$->setRhs( $4);
   }
   
   
-  if(problem.problem->size>0){
+  if(problem.problem->size()>0){
 
     problem.solve();
 
@@ -550,30 +542,36 @@ constraint_left  SOSGEQ constraint_right
 {
   
   $$=$1;
+
+  Poly_t *lrhs=$$->getRhs();
+
+  Poly_t *rrhs=$3->getRhs();
+  
+  if(NULL!=lrhs){
     
-  if(NULL!=$$->rhs){
-    
-    if(NULL!= $3->rhs)
-      p_add_Poly_assign($$->rhs, $3->rhs );
+    if(NULL!= rrhs){
+      lrhs->add_poly(rrhs);
+    }
+
   }else{
-    if(NULL!=$3->rhs){
-      setSOSRhs($$, $3->rhs);
+    if(NULL!=rrhs){
+      $$->setRhs(rrhs);
     }
   }
   
   int i;
   int left=problem.left_printMap.size();
   
-  for(i=0;i< $3->size; i++){
-    addConstraint($$,$3->polys[i], $3->polyConstraints[i] );
+  for(i=0;i< $3->size(); i++){
+    $$->addElem($3->getPoly(i), $3->getPolyConstraint(i) );
+
     problem.left_printMap[left+i]=problem.right_printMap[i];
   }
   problem.right_printMap.clear();
-  free($3->polys );
-  free($3->polyConstraints );
-  free($3);
 
-  if(problem.problem->size>0){
+  delete $3;
+
+  if(problem.problem->size()>0){
     problem.solve();
 
   }
@@ -585,39 +583,40 @@ constraint_left  SOSGEQ constraint_right
 FINDSOS '(' poly ')'
 {
   problem.findSOS($3);
-  deletePoly($3);
+  delete $3;
+
 }
 |
 
 INTERP '(' constraint_right ',' constraint_right ')'
 {
-  int sep= $3->size+1;
+  int sep= $3->size()+1;
   int i;
-  for(i=0; i<$5->size; i++){
-    addConstraint($3, $5->polys[i], $5->polyConstraints[i] );
+  for(i=0; i<$5->size(); i++){
+    
+    $3->addElem( $5->getPoly(i), $5->getPolyConstraint(i) );
   }
-  for(i=0; i<$3->size; i++){
-    p_mult_cons_assign($3->polys[i],-1);
+  for(i=0; i<$3->size(); i++){
+    $3->getPoly(i)->mult(-1);
+
   }
-  if(NULL==$3->rhs){
-    $3->rhs=createPoly();
-  }
-  if(NULL!=$5->rhs)
-    p_add_Poly_assign_del($3->rhs, $5->rhs);
   
-  p_add_cons_assign($3->rhs,  1 );
-  p_mult_cons_assign($3->rhs,-1);
+  if(NULL==$3->getRhs()){
+    $3->setRhs(new Poly_t());
+  }
+  if(NULL!=$5->getRhs()){
+    $3->getRhs()->add_poly($5->getRhs());
+    $5->deleteRhs();
+  }
+  $3->getRhs()->add(1);
+  $3->getRhs()->mult(-1);
   
   problem.interpolant( $3, sep);
   
-  free($5->polys );
-  free($5->polyConstraints );
-  free($5);
-  deleteSOSProblem($3);
-  
-  /* free($3->polys ); */
-  /* free($3->polyConstraints ); */
-  /* free($3); */
+  delete $5;
+  delete $3;
+
+
 }
 ;
 
@@ -628,8 +627,10 @@ constraint_left '+' poly '*' UNHNOW
 {
   $$=$1;
 
-  PolyConstraint *pcons=copyPolyConstraint($5);
-  int index=addConstraint($$,$3, pcons );
+  PolyConstraint *pcons=new PolyConstraint($5);
+
+
+  int index=$$-> addElem($3, pcons );
   problem.left_printMap[index]=unkown_name;
 }
 
@@ -638,9 +639,9 @@ constraint_left '+' poly '*' UNHNOW
 constraint_left '+' UNHNOW '*' poly
 {
   $$=$1;
-  PolyConstraint *pcons=copyPolyConstraint($3);
+  PolyConstraint *pcons=new PolyConstraint($3);
 
-  int index=addConstraint($$,$5, pcons );
+  int index=$$->addElem($5, pcons );
   problem.left_printMap[index]=unkown_name;
 }
 
@@ -650,10 +651,11 @@ constraint_left '-' poly '*' UNHNOW
 {
   $$=$1;
 
-  PolyConstraint *pcons=copyPolyConstraint($5);
-  
-  p_mult_cons_assign($3,-1  );
-  int index=addConstraint($$,$3, pcons );
+  PolyConstraint *pcons=new PolyConstraint($5);
+
+  $3->mult(-1);
+
+  int index=$$->addElem($3, pcons );
   problem.left_printMap[index]=unkown_name;
 }
 
@@ -664,10 +666,11 @@ constraint_left '-' poly '*' UNHNOW
 constraint_left '-' UNHNOW '*' poly
 {
   $$=$1;
+  $5->mult(-1);
 
-  p_mult_cons_assign($5,-1  );
-  PolyConstraint *pcons=copyPolyConstraint($3);
-  int index=addConstraint($$, $5, pcons );
+  PolyConstraint *pcons=new PolyConstraint($3);
+
+  int index=$$->addElem( $5, pcons );
   problem.left_printMap[index]=unkown_name;
 }
 |
@@ -675,24 +678,26 @@ constraint_left '-' UNHNOW '*' poly
 constraint_left '+' poly
 {
   $$=$1;
-  //  Poly *poly=copyPoly($3);
-  p_mult_cons_assign($3,-1  );
-  if(NULL==$$->rhs){
-    setSOSRhs($$,$3);
+  //  Poly_t *poly=copyPoly($3);
+  $3->mult(-1);
+
+  if(NULL==$$->getRhs()){
+    $$->setRhs($3);
   }else{
-    p_add_Poly_assign($$->rhs,$3 );
+    $$->getRhs()->add_poly($3);
+
   }
 }
 |
 constraint_left '-' poly
 {
   $$=$1;
-  //  Poly *poly=copyPoly($3);
-  //  p_mult_cons_assign($3,-1  );
-  if(NULL==$$->rhs){
-    setSOSRhs($$,$3);
+
+  if(NULL==$$->getRhs()){
+    $$->setRhs($3);
   }else{
-    p_add_Poly_assign($$->rhs,$3 );
+    $$->getRhs()->add_poly($3);
+
   }
 }
 |
@@ -700,21 +705,24 @@ constraint_left '-' poly
 constraint_left '+' UNHNOW
 {
   $$=$1;
-  Poly * poly=createPoly();
-  resetOne(poly);
-  PolyConstraint *pcons=copyPolyConstraint($3);
-  int index=addConstraint($$,poly, pcons );
+  Poly_t * poly=new Poly_t();
+  poly->add(1);
+
+  PolyConstraint *pcons=new PolyConstraint( $3);
+
+  int index=$$->addElem(poly, pcons );
   problem.left_printMap[index]=unkown_name;
 }
 |
 constraint_left '-' UNHNOW
 {
   $$=$1;
-  Poly * poly=createPoly();
-  resetOne(poly);
-  p_mult_cons_assign(poly,-1);
-  PolyConstraint *pcons=copyPolyConstraint($3);
-  int index=addConstraint($$,poly, pcons );
+  Poly_t * poly= new Poly_t();
+  poly->add(-1);
+
+  PolyConstraint *pcons=new PolyConstraint( $3);
+
+  int index=$$->addElem(poly, pcons );
   problem.left_printMap[index]=unkown_name;
   
 }
@@ -727,8 +735,9 @@ constraint_left '-' UNHNOW
 poly '*' UNHNOW
 {
   $$=problem.problem;
-  PolyConstraint *pcons=copyPolyConstraint($3);
-  int index=addConstraint($$,$1, pcons );
+  PolyConstraint *pcons=new  PolyConstraint( $3);
+
+  int index=$$->addElem($1, pcons);
   problem.left_printMap[index]=unkown_name;
   
 }
@@ -736,8 +745,9 @@ poly '*' UNHNOW
 UNHNOW '*' poly
 {
   $$=problem.problem;
-  PolyConstraint *pcons=copyPolyConstraint($1);
-  int index=addConstraint($$,$3, pcons );
+  PolyConstraint *pcons=new PolyConstraint($1);
+
+  int index=$$->addElem($3, pcons );
   problem.left_printMap[index]=unkown_name;
   
 }
@@ -747,11 +757,13 @@ UNHNOW '*' poly
 UNHNOW
 {
   $$ =problem.problem;
-  Poly *poly=createPoly();
-  resetOne(poly);
+  Poly_t *poly=new Poly_t();
+  poly->add(1);
+
   
-  PolyConstraint *pcons=copyPolyConstraint($1);
-  int index=addConstraint($$,poly, pcons );
+  PolyConstraint *pcons=new PolyConstraint($1);
+
+  int index=$$->addElem(poly, pcons );
   problem.left_printMap[index]=unkown_name;
 }
 ;
@@ -762,21 +774,23 @@ constraint_right:
 constraint_right '+' poly  '*' UNHNOW
 {
   $$=$1;
+  $3->mult(-1);
 
-  p_mult_cons_assign($3,-1);
-  PolyConstraint *pcons=copyPolyConstraint($5);
-  int index=addConstraint($$,$3, pcons );
+  PolyConstraint *pcons=new PolyConstraint($5);
+
+  int index=$$->addElem($3, pcons );
   problem.right_printMap[index]=unkown_name;
 }
 |
 
 constraint_right '+' UNHNOW '*' poly
 {
+  $5->mult(-1);
 
-  p_mult_cons_assign($5,-1);
-  PolyConstraint *pcons=copyPolyConstraint($3);
+  PolyConstraint *pcons=new PolyConstraint($3);
+
   $$=$1;
-  int index=addConstraint($$,$5, pcons );
+  int index=$$->addElem($5, pcons );
   problem.right_printMap[index]=unkown_name;
 }
 
@@ -785,9 +799,9 @@ constraint_right '-' poly '*' UNHNOW
 {
   $$=$1;
 
-  PolyConstraint *pcons=copyPolyConstraint($5);
+  PolyConstraint *pcons=new PolyConstraint($5);
 
-  int index=addConstraint($$,$3, pcons );
+  int index=$$->addElem($3, pcons );
   problem.right_printMap[index]=unkown_name;
 }
 
@@ -797,8 +811,9 @@ constraint_right '-' UNHNOW '*' poly
 {
   $$=$1;
 
-  PolyConstraint *pcons=copyPolyConstraint($3);
-  int index=addConstraint($$, $5, pcons );
+  PolyConstraint *pcons= new PolyConstraint($3);
+
+  int index=$$->addElem( $5, pcons );
   problem.right_printMap[index]=unkown_name;
 
 }
@@ -809,43 +824,46 @@ constraint_right '+' poly
 {
   $$=$1;
 
-  if(NULL==$$->rhs){
-    setSOSRhs($$,$3);
+  if(NULL==$$->getRhs()){
+    $$->setRhs($3);
   }else{
-    p_add_Poly_assign($$->rhs,$3 );
+    $$->getRhs()->add_poly($3);
   }
 }
 |
 constraint_right '-' poly
 {
   $$=$1;
-  p_mult_cons_assign($3,-1  );
-  if(NULL==$$->rhs){
-    setSOSRhs($$,$3);
+  $3->mult(-1);
+
+  if(NULL==$$->getRhs()){
+    $$->setRhs($3);
   }else{
-    p_add_Poly_assign($$->rhs,$3 );
+    $$->getRhs()->add_poly($3);
+
   }
 }
 |
 constraint_right '+' UNHNOW
 {
   $$=$1;
-  Poly * poly=createPoly();
-  resetOne(poly);
-  p_mult_cons_assign(poly,-1);
-  PolyConstraint *pcons=copyPolyConstraint($3);
-  int index=addConstraint($$,poly, pcons );
+  Poly_t * poly= new Poly_t();
+  poly->add(-1);
+
+  PolyConstraint *pcons=new PolyConstraint($3);
+
+  int index=$$->addElem(poly, pcons );
   problem.right_printMap[index]=unkown_name;
 }
 |
 constraint_right '-' UNHNOW
 {
   $$=$1;
-  Poly * poly=createPoly();
-  resetOne(poly);
+  Poly_t * poly=new Poly_t();
+  poly->add(1);
 
-  PolyConstraint *pcons=copyPolyConstraint($3);
-  int index=addConstraint($$,poly, pcons );
+  PolyConstraint *pcons=new PolyConstraint($3);
+  int index=$$->addElem(poly, pcons );
   problem.right_printMap[index]=unkown_name;
 }
 |
@@ -855,19 +873,21 @@ constraint_right '-' UNHNOW
 |
 poly '*' UNHNOW{
 
-  $$ =createSOSProblem();
-  PolyConstraint *pcons=copyPolyConstraint($3);
-  p_mult_cons_assign($1,-1);
-  int index=addConstraint($$,$1, pcons );
+  $$ =new SOSProblem();
+  PolyConstraint *pcons=new PolyConstraint($3);
+  $1->mult(-1);
+
+  int index=$$->addElem($1, pcons );
   
   problem.right_printMap[index]=unkown_name;    
 }
 |
 UNHNOW '*' poly{
-  $$ =createSOSProblem();
-  PolyConstraint *pcons=copyPolyConstraint($1);
-  p_mult_cons_assign($3,-1);
-  int index=addConstraint($$,$3, pcons );
+  $$ =new SOSProblem();
+  PolyConstraint *pcons=new PolyConstraint($1);
+  $3->mult(-1);
+
+  int index=$$->addElem($3, pcons );
   
   problem.right_printMap[index]=unkown_name;    
   
@@ -876,13 +896,13 @@ UNHNOW '*' poly{
 |
 UNHNOW
 {
-  $$ =createSOSProblem();
+  $$ =new SOSProblem();
   
-  Poly *poly=createPoly();
-  resetOne(poly);
-  p_mult_cons_assign(poly,-1);
-  PolyConstraint *pcons=copyPolyConstraint($1);
-  int index=addConstraint($$,poly, pcons );
+  Poly_t *poly=new Poly_t();
+  poly->add(-1);
+
+  PolyConstraint *pcons=new PolyConstraint($1);
+  int index=$$->addElem(poly, pcons );
   problem.right_printMap[index]=unkown_name;
 }
 ;

@@ -337,7 +337,7 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
         if (index[k] < lengthM[sosmMap[p]]) {
           polyVarSize = getVarTable<indice_t>().getVarNum(polys[p]->getVarId());
           sosVarSize = getVarTable<indice_t>().getVarNum(
-              SUPPORT_TABLE.getSupElem((polyConstraints[i])->supportId)->varId);
+              SUPPORT_TABLE.getSupElem((polyConstraints[p])->supportId)->varId);
 
           pi = 0;
           si = 0;
@@ -905,7 +905,7 @@ int SOSProblem::inter_sdp(const int sep, char const *fprobname,
  *
  * @return
  */
-int SOSProblem::sdp_solver(Poly_t **resP, char const *fprobname,
+int SOSProblem::sdp_solver( vector<Poly_t *> &resP, char const *fprobname,
                            char const *fsolname) {
   int ret = 0;
   int numofCons;
@@ -971,7 +971,7 @@ int SOSProblem::sdp_solver(Poly_t **resP, char const *fprobname,
   //  wellform(sys , sep , sosMId, sosMap, blockSize, blockNum, blockMap ,&X);
   if (ret == 0) {
     for (i = 0; i < size; i++) {
-      resP[i] = getConstraintPoly(i, sosMId, sosMap, blockSize, blockMap, &X);
+      resP.push_back( getConstraintPoly(i, sosMId, sosMap, blockSize, blockMap, &X));
     }
 
     /*      wellform(sys , sep , sosMId, sosMap, blockSize, blockNum, blockMap

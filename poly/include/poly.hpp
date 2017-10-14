@@ -19,9 +19,31 @@
 #include <cmath>
 #include <iomanip>
 
+#include<iterator>
+
 #include "vartable.hpp"
 
 namespace aiSat {
+
+std::string trim(const std::string& str);
+
+
+template<typename Out>
+void split(const std::string &s, char delim, Out result) {
+  std::stringstream ss;
+  ss.str(s);
+  std::string item;
+  while (std::getline(ss, item, delim)) {
+    item=trim(item);
+    if(!item.empty()){
+      *(result++) = item;      
+    }
+
+  }
+}
+
+
+std::vector<std::string> split(const std::string &s, char delim); 
 
 namespace psd {
 class ConvexGenerator;
@@ -30,6 +52,10 @@ class SOSChecker;
 }
 
 namespace poly {
+
+
+
+
 template <typename C, typename T >
 class Subpoly;
 
@@ -286,6 +312,20 @@ class Poly {
     varNum = getVarTable<T>().getVarNum(varId);
     id = POLY_ID++;
   }
+  Poly(bool totalVars){
+    
+    varNum=getVarTable<T>().getAllVarNum();
+    
+    vector<T> vars;
+    for(int i=0; i< varNum; i++){
+      vars.push_back(i);
+    }
+    
+    varId=getVarTable<T>().addVarElem(vars);
+    
+    id = POLY_ID++;
+    
+  }
 
   Poly(const int evarId, const C coefDomain, const int termLength,
        const int indiceDomain) {
@@ -354,13 +394,40 @@ class Poly {
     vector<indice_t> pow(varNum, 0);
 
     for (size_t i = 0; i < term.key.size(); i++) {
-      pow[mapIndex[term.key[i].first]] = term.key[i].second;
+      pow[mapIndex[term.key[i].first]]+= term.key[i].second;
     }
     int loc = findIndex(pow);
     ASSERT(loc > -1, "There are no that term");
     if (loc > -1) {
       return getCF(loc);
+    }else{
+      return 0;
     }
+  }
+  
+  C getCF(const string &term) const{
+    Term temp_term;
+    vector<string> elems=split(term, '*');
+    for(vector<string>::iterator it=elems.begin(); it!= elems.end(); it++){
+      string str=*it;
+      std::size_t found = str.find("^");
+      string var;
+      int pow=1;
+      if (found!=std::string::npos){
+        var=str.substr(0, found);
+        pow=atoi(str.substr (found+1).c_str());
+      }else{
+        var=str;
+      }
+      int index=getVarTable<T>().findVarIndex(var);
+      if(index<0){
+        return 0;
+      }
+      temp_term.key.push_back(make_pair(index, pow));
+    }
+
+    return getCF(temp_term);
+    
   }
 
   /**
@@ -956,11 +1023,16 @@ class Poly {
       add_term(tempt);  //  key, poly2.coef[i]);
     }
   }
+  
 
   Poly<C, T> operator+(const poly_t &poly2) const {
     Poly<C, T> temp = *this;
     temp, add_poly(poly2);
     return temp;
+  }
+
+  void add_poly(const poly_t * poly2){
+    add_poly(*poly2);
   }
 
   void mult_poly(const poly_t &poly2) {
@@ -1027,6 +1099,24 @@ class Poly {
     temp.mult_poly(poly2);
     return temp;
   }
+  
+  void mult_poly( const poly_t * poly2) {
+    mult_poly(*poly2);
+  }
+
+  void pow(const int p) {
+    poly_t dummy=*this;
+    for(int i=1; i< p; i++){
+      this->mult_poly(dummy);
+    }
+  }
+  
+  poly_t operator ^ (const int p) const{
+    poly_t temp = *this;
+    temp.pow(p);
+    return temp;
+  }
+  
   template <typename CC, typename TT>
   friend ostream &operator<<(ostream &os, Poly<CC, TT> &p);
 };

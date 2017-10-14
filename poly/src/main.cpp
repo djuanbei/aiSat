@@ -24,6 +24,9 @@ typedef Subpoly<coef_t, indice_t> Subpoly_t;
 
 int main(int argc, char* argv[]) {
   Poly_t  p=  parse("x^2+y^2+1+(x+23)^2");
+
+  cout<<p.getCF("x^2")<<endl;
+  
   // Poly_t  p = parse("(x+1)*(y+1)+x^2+x^2*y+2*j+33*z");
   
   vector<int>locs1,lcos2;

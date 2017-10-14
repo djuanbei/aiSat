@@ -77,8 +77,8 @@ number (({digit}+)|({digit}*"."{digit}*)|({digit}+"e"(({digit}+)|("-"{digit}+)))
 
     yylval.dilVal=problem.monoMap[string(yytext)];
     return MONOMIAL;
-  }else if(findVarIndex(yytext)>-1){
-    yylval.dilVal=findVarIndex(yytext);
+  }else if(getVarTable<indice_t>().findVarIndex(string(yytext))>-1){
+    yylval.dilVal=getVarTable<indice_t>().findVarIndex(string(yytext));
     return VAR;
   }else if (problem.varMap.find(string(yytext))!=problem.varMap.end() ){
 
