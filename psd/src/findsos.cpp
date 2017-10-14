@@ -86,8 +86,8 @@ bool SOSChecker::sosrepresent(PointList *sosList, double *X,
       getVarTable<indice_t>().getVarElem(
           SUPPORT_TABLE.getSupElem(sosMid)->varId, vars);
 
-      Poly_t::Term temp_term;
       for (j = 0; j < blockSize; j += 1) {
+        Poly_t::Term temp_term;
         for (size_t k = 0; k < vars.size(); k++) {
           temp_term.key.push_back(make_pair(vars[k], Z[j * varNum + k]));
         }

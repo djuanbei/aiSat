@@ -305,10 +305,8 @@ Poly_t *sosConvertPoly(Blockmatrix *const X, const int k, const int blockSize,
 
   ArrangeMatrix **S = SUPPORT_TABLE.getAMIndex(supportId, &dummy);
 
-  Poly_t::Term temp_term;
-  temp_term.key.resize(varSize);
-
   for (i = 0; i < length; i += 1) {
+    Poly_t::Term temp_term;
     for (int k = 0; k < varSize; k++) {
       temp_term.key.push_back(make_pair(vars[k], support[i * varSize + k]));
       // temp_term.key[i] = support[i * varSize + k];
