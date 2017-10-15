@@ -574,7 +574,7 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
   *b = (double *)calloc_d(((*numofCons) + 1), sizeof(double));
 
   if (NULL != rhs) {
-    Poly_t *rhs = rhs;
+
     rhs->update();
 
     vector<indice_t> rhsVars;
