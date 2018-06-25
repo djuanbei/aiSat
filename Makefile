@@ -167,6 +167,8 @@ libs libp libd libr:
 	@ln -sf $(PWD)/$^ lib$(LIB).a
 
 cleanlib:  cleanutil cleansdp  cleanpoly  cleanpsd
+	find . -name *.or |xargs rm
+	find . -name *.od |xargs rm
 	find . -name lib*.a | xargs rm
 
 
