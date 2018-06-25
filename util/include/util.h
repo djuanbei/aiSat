@@ -1,7 +1,7 @@
 
 
-#ifndef UTIL_INC
-#define UTIL_INC
+#ifndef UTIL_INC_
+#define UTIL_INC_
 
 #include <signal.h>
 #include "declarations.h"

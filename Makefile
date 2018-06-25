@@ -52,7 +52,7 @@ COPTIMIZE ?= -O3
 
 CFLAGS    += -I  include -I  util/include -I poly/include -I sdp/include -I psd/include
 
-LFLAGS    +=  -L lib/  -lpsd  -lpoly -lsdp    -lutil     -llapack -lblas   -lm
+LFLAGS    +=  -L lib/  -lpsd  -lpoly -lsdp   -lutil     -llapack -lblas   -lm
   
 
 
@@ -110,7 +110,7 @@ lib$(LIB)_release.a:	$(filter-out */$(MAINFILE).or, $(RCOBJS))
 	@echo Compiling: $(subst $(WROOT)/,,$@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
-otherlib:  libutil libsdp  libpoly libcsdp libpsd
+otherlib:  libutil libsdp  libpoly  libpsd
 
 libutil:
 	cd util; make libr
@@ -120,7 +120,7 @@ libpoly:
 	cd poly; make libr
 
 libsdp:
-	cd csdp; make libr
+	cd sdp; make libr
 
 libpsd:
 	cd psd; make libr
@@ -166,11 +166,29 @@ libs libp libd libr:
 	@echo "Making Soft Link: $^ -> lib$(LIB).a"
 	@ln -sf $(PWD)/$^ lib$(LIB).a
 
+cleanlib:  cleanutil cleansdp  cleanpoly  cleanpsd
+	find . -name lib*.a | xargs rm
+
+
+cleanutil:
+	cd util; make clean
+
+
+cleanpoly:
+	cd poly; make clean
+
+cleansdp:
+	cd sdp; make clean
+
+cleanpsd:
+	cd psd; make clean
+
 ## Clean rule
-clean: 
+clean: cleanlib
 	@rm -f $(EXEC) $(EXEC)_profile $(EXEC)_debug $(EXEC)_release $(EXEC)_static \
 	  $(COBJS) $(PCOBJS) $(DCOBJS) $(RCOBJS) $(CCOBJS)  *.core depend.mk \
 	   lib$(LIB)_standard.a lib$(LIB)_profile.a lib$(LIB)_release.a lib$(LIB)_debug.a
+
 	 
 
 ## Make dependencies
