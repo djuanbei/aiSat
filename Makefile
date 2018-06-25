@@ -110,7 +110,7 @@ lib$(LIB)_release.a:	$(filter-out */$(MAINFILE).or, $(RCOBJS))
 	@echo Compiling: $(subst $(WROOT)/,,$@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
-otherlib:  libutil libsdp  libpoly libcsdp
+otherlib:  libutil libsdp  libpoly libcsdp libpsd
 
 libutil:
 	cd util; make libr
