@@ -19,6 +19,7 @@
 #include "pointvector.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "selfmemutil.h"
 #include "util.h"
 

@@ -9,6 +9,7 @@
  *
  */
 
+#include<string.h>
 #include "bimap.h"
 #include "search.h"
 

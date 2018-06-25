@@ -308,7 +308,9 @@ class VarTable {
    * hold
    */
   void getConvertMap(const int oldId, const int newId, vector<int> &mapIndex) {
-    if (oldId != 0) ASSERT(varElemContain(oldId, newId), "");
+    if (oldId != 0){
+      ASSERT(varElemContain(oldId, newId), "");
+    }
 
     int i, j;
     vector<T> ovars, nvars;

@@ -97,7 +97,7 @@ otherwise -1.
 int bisearch(const void *sortedList, const void *key, const int size,
              const size_t NSIZE, int (*cmp)(const void *, const void *),
              int *info) {
-  int low, high, mid;
+  int low, high, mid=0;
   low = 0;
   int cond = 0;
   high = size - 1;
@@ -114,7 +114,9 @@ int bisearch(const void *sortedList, const void *key, const int size,
       return mid;
   }
   *info = -1;
-  if (0 == mid) return mid;
+  if (0 == mid){
+    return mid;
+  }
   /*-----------------------------------------------------------------------------
    *  no match
    *-----------------------------------------------------------------------------*/
