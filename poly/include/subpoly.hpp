@@ -34,10 +34,10 @@ class Subpoly {
 
   void getMd5sum(md5_ctx_t *ctx) {
     md5_init(ctx);
-    uint8_t id=parent.getId();
+    uint8_t id = parent.getId();
     md5_update(ctx, &id, 1);
 
-    for (int i=0; i < locs.size(); i++) {
+    for (int i = 0; i < locs.size(); i++) {
       uint8_t loc = locs[i];
       md5_update(ctx, &loc, 1);
     }
@@ -60,8 +60,9 @@ class Subpoly {
     getMd5sum(&ctx);
     memcpy(md5sum, MD5_DIGEST(&ctx), 16 * sizeof(uint8_t));
   }
-  
-  Subpoly(const Poly<C, T> &p,const int num,  const vector<int> &loc) : parent(p), locs(loc) {
+
+  Subpoly(const Poly<C, T> &p, const int num, const vector<int> &loc)
+      : parent(p), locs(loc) {
     locs.resize(num);
     md5_ctx_t ctx;
     getMd5sum(&ctx);
@@ -103,17 +104,15 @@ class Subpoly {
   const Poly<C, T> &getParent() const { return parent; }
 
   template <typename CC, typename TT>
-  friend bool   operator==( Poly<CC,TT> & lhs,  Poly<CC,TT> & rhs );
+  friend bool operator==(Poly<CC, TT> &lhs, Poly<CC, TT> &rhs);
 
   template <typename CC, typename TT>
   friend ostream &operator<<(ostream &os, Poly<CC, TT> &p);
-  
-  
 };
 
 template <typename CC, typename TT>
-bool   operator==( Subpoly<CC,TT> & lhs, Subpoly<CC,TT> & rhs ){
-  if(0!=memcmp(lhs.getmd5(), rhs.getmd5(), DIGEST_SIZE )){
+bool operator==(Subpoly<CC, TT> &lhs, Subpoly<CC, TT> &rhs) {
+  if (0 != memcmp(lhs.getmd5(), rhs.getmd5(), DIGEST_SIZE)) {
     return false;
   }
   return true;

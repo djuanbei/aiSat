@@ -2,12 +2,11 @@
  * @file   findsos.cpp
  * @author Liyun Dai <dlyun2009@gmail.com>
  * @date   Mon Oct  9 20:02:27 2017
- * 
+ *
  * @brief  polynomial semindefinite programming
- * 
- * 
+ *
+ *
  */
-
 
 #include "findsos.h"
 
@@ -42,7 +41,6 @@ using std::endl;
 
 static clock_t start;
 
-
 static void delpoly(void *p) { delete ((Poly_t *)p); }
 
 bool SOSChecker::sosrepresent(PointList *sosList, double *X,
@@ -55,21 +53,23 @@ bool SOSChecker::sosrepresent(PointList *sosList, double *X,
   int n = blockSize;
   lwork = -1;
   double workopt;
-  char V[2],U[2];
-  V[0]='V'; U[0]='U';  V[1]=U[1]='\0';
+  char V[2], U[2];
+  V[0] = 'V';
+  U[0] = 'U';
+  V[1] = U[1] = '\0';
   /**
    * try get best work space
-   * 
+   *
    */
   dsyev_(V, U, &n, X, &lda, w, &workopt, &lwork, &info);
-  if(0!=info){
+  if (0 != info) {
     return false;
   }
   lwork = (int)workopt;
   work = (double *)malloc_d(lwork * sizeof(double));
 
   dsyev_(V, U, &n, X, &lda, w, work, &lwork, &info);
-  if(0!=info){
+  if (0 != info) {
     return false;
   }
 
@@ -107,17 +107,15 @@ bool SOSChecker::sosrepresent(PointList *sosList, double *X,
   return true;
 }
 
-void SOSChecker::sosPresent( Subpoly_t &subpoly, const PointList *sosList
-                          ) {
-  cout << subpoly<<"="<< endl;
+void SOSChecker::sosPresent(Subpoly_t &subpoly, const PointList *sosList) {
+  cout << subpoly << "=" << endl;
 
   PointElem *temp = sosList->head;
-                          
-                          
+
   while (temp->next != NULL) {
     Poly_t *tp = (Poly_t *)temp->value;
     if (tp->getSize() > 0) {
-      if(tp->isAllCoefNegative()){
+      if (tp->isAllCoefNegative()) {
         tp->mult(-1);
       }
       cout << "(";
@@ -131,7 +129,7 @@ void SOSChecker::sosPresent( Subpoly_t &subpoly, const PointList *sosList
 
   Poly_t *tp = (Poly_t *)temp->value;
   if (tp->getSize() > 0) {
-    if(tp->isAllCoefNegative()){
+    if (tp->isAllCoefNegative()) {
       tp->mult(-1);
     }
     cout << "(";
@@ -142,13 +140,10 @@ void SOSChecker::sosPresent( Subpoly_t &subpoly, const PointList *sosList
   }
 }
 
-
 int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
                               int &candidateLength, const indice_t *genSet,
                               const int genLength, indice_t **SOSM,
                               int &sosLength, PointList *ans) {
-
-
   int i, j, valueIndex, v, m;
   int k;
   int currCandLen = candidateLength;
@@ -161,7 +156,7 @@ int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
   size_t node_size = dim * sizeof(indice_t);
   vector<indice_t> key(dim);
   vector<indice_t> key1(dim);
-  
+
   map<Monomial, Monomialvalue> monMap;
   indice_t *indiceValues =
       new indice_t[candidateLength * candidateLength * dim];
@@ -195,8 +190,6 @@ int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
       }
     }
   }
-
-
 
   /*-----------------------------------------------------------------------------
    *  delete some Monomial in monMap which value equal to 1 and the value with
@@ -243,13 +236,12 @@ int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
     if (it->second.value > 0) sosLength++;
   }
 
-
   for (map<Monomial, Monomialvalue>::iterator it = monMap.begin();
        it != monMap.end(); ++it) {
-    if (it->second.value == 0){
+    if (it->second.value == 0) {
       monMap.erase(it);
     }
-    if (it == monMap.end()){
+    if (it == monMap.end()) {
       break;
     }
   }
@@ -313,7 +305,6 @@ int SOSChecker::exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
       }
     }
   }
-
 
   /*-----------------------------------------------------------------------------
    *  necessary check
@@ -388,9 +379,7 @@ Constraintmatrix *SOSChecker::createConstraintMatrix(
   int temploc;
   b[0] = (double *)calloc_d((sosLength + 1), sizeof(double));
 
-
   for (i = 0; i < size; i += 1) {
-
     temploc = findIndex(indices + loc[i] * varNum, SOSM, sosLength, varNum);
 
     if (temploc < 0) {
@@ -404,20 +393,16 @@ Constraintmatrix *SOSChecker::createConstraintMatrix(
   ArrangeMatrix **AM = SUPPORT_TABLE.getAMIndex(sosId, &temploc);
   if (NULL == AM) {
     AM = createArrangeM(sosId, SOSM, &temploc, sosLength);
-
   }
 
   Constraintmatrix *re = createNconstraintmatrix(
       sosLength); /* every Monomial w.r.t. to a constraint */
-
 
   /*-----------------------------------------------------------------------------
    *  use block to  construct  constraints
    *-----------------------------------------------------------------------------*/
 
   for (i = 0; i < sosLength; i += 1) {
-
-
     blockptr = createSparseblock(1, gLength, i + 1, AM[i]->size());
     tempI = 1;
     for (k = 0; k < AM[i]->size(); k += 1) {
@@ -437,13 +422,12 @@ int SOSChecker::overConvexChecking(const Subpoly_t &subpoly,
                                    const vector<int> &loc, const int size,
                                    const map<Monomial, Monomialvalue> &monMap,
                                    PointList *ans) {
-
   int i, j, num, k;
 
   vector<char> check(size, 0);
   int checkSize = size;
   vector<int> choose(size);
-  vector<char>  checked(size, 0);
+  vector<char> checked(size, 0);
   vector<int> tempLoc(size);
 
   uint32_t set[4];
@@ -482,14 +466,14 @@ int SOSChecker::overConvexChecking(const Subpoly_t &subpoly,
       }
 
       if (num < size) {
-        if (NULL != ans){
+        if (NULL != ans) {
           cout << "found a split poly" << endl;
         }
         Subpoly_t tempSub(subpoly.parent, num, tempLoc);
         int preAnsLength = 0;
         if (NULL != ans) preAnsLength = size_L(ans);
         if (!polyIsSOS(tempSub, ans)) { /* necessary condition */
-          if (NULL != ans){
+          if (NULL != ans) {
             delListStart(ans, preAnsLength);
           }
 
@@ -511,7 +495,6 @@ int SOSChecker::overConvexChecking(const Subpoly_t &subpoly,
   }
 
   if (0 == checkSize) {
-
     return SUCCESS;
   }
 
@@ -522,7 +505,7 @@ int SOSChecker::overConvexChecking(const Subpoly_t &subpoly,
     int preAnsLength = 0;
     if (NULL != ans) preAnsLength = size_L(ans);
 
-    Subpoly_t tempSub (subpoly.parent, checkSize, tempLoc);
+    Subpoly_t tempSub(subpoly.parent, checkSize, tempLoc);
     if (!polyIsSOS(tempSub, ans)) {
       if (NULL != ans) delListStart(ans, preAnsLength);
       return FAILURE;
@@ -567,10 +550,9 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
   int check = generator.easyCheck(ans);
 
   if (CONVEX_POLY == check) {
-    
   } else if (NOSOS == check) {
     return false;
-  } else if (EXACTLY_SOS == check){
+  } else if (EXACTLY_SOS == check) {
     return true;
   }
 
@@ -606,7 +588,7 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
     }
     genLength = j;
 
-    indice_t *candidate =overConvexHull(temp, genLength, dim, &tempLength);
+    indice_t *candidate = overConvexHull(temp, genLength, dim, &tempLength);
 
     int dummy = exactConvHull(subpoly, candidate, tempLength, temp, genLength,
                               &SOSM, sosLength, ans);
@@ -636,7 +618,7 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
 
   Blockmatrix *C = (Blockmatrix *)malloc_d(sizeof(Blockmatrix));
 
-  double *b[1];// = (double **)malloc_d(sizeof(double *));
+  double *b[1];  // = (double **)malloc_d(sizeof(double *));
 
   Constraintmatrix *constraints;
   Blockmatrix X, Z;
@@ -669,17 +651,17 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
 
     if (0 == easy_sdp(gLength, sosLength, *C, *b, constraints, 0.0, &X, &y, &Z,
                       &pobj, &dobj)) {
-      if (NULL != ans){
-        if(sosrepresent(ans, X.blocks[1].data.mat, gLength, sosId)){
+      if (NULL != ans) {
+        if (sosrepresent(ans, X.blocks[1].data.mat, gLength, sosId)) {
           free_prob(gLength, sosLength, *C, *b, constraints, X, y, Z);
           free(C);
-          return true;          
+          return true;
         }
 
         free_prob(gLength, sosLength, *C, *b, constraints, X, y, Z);
         free(C);
-        
-        return false;          
+
+        return false;
       }
 
     } else {
@@ -696,62 +678,54 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
 
 bool SOSChecker::checksos(bool print) {
   if (p.getTotalDegree() <= 0) {
-    if (p.isZero() || p.isPositive()){
+    if (p.isZero() || p.isPositive()) {
       return true;
-    }
-    else{
+    } else {
       return false;
     }
   }
 
   dim = getVarTable<indice_t>().getVarNum(p.varId);
 
-
-  Subpoly_t subp (p);
+  Subpoly_t subp(p);
 
   PointList *ans = createList(delpoly);
 
   bool re = polyIsSOS(subp, ans, 1);
 
-  if (re&& print) {
+  if (re && print) {
     sosPresent(subp, ans);
   }
   delList(ans);
 
-
   return re;
 }
 
-
-bool SOSChecker::findSOS(vector<Poly_t> & polyvec){
-  
+bool SOSChecker::findSOS(vector<Poly_t> &polyvec) {
   if (p.getTotalDegree() <= 0) {
-    if (p.isZero() || p.isPositive()){
+    if (p.isZero() || p.isPositive()) {
       return true;
-    }
-    else{
+    } else {
       return false;
     }
   }
 
   dim = getVarTable<indice_t>().getVarNum(p.varId);
 
-  Subpoly_t subp (p);
+  Subpoly_t subp(p);
 
   PointList *ans = createList(delpoly);
 
   bool re = polyIsSOS(subp, ans, 1);
-  if(re){
+  if (re) {
     PointElem *temp = ans->head;
     while (temp != NULL) {
       polyvec.push_back(*((Poly_t *)temp->value));
-      temp=temp->next;
+      temp = temp->next;
     }
   }
   delList(ans);
   return re;
-  
 }
-
 }
 }

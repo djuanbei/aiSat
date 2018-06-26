@@ -84,8 +84,6 @@ class Supporttable {
 
   vector<Support *> values;
 
-
-
   int findSupElem(const int deg, const int varId, const int consNum,
                   const int *consIds);
 

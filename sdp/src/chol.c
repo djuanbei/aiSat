@@ -127,7 +127,7 @@ void chol_inv(A, work) struct blockmatrix A, work;
   int blk;
   int n;
   double *ap;
-  double scale=1.0;
+  double scale = 1.0;
 
   copy_mat(A, work);
 

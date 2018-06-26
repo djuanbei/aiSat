@@ -574,7 +574,6 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
   *b = (double *)calloc_d(((*numofCons) + 1), sizeof(double));
 
   if (NULL != rhs) {
-
     rhs->update();
 
     vector<indice_t> rhsVars;
@@ -905,7 +904,7 @@ int SOSProblem::inter_sdp(const int sep, char const *fprobname,
  *
  * @return
  */
-int SOSProblem::sdp_solver( vector<Poly_t *> &resP, char const *fprobname,
+int SOSProblem::sdp_solver(vector<Poly_t *> &resP, char const *fprobname,
                            char const *fsolname) {
   int ret = 0;
   int numofCons;
@@ -971,7 +970,8 @@ int SOSProblem::sdp_solver( vector<Poly_t *> &resP, char const *fprobname,
   //  wellform(sys , sep , sosMId, sosMap, blockSize, blockNum, blockMap ,&X);
   if (ret == 0) {
     for (i = 0; i < size; i++) {
-      resP.push_back( getConstraintPoly(i, sosMId, sosMap, blockSize, blockMap, &X));
+      resP.push_back(
+          getConstraintPoly(i, sosMId, sosMap, blockSize, blockMap, &X));
     }
 
     /*      wellform(sys , sep , sosMId, sosMap, blockSize, blockNum, blockMap

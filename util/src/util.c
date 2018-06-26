@@ -29,7 +29,7 @@ BOOL isSameLine(const indice_t points[], const int *loc, const int n,
     return TRUE;
   }
 
-  int i, j, k=0;
+  int i, j, k = 0;
   int base[dim];
   int current, next;
   for (i = 0; i < dim; i += 1) {

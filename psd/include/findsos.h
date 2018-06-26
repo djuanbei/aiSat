@@ -33,15 +33,16 @@ class SOSChecker {
 
   bool polyIsSOS(Subpoly_t &subpoly, PointList *ans, const int verbose = 0);
 
-  /** 
-   * 
-   * 
-   * @param sosList 
-   * @param X 
-   * @param blockSize 
-   * @param sosMid 
-   * 
-   * @return  true if success find a sos presentation for given polynomial, flase otherwise
+  /**
+   *
+   *
+   * @param sosList
+   * @param X
+   * @param blockSize
+   * @param sosMid
+   *
+   * @return  true if success find a sos presentation for given polynomial,
+   * flase otherwise
    */
   bool sosrepresent(PointList *sosList, double *X, const int blockSize,
                     const int sosMid);
@@ -52,7 +53,6 @@ class SOSChecker {
                          PointList *ans);
 
   void sosPresent(Subpoly_t &subpoly, const PointList *sosList);
-
 
   int exactConvHull(const Subpoly_t &subpoly, indice_t *candidateSet,
                     int &candidateLength, const indice_t *genSet,
@@ -66,26 +66,26 @@ class SOSChecker {
                                            const int gLength);
 
  public:
-  SOSChecker(Poly_t& poly) : p(poly) {}
-  void setPara(const Params &p){
-    para=p;
-  }
-  /** 
-   * 
-   * 
+  SOSChecker(Poly_t &poly) : p(poly) {}
+  void setPara(const Params &p) { para = p; }
+  /**
+   *
+   *
    * @param polyvec the sos representaion polynomials
-   * 
-   * @return true if find SOS presentation for a given polynomial, otherwise, false
+   *
+   * @return true if find SOS presentation for a given polynomial, otherwise,
+   * false
    */
-  bool checksos(bool print=true);
-  /** 
-   * 
-   * 
+  bool checksos(bool print = true);
+  /**
+   *
+   *
    * @param polyvec the sos representaion polynomials
-   * 
-   * @return true if find SOS presentation for a given polynomial, otherwise, false
+   *
+   * @return true if find SOS presentation for a given polynomial, otherwise,
+   * false
    */
-  bool findSOS(vector<Poly_t> & polyvec);
+  bool findSOS(vector<Poly_t> &polyvec);
 };
 }
 }

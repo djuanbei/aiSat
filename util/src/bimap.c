@@ -9,8 +9,8 @@
  *
  */
 
-#include<string.h>
 #include "bimap.h"
+#include <string.h>
 #include "search.h"
 
 #include "selfmemutil.h"

@@ -16,8 +16,8 @@
 #include <string>
 #include <vector>
 
-#include "util.h"
 #include "config.h"
+#include "util.h"
 
 #include "selfassert.h"
 
@@ -26,7 +26,7 @@
 /**
  * macro to string from the name x to string("x")
  *
- * 
+ *
  */
 
 #define VAR(x) string(QUdi(x))
@@ -88,7 +88,7 @@ class VarTable {
    * @return the id of vname, if there are no vname in the table then
    * vname will append in the table
    */
-  
+
   int addVar(const string &vname) {
     int varNum = variateSymbol.size();
 
@@ -100,12 +100,10 @@ class VarTable {
 
     variateSymbol.push_back(vname);
 
-    return variateSymbol.size()-1;
+    return variateSymbol.size() - 1;
   }
 
-  int addVar(const string * vname){
-    return addVar(*vname);
-  }
+  int addVar(const string *vname) { return addVar(*vname); }
 
   /**
    *
@@ -124,11 +122,8 @@ class VarTable {
     }
     return -1;
   }
-  
-  int findVarIndex(const string *name) const {
-    return findVarIndex(*name);
 
-  }
+  int findVarIndex(const string *name) const { return findVarIndex(*name); }
 
   void setVarName(const int index, const string &name) {
     ASSERT(index < variateSymbol.size(), "overflow");
@@ -173,10 +168,8 @@ class VarTable {
     return startLocation.size() - 2;
   }
 
-  
   int addVarElem(const vector<T> &evars, const int num) {
-
-    vector<T> vars(evars.begin(), evars.begin()+num);
+    vector<T> vars(evars.begin(), evars.begin() + num);
     sort(vars.begin(), vars.end());
 
     int n = vars.size();
@@ -196,7 +189,6 @@ class VarTable {
     }
     startLocation.push_back(variateCombine.size());
     return startLocation.size() - 2;
-
   }
 
   /**
@@ -308,7 +300,7 @@ class VarTable {
    * hold
    */
   void getConvertMap(const int oldId, const int newId, vector<int> &mapIndex) {
-    if (oldId != 0){
+    if (oldId != 0) {
       ASSERT(varElemContain(oldId, newId), "");
     }
 

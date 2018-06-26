@@ -2,16 +2,16 @@
 #include <iostream>
 #include <map>
 #include "convexhull.h"
-#include "psdutil.h"
-#include "sdpsolver.h"
 #include "findsos.h"
 #include "monomial.h"
+#include "psdutil.h"
+#include "sdpsolver.h"
 #include "search.h"
 #include "sort.h"
 
-namespace aiSat{
+namespace aiSat {
 
-namespace psd{
+namespace psd {
 
 using std::cout;
 using std::endl;
@@ -178,8 +178,9 @@ static int reduceConvexHulll(const int DIM, indice_t *Gsup, int &GLength,
 }
 
 int SOSP::addSOSsup(vector<SOSMonomial *> *indices_vec) {
-  int varNum =  getVarTable<indice_t>().getAllVarNum();  // getvarNum(1);//all num of vaiable
-  
+  int varNum = getVarTable<indice_t>()
+                   .getAllVarNum();  // getvarNum(1);//all num of vaiable
+
   int *varOccur = new int[varNum];
   int i, j;
 
@@ -194,7 +195,7 @@ int SOSP::addSOSsup(vector<SOSMonomial *> *indices_vec) {
       if ((*it)->indices[i] > 0) varOccur[i] = 1;
     }
   }
-  
+
   vector<indice_t> vars(varNum);
 
   int exactVarNum = 0;
@@ -257,7 +258,6 @@ int SOSP::addSOSsup(vector<SOSMonomial *> *indices_vec) {
   int AMlength = 0;
 
   createArrangeM(supportId, SOSM, &AMlength, sosLength);
-
 
   delete[] indices;
   delete[] tempG;
@@ -325,10 +325,9 @@ int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec) {
   int sosLength =
       reduceConvexHulll(varNum, Gsup, gLength, indices, length, &SOSM);
 
-  if (0 != gLength * varNum){
+  if (0 != gLength * varNum) {
     GSUP = (indice_t *)realloc_d(Gsup, gLength * varNum * sizeof(indice_t));
-  }
-  else{
+  } else {
     GSUP = Gsup;
   }
   qsortM(GSUP, varNum, 0, gLength - 1, compare);
@@ -358,14 +357,14 @@ void SOSP::title() {
 
 void SOSP::solve() {
   title();
-  
+
   vector<Poly_t *> resP;
-  int re = problem->sdp_solver( resP, "pro.txt", "result.txt");
+  int re = problem->sdp_solver(resP, "pro.txt", "result.txt");
   if (re == 0) {
     map<int, string>::iterator it = left_printMap.begin();
     while (it != left_printMap.end()) {
-      std::cout << it->second << " := "<<*(resP[it->first])<<endl;
-      
+      std::cout << it->second << " := " << *(resP[it->first]) << endl;
+
       it++;
     }
     int i;
@@ -376,9 +375,8 @@ void SOSP::solve() {
     printf("can not find a feasiable solution\n");
   }
 
-
   problem->clear();
-  
+
   left_printMap.clear();
 }
 
@@ -394,15 +392,17 @@ void SOSP::findSOS(Poly_t *poly) {
 
 void SOSP::interpolant(SOSProblem *sys, const int sep) {
   title();
-  sys->inter_sdp( sep, "pro.txt", "result.txt");
+  sys->inter_sdp(sep, "pro.txt", "result.txt");
   left_printMap.clear();
 }
 void SOSP::clear() {
   problem->clear();
-  for(map<string, Poly_t*>::iterator it=polyMap.begin(); it!=polyMap.end(); it++){
+  for (map<string, Poly_t *>::iterator it = polyMap.begin();
+       it != polyMap.end(); it++) {
     delete it->second;
   }
-  for(map<string, PolyConstraint*>::iterator it=polyConsMap.begin(); it!= polyConsMap.end(); it++){
+  for (map<string, PolyConstraint *>::iterator it = polyConsMap.begin();
+       it != polyConsMap.end(); it++) {
     delete it->second;
   }
 
@@ -445,7 +445,6 @@ bool SOSP::addMonoElem(const string &str, const int value) {
 
 bool SOSP::addPolyElem(const string &str, Poly_t *poly) {
   if (polyMap.find(str) == polyMap.end()) {
-
     polyMap[str] = poly;
     return true;
   } else {
@@ -469,6 +468,5 @@ bool SOSP::addPolyConsElem(const string &str, PolyConstraint *polyCons) {
     return false;
   }
 }
-
 }
 }

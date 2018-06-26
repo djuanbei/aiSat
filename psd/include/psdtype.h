@@ -54,22 +54,17 @@ struct MonomialConstraint {
 
 enum PolyConstraintType { EQ, GE, GT, NE };
 
-
-
 struct PolyConstraint {
   PolyConstraintType type;
   int supportId;
-  PolyConstraint(){
-  }
-  PolyConstraint(PolyConstraint *other){
-    type=other->type;
-    supportId=other->supportId;
+  PolyConstraint() {}
+  PolyConstraint(PolyConstraint *other) {
+    type = other->type;
+    supportId = other->supportId;
   }
 };
 
-
 enum SupportType { NORMAL, SUB_POLY, INDICE };
-
 
 struct Support {
   SupportType type;
@@ -84,13 +79,13 @@ struct Support {
   int constNum;
   int consCap;
   Support(const int evarId, const indice_t *indices, const int size) {
-    subp=NULL;
+    subp = NULL;
     type = INDICE;
     md5sumbyIndice(md5sum, evarId, indices, size);
     varId = evarId;
     consId = NULL;
   }
-  
+
   Support(Subpoly_t *subpoly) {
     type = SUB_POLY;
     subp = subpoly;
@@ -104,7 +99,7 @@ struct Support {
     consId = NULL;
     consCap = 0;
   }
-  ~ Support(){
+  ~Support() {
     if (consId != NULL) {
       free(consId);
     }

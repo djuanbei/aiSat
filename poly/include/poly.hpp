@@ -19,31 +19,28 @@
 #include <cmath>
 #include <iomanip>
 
-#include<iterator>
+#include <iterator>
 
 #include "vartable.hpp"
 
 namespace aiSat {
 
-std::string trim(const std::string& str);
+std::string trim(const std::string &str);
 
-
-template<typename Out>
+template <typename Out>
 void split(const std::string &s, char delim, Out result) {
   std::stringstream ss;
   ss.str(s);
   std::string item;
   while (std::getline(ss, item, delim)) {
-    item=trim(item);
-    if(!item.empty()){
-      *(result++) = item;      
+    item = trim(item);
+    if (!item.empty()) {
+      *(result++) = item;
     }
-
   }
 }
 
-
-std::vector<std::string> split(const std::string &s, char delim); 
+std::vector<std::string> split(const std::string &s, char delim);
 
 namespace psd {
 class ConvexGenerator;
@@ -53,10 +50,7 @@ class SOSChecker;
 
 namespace poly {
 
-
-
-
-template <typename C, typename T >
+template <typename C, typename T>
 class Subpoly;
 
 static size_t POLY_ID = 0;
@@ -65,11 +59,11 @@ using namespace std;
 
 template <typename C = double, typename T = int>
 class Poly {
-  
   friend class aiSat::psd::ConvexGenerator;
-  
+
   friend class aiSat::psd::SOSChecker;
-  friend class Subpoly<C,T>;
+  friend class Subpoly<C, T>;
+
  private:
   struct term {
     vector<T> key;
@@ -78,7 +72,7 @@ class Poly {
     term(const vector<T> &k, const C &c) : key(k), cf(c) {}
   };
   typedef Poly<C, T>::term term_t;
-  
+
  public:
   struct Term {
     vector<pair<T, T> > key;  // var, power
@@ -97,16 +91,12 @@ class Poly {
 
   typedef Poly<C, T> poly_t;
 
-
-
  private:
   size_t id;
   int varId;  /// the variables id of this polynomial
   int varNum;
   vector<T> indices;
   vector<C> coef;
-
-
 
   void add_term_with_sort(const vector<T> &key, const C cf) {
     int i, j;
@@ -174,9 +164,6 @@ class Poly {
     temp.mult_term(t);
     return temp;
   }
-
-
-  
 
   int compare(const int k1, const int k2) const {
     int i = 0;
@@ -312,19 +299,17 @@ class Poly {
     varNum = getVarTable<T>().getVarNum(varId);
     id = POLY_ID++;
   }
-  Poly(bool totalVars){
-    
-    varNum=getVarTable<T>().getAllVarNum();
-    
+  Poly(bool totalVars) {
+    varNum = getVarTable<T>().getAllVarNum();
+
     vector<T> vars;
-    for(int i=0; i< varNum; i++){
+    for (int i = 0; i < varNum; i++) {
       vars.push_back(i);
     }
-    
-    varId=getVarTable<T>().addVarElem(vars);
-    
+
+    varId = getVarTable<T>().addVarElem(vars);
+
     id = POLY_ID++;
-    
   }
 
   Poly(const int evarId, const C coefDomain, const int termLength,
@@ -357,22 +342,18 @@ class Poly {
 
   int getSize() const { return coef.size(); }
 
-  int getId() const{
-    return id;
-  }
+  int getId() const { return id; }
   int getVarId() const { return varId; }
   int getVarNum() const { return varNum; }
 
-
-
-    /**
-   * @brief get the corresponding degree of k-th term i variate degree
-   *
-   * @param k term index
-   * @param i  variate index
-   *
-   * @return
-   */
+  /**
+ * @brief get the corresponding degree of k-th term i variate degree
+ *
+ * @param k term index
+ * @param i  variate index
+ *
+ * @return
+ */
   int getDegreeAt(int k, int i) const { return indices[k * varNum + i]; }
 
   void getDegreeAt(int k, vector<T> &re) const {
@@ -383,7 +364,7 @@ class Poly {
   }
 
   C getCF(const int i) const { return coef[i]; }
-  
+
   C getCF(const Term &term) const {
     map<int, int> mapIndex;
     vector<T> vars;
@@ -394,40 +375,39 @@ class Poly {
     vector<indice_t> pow(varNum, 0);
 
     for (size_t i = 0; i < term.key.size(); i++) {
-      pow[mapIndex[term.key[i].first]]+= term.key[i].second;
+      pow[mapIndex[term.key[i].first]] += term.key[i].second;
     }
     int loc = findIndex(pow);
     ASSERT(loc > -1, "There are no that term");
     if (loc > -1) {
       return getCF(loc);
-    }else{
+    } else {
       return 0;
     }
   }
-  
-  C getCF(const string &term) const{
+
+  C getCF(const string &term) const {
     Term temp_term;
-    vector<string> elems=split(term, '*');
-    for(vector<string>::iterator it=elems.begin(); it!= elems.end(); it++){
-      string str=*it;
+    vector<string> elems = split(term, '*');
+    for (vector<string>::iterator it = elems.begin(); it != elems.end(); it++) {
+      string str = *it;
       std::size_t found = str.find("^");
       string var;
-      int pow=1;
-      if (found!=std::string::npos){
-        var=str.substr(0, found);
-        pow=atoi(str.substr (found+1).c_str());
-      }else{
-        var=str;
+      int pow = 1;
+      if (found != std::string::npos) {
+        var = str.substr(0, found);
+        pow = atoi(str.substr(found + 1).c_str());
+      } else {
+        var = str;
       }
-      int index=getVarTable<T>().findVarIndex(var);
-      if(index<0){
+      int index = getVarTable<T>().findVarIndex(var);
+      if (index < 0) {
         return 0;
       }
       temp_term.key.push_back(make_pair(index, pow));
     }
 
     return getCF(temp_term);
-    
   }
 
   /**
@@ -476,7 +456,7 @@ class Poly {
       int h = 0;
       for (int j = 0; j < varNum; j++) {
         if (haveAssign[j]) {
-          if ((values[j] == 0)&& (indices[i * varNum + j]>0) ) {
+          if ((values[j] == 0) && (indices[i * varNum + j] > 0)) {
             ncoef[i] = 0;
             break;
           }
@@ -536,45 +516,44 @@ class Poly {
     }
   }
 
-  /** 
+  /**
    * @brief delete the variable which never occur in polynomial
-   * 
+   *
    */
 
-  void simplify(){
+  void simplify() {
     update();
     vector<T> usedVars;
     vector<T> vars;
-    vector<bool> exists(varNum, false );
+    vector<bool> exists(varNum, false);
     getVarTable<T>().getVarElem(varId, vars);
-    int size=coef.size();
-    for(int i=0; i< varNum; i++){
-      int j=0;
-      for(; j< size; j++){
-        if(indices[i*varNum+j]>0){
+    int size = coef.size();
+    for (int i = 0; i < varNum; i++) {
+      int j = 0;
+      for (; j < size; j++) {
+        if (indices[i * varNum + j] > 0) {
           break;
         }
       }
-      if(j<size){
+      if (j < size) {
         usedVars.push_back(vars[i]);
-        exists[i]=true;
+        exists[i] = true;
       }
     }
-    
-    if(usedVars.size()<varNum){
-      varId= getVarTable<T>().addVarElem(usedVars );
-      varNum=usedVars.size();
-      int i,j;
-      i=j=0;
-      for(; i< size*varNum; i++){
-        if(exists[i%varNum]){
-          indices[j++]=indices[i];
+
+    if (usedVars.size() < varNum) {
+      varId = getVarTable<T>().addVarElem(usedVars);
+      varNum = usedVars.size();
+      int i, j;
+      i = j = 0;
+      for (; i < size * varNum; i++) {
+        if (exists[i % varNum]) {
+          indices[j++] = indices[i];
         }
       }
       indices.resize(j);
     }
   }
-  
 
   void getSubpoly(const vector<int> &locs, poly_t &re) const {
     re.id = POLY_ID++;
@@ -594,18 +573,15 @@ class Poly {
     re.update();
   }
 
-  
-  /** 
+  /**
    * @brief compare two polynomial after simplify them.
-   * 
-   * @param other 
-   * 
-   * @return 
+   *
+   * @param other
+   *
+   * @return
    */
   template <typename CC, typename TT>
-  bool  friend operator==(Poly<CC,TT> & lhs, Poly<CC,TT> & rhs );
-  
-
+  bool friend operator==(Poly<CC, TT> &lhs, Poly<CC, TT> &rhs);
 
   string toString() {
     update();
@@ -734,9 +710,9 @@ class Poly {
 
     return false;
   }
-  bool isAllCoefNegative()const{
-    for(size_t i=0; i< coef.size(); i++){
-      if(coef[i]>0){
+  bool isAllCoefNegative() const {
+    for (size_t i = 0; i < coef.size(); i++) {
+      if (coef[i] > 0) {
         return false;
       }
     }
@@ -775,7 +751,7 @@ class Poly {
 
   C getConstant() {
     update();
-    ASSERT(isConstant(),"polynomail must be constant " );
+    ASSERT(isConstant(), "polynomail must be constant ");
     return coef[0];
   }
 
@@ -1023,7 +999,6 @@ class Poly {
       add_term(tempt);  //  key, poly2.coef[i]);
     }
   }
-  
 
   Poly<C, T> operator+(const poly_t &poly2) const {
     Poly<C, T> temp = *this;
@@ -1031,9 +1006,7 @@ class Poly {
     return temp;
   }
 
-  void add_poly(const poly_t * poly2){
-    add_poly(*poly2);
-  }
+  void add_poly(const poly_t *poly2) { add_poly(*poly2); }
 
   void mult_poly(const poly_t &poly2) {
     int j;
@@ -1099,24 +1072,22 @@ class Poly {
     temp.mult_poly(poly2);
     return temp;
   }
-  
-  void mult_poly( const poly_t * poly2) {
-    mult_poly(*poly2);
-  }
+
+  void mult_poly(const poly_t *poly2) { mult_poly(*poly2); }
 
   void pow(const int p) {
-    poly_t dummy=*this;
-    for(int i=1; i< p; i++){
+    poly_t dummy = *this;
+    for (int i = 1; i < p; i++) {
       this->mult_poly(dummy);
     }
   }
-  
-  poly_t operator ^ (const int p) const{
+
+  poly_t operator^(const int p) const {
     poly_t temp = *this;
     temp.pow(p);
     return temp;
   }
-  
+
   template <typename CC, typename TT>
   friend ostream &operator<<(ostream &os, Poly<CC, TT> &p);
 };
@@ -1127,26 +1098,22 @@ ostream &operator<<(ostream &os, Poly<CC, TT> &p) {
   return os;
 }
 
-
 template <typename CC, typename TT>
-bool  operator==(Poly<CC,TT> & lhs, Poly<CC,TT> & rhs ){
-  
+bool operator==(Poly<CC, TT> &lhs, Poly<CC, TT> &rhs) {
   lhs.simplify();
   rhs.simplify();
-  if(lhs.varId!=rhs.varId){
+  if (lhs.varId != rhs.varId) {
     return false;
   }
 
-  if(lhs.coef!=rhs.coef){
+  if (lhs.coef != rhs.coef) {
     return false;
   }
-  if(lhs.indices!=rhs.indices){
+  if (lhs.indices != rhs.indices) {
     return false;
   }
 
   return true;
-  
-  
 }
 }
 }

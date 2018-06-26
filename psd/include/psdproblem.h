@@ -14,13 +14,12 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "sdpsolver.h"
 #include "psdtype.h"
+#include "sdpsolver.h"
 #include "util.h"
 
-namespace aiSat{
-namespace psd{
-
+namespace aiSat {
+namespace psd {
 
 using std::map;
 using std::vector;
@@ -50,7 +49,6 @@ struct SOSP {
   ~SOSP() {
     clear();
     delete problem;
-
   }
 
   int sos_num;
@@ -58,8 +56,8 @@ struct SOSP {
   SOSProblem *problem;
   map<string, vector<int> *> varMap;
   map<string, int> monoMap;
-  map<string, Poly_t*> polyMap;
-  map<string, PolyConstraint*> polyConsMap;
+  map<string, Poly_t *> polyMap;
+  map<string, PolyConstraint *> polyConsMap;
   map<int, string> left_printMap;
   map<int, string> right_printMap;
 
@@ -85,7 +83,6 @@ struct SOSP {
 
   bool addPolyConsElem(const string &str, PolyConstraint *polyCons);
 };
-
 }
 }
 

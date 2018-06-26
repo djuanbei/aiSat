@@ -39,11 +39,8 @@ static long int BOUND = INT_MAX;
 static int node_dim;
 static size_t node_b_size;
 
-
-
-indice_t* overConvexHull(const indice_t* genSet,
-                                          const int genLength, const int dim,
-                                          int* reLength) {
+indice_t* overConvexHull(const indice_t* genSet, const int genLength,
+                         const int dim, int* reLength) {
   ASSERT(genLength > 0, "at least have one point");
   int i, j, k;
   if (1 == genLength) {
@@ -250,7 +247,6 @@ indice_t* overConvexHull(const indice_t* genSet,
     *reLength = genLength;
 
   } else {
-
     tempLength = reduceByLestEignV(candidateSet, tempLength, dim, genSet,
                                    genLength, max);
 
@@ -260,16 +256,13 @@ indice_t* overConvexHull(const indice_t* genSet,
     }
 
     *reLength = tempLength;
-
   }
   return candidateSet;
 }
 
-
-int reduceByLestEignV(indice_t* candidateSet,
-                                       const int candLength, const int dim,
-                                       const indice_t* genSet,
-                                       const int genLength, const int max[]) {
+int reduceByLestEignV(indice_t* candidateSet, const int candLength,
+                      const int dim, const indice_t* genSet,
+                      const int genLength, const int max[]) {
   long int bound;
   int maxSum = 0;
   int minSum;
@@ -1129,9 +1122,8 @@ indice_t* ConvexGenerator::randPointSet(const int length, const int dim,
  *
  * @return
  */
-int reduceByPlane(indice_t* candidateSet, const int length,
-                                   const int dim, const int* coefs,
-                                   int maxSum) {
+int reduceByPlane(indice_t* candidateSet, const int length, const int dim,
+                  const int* coefs, int maxSum) {
   int i, j;
   int tempSum = 0;
   int len = length;
@@ -1152,9 +1144,5 @@ int reduceByPlane(indice_t* candidateSet, const int length,
   }
   return len;
 }
-
-
-
-
 }
 }

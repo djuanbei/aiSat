@@ -21,24 +21,21 @@ namespace psd {
 
 enum POLY_SOS_T { NOSOS, CONVEX_POLY, EXACTLY_SOS, UNHNOW };
 
-
 indice_t* overConvexHull(const indice_t* genSet, const int length,
-                           const int dim, int* relength);
+                         const int dim, int* relength);
 
 int reduceByLestEignV(indice_t* candidateSet, const int candLength,
-                        const int dim, const indice_t* genSet,
-                        const int genLength, const int max[]);
-
+                      const int dim, const indice_t* genSet,
+                      const int genLength, const int max[]);
 
 int reduceByPlane(indice_t* candidateSet, const int length, const int dim,
-                    const int* coefs, int maxSum);
+                  const int* coefs, int maxSum);
 
 class ConvexGenerator {
  private:
   const Subpoly_t& subpoly;
 
   POLY_SOS_T checkThreeP(const int dim, PointList* ans);
-
 
  public:
   ConvexGenerator(const Subpoly_t& subp) : subpoly(subp) {}
@@ -50,12 +47,8 @@ class ConvexGenerator {
 
   indice_t* randPointSet(const int length, const int dim, const int domain);
 
-
-
   int reduceConvexHull(indice_t* candidateSet, const int length, const int dim,
                        const indice_t* genSet, const int lengthG);
-
-
 };
 }
 }

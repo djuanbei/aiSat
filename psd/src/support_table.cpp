@@ -69,9 +69,6 @@ Support *createSupport(const int deg, const int varId, const int consNum,
   return re;
 }
 
-
-
-
 int Supporttable::findSupElem(const int deg, const int varId, const int consNum,
                               const int *consIds) {
   int i, j;
@@ -105,7 +102,7 @@ int Supporttable::findSupByPoly(const Subpoly_t &subpoly) {
   int i = 0;
   for (i = 0; i < values.size(); i += 1) {
     if (values[i]->type == SUB_POLY) {
-      if (0 == memcmp(values[i]->md5sum, subpoly.getmd5(), DIGEST_SIZE)){
+      if (0 == memcmp(values[i]->md5sum, subpoly.getmd5(), DIGEST_SIZE)) {
         return findBimapByValue(loc, i);
       }
     }
@@ -140,10 +137,10 @@ int Supporttable::addSOSup(const int deg, const int varId, const int consNum,
 
   SOSsup.push_back(NULL);
   sosLength.push_back(0);
-  
+
   Gsup.push_back(NULL);
   gLength.push_back(0);
-  
+
   arrangeM.push_back(NULL);
   return addBimapElem(loc, re);
 }
@@ -164,7 +161,7 @@ int Supporttable::addSOSsupByIndice(const int varId, indice_t *indices,
 
   SOSsup.push_back(NULL);
   sosLength.push_back(0);
-    
+
   Gsup.push_back(NULL);
   gLength.push_back(0);
   arrangeM.push_back(NULL);
@@ -230,10 +227,10 @@ int Supporttable::addconvexsosSup(Subpoly_t &poly) {
 
   SOSsup.push_back(NULL);
   sosLength.push_back(0);
-  
+
   Gsup.push_back(NULL);
   gLength.push_back(0);
-  
+
   arrangeM.push_back(NULL);
   re = value_size;
   value_size++;
@@ -286,9 +283,7 @@ void Supporttable::clearSupportTable(void) {
 
   values.clear();
 }
-Supporttable::Supporttable() {
-  loc = createBimap();
-}
+Supporttable::Supporttable() { loc = createBimap(); }
 Supporttable::~Supporttable() {
   int value_size = values.size();
 
