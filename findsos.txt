@@ -1,0 +1,7 @@
+A = [x y z] # variables
+f=x^6+y^6-2*x^2*y^2+x^4+y^4
+
+findsos(f) # find sos decomposition of polynomial f
+
+f1=x^6+y^6-2*x^2*y^2+x^4+y^4-10
+findsos(f1) # find sos decomposition of polynomial f
