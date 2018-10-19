@@ -1,0 +1,11 @@
+A = [x y z] # variables
+M= { 1 x y x^2 x*y y^2  } # monomial used in  unkown polynomial
+
+f1=x^2+2*x*y+y^2-10
+
+s=sos(M) # an unknown sos polynomial whose support is M (evey  momomial of s must occur in set M ),in orther words s =f_1^2+...+f_s^2 
+
+cg=poly(M)# an unknown polynomial whose suppport is M
+
+s+cg == f1 #solve a constraintd polynomails problem
+
