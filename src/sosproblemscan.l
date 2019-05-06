@@ -85,7 +85,6 @@ number (({digit}+)|({digit}*"."{digit}*)|({digit}+"e"(({digit}+)|("-"{digit}+)))
     yylval.iVec=problem.varMap[string(yytext)];
     return VAR_LIST;
   }
-  
 
   yylval.identifier= new string(yytext);
   return IDENT;

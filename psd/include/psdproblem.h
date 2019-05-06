@@ -41,14 +41,19 @@ struct SOSMonomial {
   void times(const int loc, const int t) { indices[loc] *= t; }
 };
 struct SOSP {
+  int time=0;
   SOSP() : sos_num(0) {
     getVarTable<indice_t>().clear();
 
     problem = new SOSProblem();
   }
   ~SOSP() {
+   
+    cout<<"time: "<<time<<endl;
+    time++;
     clear();
     delete problem;
+    problem =NULL;
   }
 
   int sos_num;

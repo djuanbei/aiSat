@@ -30,7 +30,7 @@ Poly_t *SOSProblem::getConstraintPoly(const int index, const int sosMId[],
   k = 0;
   for (i = 0; i < size; ++i) {
     if (index == i) {
-      if (polyConstraints[i]->type == EQ) {
+      if (polyConstraints[i].type == EQ) {
         Poly_t *posPoly = sosConvertPoly(X, k, blockSize[k],
                                          sosMId[sosMap[abs(blockMap[k]) - 1]]);
 
@@ -52,7 +52,7 @@ Poly_t *SOSProblem::getConstraintPoly(const int index, const int sosMId[],
       }
     }
 
-    if (polyConstraints[i]->type == EQ) {
+    if (polyConstraints[i].type == EQ) {
       k += 2;
     } else {
       k++;
@@ -78,7 +78,7 @@ void SOSProblem::wellform(const int sep, const int sosMId[], const int sosMap[],
 
   Poly_t check;
 
-  Poly_t interpolant = (*(rhs)) * (0.5);
+  Poly_t interpolant = (rhs) * (0.5);
 
   cout << std::endl;
   k = 0;
@@ -87,7 +87,7 @@ void SOSProblem::wellform(const int sep, const int sosMId[], const int sosMap[],
          << i + 1 << "............................... " << i + 1 << endl;
     cout << "....................................." << endl;
 
-    if (polyConstraints[i]->type == EQ) {
+    if (polyConstraints[i].type == EQ) {
       Poly_t *posPoly = sosConvertPoly(X, k, blockSize[k],
                                        sosMId[sosMap[abs(blockMap[k]) - 1]]);
 
@@ -102,7 +102,7 @@ void SOSProblem::wellform(const int sep, const int sosMId[], const int sosMap[],
       cout << i + 1 << " normal polynomial :" << endl;
       string str = posPoly->toString();
       cout << str;
-      Poly_t mult = (*(polys[i])) * (*posPoly);
+      Poly_t mult = (polys[i]) * (*posPoly);
 
       if (i + 1 >= sep) {
         interpolant.add_poly(mult);
@@ -114,7 +114,7 @@ void SOSProblem::wellform(const int sep, const int sosMId[], const int sosMap[],
       Poly_t *poly = sosConvertPoly(X, k, blockSize[k],
                                     sosMId[sosMap[abs(blockMap[k]) - 1]]);
 
-      Poly_t mult = (*polys[i]) * (*poly);
+      Poly_t mult = (polys[i]) * (*poly);
 
       if (i + 1 >= sep) {
         interpolant.add_poly(mult);
@@ -136,7 +136,7 @@ void SOSProblem::wellform(const int sep, const int sosMId[], const int sosMap[],
   }
   cout << endl << "check: 1+sum_i(fi*si)=0:::::::::::::::::;" << endl;
 
-  Poly_t dummy(*rhs);
+  Poly_t dummy(rhs);
 
   dummy.mult(-1);
   check.add_poly(dummy);
@@ -295,15 +295,15 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
         lengthM[sosmMap[i]] * ENLARGE_RAT /
         (i * i * i + 1); /* here can have more smart method to deal with */
 
-    getVarTable<indice_t>().getVarElem(polys[i]->getVarId(), polyVarMap[i]);
+    getVarTable<indice_t>().getVarElem(polys[i].getVarId(), polyVarMap[i]);
 
     getVarTable<indice_t>().getVarElem(
-        SUPPORT_TABLE.getSupElem((polyConstraints[i])->supportId)->varId,
+        SUPPORT_TABLE.getSupElem((polyConstraints[i]).supportId)->varId,
         sosVarMap[i]);
 
     multVarId[i] = getVarTable<indice_t>().mergeVar(
-        polys[i]->getVarId(),
-        SUPPORT_TABLE.getSupElem((polyConstraints[i])->supportId)->varId);
+        polys[i].getVarId(),
+        SUPPORT_TABLE.getSupElem((polyConstraints[i]).supportId)->varId);
 
     getVarTable<indice_t>().getVarElem(multVarId[i], varMap[i]);
 
@@ -318,7 +318,7 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
 
   for (p = 0; p < size; p += 1) { /* polynomial index */
 
-    psize = polys[p]->getSize(); /* psize polynomial term size */
+    psize = polys[p].getSize(); /* psize polynomial term size */
 
     int index[psize];
     int jump[psize];
@@ -335,9 +335,9 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
       for (k = 0; k < psize; k += 1) { /* polynomial term size */
 
         if (index[k] < lengthM[sosmMap[p]]) {
-          polyVarSize = getVarTable<indice_t>().getVarNum(polys[p]->getVarId());
+          polyVarSize = getVarTable<indice_t>().getVarNum(polys[p].getVarId());
           sosVarSize = getVarTable<indice_t>().getVarNum(
-              SUPPORT_TABLE.getSupElem((polyConstraints[p])->supportId)->varId);
+              SUPPORT_TABLE.getSupElem((polyConstraints[p]).supportId)->varId);
 
           pi = 0;
           si = 0;
@@ -350,7 +350,7 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
               if (pi < polyVarSize && si < sosVarSize &&
                   polyVarMap[p][pi] == varMap[p][i] &&
                   sosVarMap[p][si] == varMap[p][i]) {
-                temp1[i] = polys[p]->getDegreeAt(k, pi) +
+                temp1[i] = polys[p].getDegreeAt(k, pi) +
                            SOSM[sosmMap[p]][sosVarSize * index[k] + si];
 
                 si++;
@@ -358,7 +358,7 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
 
               } else if (pi < polyVarSize &&
                          polyVarMap[p][pi] == varMap[p][i]) {
-                temp1[i] = polys[p]->getDegreeAt(k, pi);
+                temp1[i] = polys[p].getDegreeAt(k, pi);
                 pi++;
               } else if (si < sosVarSize && sosVarMap[p][si] == varMap[p][i]) {
                 temp1[i] = SOSM[sosmMap[p]][sosVarSize * index[k] + si];
@@ -373,7 +373,7 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
               if (pi < polyVarSize && si < sosVarSize &&
                   polyVarMap[p][pi] == varMap[p][i] &&
                   sosVarMap[p][si] == varMap[p][i]) {
-                temp2[i] = polys[p]->getDegreeAt(k, pi) +
+                temp2[i] = polys[p].getDegreeAt(k, pi) +
                            SOSM[sosmMap[p]][sosVarSize * index[k] + si];
 
                 si++;
@@ -381,7 +381,7 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
 
               } else if (pi < polyVarSize &&
                          polyVarMap[p][pi] == varMap[p][i]) {
-                temp2[i] = polys[p]->getDegreeAt(k, pi);
+                temp2[i] = polys[p].getDegreeAt(k, pi);
                 pi++;
               } else {
                 temp2[i] = SOSM[sosmMap[p]][sosVarSize * index[k] + si];
@@ -543,7 +543,7 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
 
   *blockNum = 0;
   for (i = 0; i < size; i += 1) {
-    if (polyConstraints[i]->type == EQ) {
+    if (polyConstraints[i].type == EQ) {
       blockSize[*blockNum] = tempblockSize[sosmMap[i]];
       blockMap[*blockNum] = i + 1; /* more attention on +1 */
       blockSize[*blockNum + 1] = tempblockSize[sosmMap[i]];
@@ -573,16 +573,16 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
 
   *b = (double *)calloc_d(((*numofCons) + 1), sizeof(double));
 
-  if (NULL != rhs) {
-    rhs->update();
+  if ( rhs.getInit( )) {
+    rhs.update();
 
     vector<indice_t> rhsVars;
-    getVarTable<indice_t>().getVarElem(rhs->getVarId(), rhsVars);
+    getVarTable<indice_t>().getVarElem(rhs.getVarId(), rhsVars);
 
-    int size = rhs->getSize();
+    int size = rhs.getSize();
     for (i = 0; i < size; i++) {
       vector<indice_t> key;
-      rhs->getDegreeAt(i, key);
+      rhs.getDegreeAt(i, key);
       index = 0;
       k = 0;
       while (k < size) {
@@ -598,7 +598,7 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
         k++;
       }
       if (k < size) {
-        (*b)[index + 1] = rhs->getCF(i);  // b start from 1
+        (*b)[index + 1] = rhs.getCF(i);  // b start from 1
       }
     }
   }
@@ -629,7 +629,7 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
     if (p < 0) p = -p;
     p--; /* p  sys polynomial index */
 
-    int size = polys[p]->getSize();
+    int size = polys[p].getSize();
     for (h = 0; h < size; h += 1) {
       for (j = 0; j < lengthM[sosmMap[p]];
            j += 1) { /*lengthM is the length of  SOS's Monomial */
@@ -644,12 +644,12 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
           if (pi < pSize && si < sSize && polyVarMap[p][pi] == varMap[p][k] &&
               sosVarMap[p][si] == varMap[p][k]) {
             key[k] =
-                polys[p]->getDegreeAt(h, pi) + SOSM[sosmMap[p]][sSize * j + si];
+                polys[p].getDegreeAt(h, pi) + SOSM[sosmMap[p]][sSize * j + si];
 
             si++;
             pi++;
           } else if (pi < pSize && polyVarMap[p][pi] == varMap[p][k]) {
-            key[k] = polys[p]->getDegreeAt(h, pi);
+            key[k] = polys[p].getDegreeAt(h, pi);
 
             pi++;
           } else {
@@ -674,13 +674,13 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
         }
 
         if (blockMap[i] > 0) {
-          block[index][i]->addSparse(j, polys[p]->getCF(h));
+          block[index][i]->addSparse(j, polys[p].getCF(h));
         }
         /* >= index is the constraints
            location and i is the number of
            block, j is the index of SOSM. */
         else {
-          block[index][i]->addSparse(j, (-1) * (polys[p]->getCF(h)));
+          block[index][i]->addSparse(j, (-1) * (polys[p].getCF(h)));
         }
         /* <= index is the constraints location
            and j is the number of polynomial it
@@ -765,7 +765,7 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
  *Theorem)
  *  and semidefinite programming mostly we find
  *  a set of sos polynomials which satisfy
- *sys->rhs=sos_0+sos_1f_1+...+sos_{sep}f_{sep}+sos_{sep+1}f_{sep+1}...
+ *sys.rhs=sos_0+sos_1f_1+...+sos_{sep}f_{sep}+sos_{sep+1}f_{sep+1}...
  *  . We can easily find 1/2sos_0+sos_1f_1+...+sos_{sep}f_{sep} is a Craig
  *interpolation
  *
@@ -801,7 +801,7 @@ int SOSProblem::inter_sdp(const int sep, char const *fprobname,
    *      And there C is a zero block matrix.
    *      The matrix X with respect to the monomial will used in Putiner's
    *positivtellensatz Theorem
-   *      b is a vector with respect to sys->rhs.
+   *      b is a vector with respect to sys.rhs.
    *      Main work we will do is working out the number of blocks C need and
    *the
    *      block size. and the length of b.
@@ -896,7 +896,7 @@ int SOSProblem::inter_sdp(const int sep, char const *fprobname,
  *  and semidefinite programming mostly we find
  *  a set of sos polynomials which satisfy
  *  find sys->cons satisfy that
- *  \sum_{i=0}^{sys->size-1}sys->polys[i]*sys->cons[i]=rhs->rhs
+ *  \sum_{i=0}^{sys->size-1}sys->polys[i]*sys->cons[i]=rhs.rhs
  * @param sys
  * @param resP
  * @param fprobname
@@ -904,7 +904,7 @@ int SOSProblem::inter_sdp(const int sep, char const *fprobname,
  *
  * @return
  */
-int SOSProblem::sdp_solver(vector<Poly_t *> &resP, char const *fprobname,
+int SOSProblem::sdp_solver(vector<Poly_t > &resP, char const *fprobname,
                            char const *fsolname) {
   int ret = 0;
   int numofCons;
@@ -926,7 +926,7 @@ int SOSProblem::sdp_solver(vector<Poly_t *> &resP, char const *fprobname,
    *      X>=0 is a semidefinite matrix.
    *
    *      And there C is a zero block matrix.
-   *      b with respect to sys->rhs.
+   *      b with respect to sys.rhs.
    *      Main work we will do is working out the number of blocks C need and
    *the
    *      block size. and the length of b.
@@ -1028,7 +1028,7 @@ int SOSProblem::getSOSMsize(int sosmMap[], int sosMId[]) {
        *
        */
 
-      if (sosMId[j] == polyConstraints[i]->supportId) {
+      if (sosMId[j] == polyConstraints[i].supportId) {
         break;
       }
       j++;
@@ -1037,7 +1037,7 @@ int SOSProblem::getSOSMsize(int sosmMap[], int sosMId[]) {
     sosmMap[i] = j;
 
     if (re == j) {
-      sosMId[j] = polyConstraints[i]->supportId;
+      sosMId[j] = polyConstraints[i].supportId;
       re++;
     }
   }

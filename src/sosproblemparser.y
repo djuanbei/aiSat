@@ -482,10 +482,10 @@ constraint_left  SOSEQ  poly
 
   $$=$1;
   
-  if(NULL!=$$->getRhs()){
+  if($$->getRhs().getInit( )){
     
     if(NULL!= $3){
-      $$->getRhs()->add_poly($3);
+      $$->getRhs().add_poly($3);
       delete $3;
     }
   }else{
@@ -509,14 +509,14 @@ constraint_left  SOSEQ  '-' poly
 {
 
   $$=$1;
-  Poly_t *rhs=$$->getRhs();
+  Poly_t &rhs=$$->getRhs();
 
-  if(NULL!=rhs){
+  if(rhs.getInit( )){
     
     if(NULL!= $4){
       $4->mult(-1);
 
-      rhs->add_poly($4);
+      rhs.add_poly($4);
       delete $4;
     }
 
@@ -543,18 +543,18 @@ constraint_left  SOSGEQ constraint_right
   
   $$=$1;
 
-  Poly_t *lrhs=$$->getRhs();
+  Poly_t &lrhs=$$->getRhs();
 
-  Poly_t *rrhs=$3->getRhs();
+  Poly_t &rrhs=$3->getRhs();
   
-  if(NULL!=lrhs){
+  if(lrhs.getInit( )){
     
-    if(NULL!= rrhs){
-      lrhs->add_poly(rrhs);
+    if( rrhs.getInit( )){
+      lrhs.add_poly(rrhs);
     }
 
   }else{
-    if(NULL!=rrhs){
+    if(rrhs.getInit( )){
       $$->setRhs(rrhs);
     }
   }
@@ -597,19 +597,19 @@ INTERP '(' constraint_right ',' constraint_right ')'
     $3->addElem( $5->getPoly(i), $5->getPolyConstraint(i) );
   }
   for(i=0; i<$3->size(); i++){
-    $3->getPoly(i)->mult(-1);
+    $3->getPoly(i).mult(-1);
 
   }
   
-  if(NULL==$3->getRhs()){
-    $3->setRhs(new Poly_t());
+  if(!$3->getRhs().getInit( )){
+    $3->setRhs(Poly_t());
   }
-  if(NULL!=$5->getRhs()){
-    $3->getRhs()->add_poly($5->getRhs());
+  if($5->getRhs().getInit( )){
+    $3->getRhs().add_poly($5->getRhs());
     $5->deleteRhs();
   }
-  $3->getRhs()->add(1);
-  $3->getRhs()->mult(-1);
+  $3->getRhs().add(1);
+  $3->getRhs().mult(-1);
   
   problem.interpolant( $3, sep);
   
@@ -681,10 +681,10 @@ constraint_left '+' poly
   //  Poly_t *poly=copyPoly($3);
   $3->mult(-1);
 
-  if(NULL==$$->getRhs()){
+  if(!$$->getRhs().getInit( )){
     $$->setRhs($3);
   }else{
-    $$->getRhs()->add_poly($3);
+    $$->getRhs().add_poly($3);
 
   }
 }
@@ -693,10 +693,10 @@ constraint_left '-' poly
 {
   $$=$1;
 
-  if(NULL==$$->getRhs()){
+  if(!($$->getRhs().getInit( ))){
     $$->setRhs($3);
   }else{
-    $$->getRhs()->add_poly($3);
+    $$->getRhs().add_poly($3);
 
   }
 }
@@ -824,10 +824,10 @@ constraint_right '+' poly
 {
   $$=$1;
 
-  if(NULL==$$->getRhs()){
+  if(!$$->getRhs().getInit( )){
     $$->setRhs($3);
   }else{
-    $$->getRhs()->add_poly($3);
+    $$->getRhs().add_poly($3);
   }
 }
 |
@@ -836,10 +836,10 @@ constraint_right '-' poly
   $$=$1;
   $3->mult(-1);
 
-  if(NULL==$$->getRhs()){
+  if($$->getRhs().getInit( )){
     $$->setRhs($3);
   }else{
-    $$->getRhs()->add_poly($3);
+    $$->getRhs().add_poly($3);
 
   }
 }

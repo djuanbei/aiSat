@@ -64,12 +64,49 @@ void deleteAllIndices(indice_t **all, const int length);
   sum_{i=0}^{size-1} polys[i]*polyConstraints[i]=rhs
 */
 class SOSProblem {
+
+
+ public:
+  SOSProblem() {  }
+  ~SOSProblem() { clear(); }
+
+  void clear() {
+    polys.clear();
+    polyConstraints.clear();
+  }
+  void setRhs(const Poly_t &r) { rhs = r; }
+
+  Poly_t &getRhs(void) { return rhs; }
+
+  void deleteRhs(void) {
+    rhs=Poly_t( );
+  }
+  int size() const { return polys.size(); }
+
+  Poly_t &getPoly(const int id)  { return polys[id]; }
+
+  PolyConstraint &getPolyConstraint(const int id) {
+    return polyConstraints[id];
+  }
+
+  int addElem(const Poly_t &poly, const PolyConstraint &polycons) {
+    int re = polys.size();
+    polys.push_back(poly);
+    polyConstraints.push_back(polycons);
+    return re;
+  }
+
+  int inter_sdp(const int sep, const char *fproname, const char *fsolname);
+
+  int sdp_solver(vector<Poly_t > &resP, const char *fproname,
+                 const char *fsolname);
+
  private:
-  Poly_t *rhs;
+  Poly_t rhs;
 
-  vector<Poly_t *> polys;
+  vector<Poly_t > polys;
 
-  vector<PolyConstraint *> polyConstraints;
+  vector<PolyConstraint > polyConstraints;
 
   void wellform(const int sep, const int sosMId[], const int sosMap[],
                 const int blockSize[], const int blockMap[], Blockmatrix *X);
@@ -87,53 +124,7 @@ class SOSProblem {
 
   Poly_t *getConstraintPoly(const int index, const int sosMId[],
                             const int sosMap[], const int blockSize[],
-                            const int blockMap[], Blockmatrix *const X);
-
- public:
-  SOSProblem() { rhs = NULL; }
-  ~SOSProblem() { clear(); }
-
-  void clear() {
-    if (NULL != rhs) {
-      delete rhs;
-      rhs = NULL;
-    }
-    for (size_t i = 0; i < polys.size(); i++) {
-      delete polys[i];
-      delete polyConstraints[i];
-    }
-    polys.clear();
-    polyConstraints.clear();
-  }
-  void setRhs(Poly_t *r) { rhs = r; }
-
-  Poly_t *getRhs(void) { return rhs; }
-
-  void deleteRhs(void) {
-    if (NULL != rhs) {
-      delete rhs;
-      rhs = NULL;
-    }
-  }
-  int size() const { return polys.size(); }
-
-  Poly_t *getPoly(const int id) { return polys[id]; }
-
-  PolyConstraint *getPolyConstraint(const int id) {
-    return polyConstraints[id];
-  }
-
-  int addElem(Poly_t *poly, PolyConstraint *polycons) {
-    int re = polys.size();
-    polys.push_back(poly);
-    polyConstraints.push_back(polycons);
-    return re;
-  }
-
-  int inter_sdp(const int sep, const char *fproname, const char *fsolname);
-
-  int sdp_solver(vector<Poly_t *> &resP, const char *fproname,
-                 const char *fsolname);
+                            const int blockMap[], Blockmatrix *const X); 
 };
 }
 }

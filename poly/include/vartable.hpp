@@ -29,7 +29,7 @@
  *
  */
 
-#define VAR(x) string(QUdi(x))
+#define VAR_STR(x) string(QUdi(x))
 
 namespace aiSat {
 
@@ -114,7 +114,7 @@ class VarTable {
    */
 
   int findVarIndex(const string &name) const {
-    int varNum = variateSymbol.size();
+    int varNum = (int)variateSymbol.size();
     for (int i = 0; i < varNum; i++) {
       if (name == variateSymbol[i]) {
         return i;
@@ -149,7 +149,7 @@ class VarTable {
     vector<T> vars(evars);
     sort(vars.begin(), vars.end());
 
-    int n = vars.size();
+    int n = (int)vars.size();
     if (0 == n) {
       return 0;
     }
@@ -209,7 +209,7 @@ class VarTable {
     sort(vars.begin(), vars.end());
 
     int i, j, k, len;
-    int n = vars.size();
+    int n = (int)vars.size();
     i = 1;
     while (i + 1 < (int)startLocation.size()) {
       k = startLocation[i];

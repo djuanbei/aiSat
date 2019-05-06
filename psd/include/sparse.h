@@ -36,7 +36,7 @@ class ArrangeMatrix {
  public:
   ArrangeMatrix(const int rowLength);
 
-  int size() const { return data.size(); }
+  int size() const { return (int)data.size(); }
   int getRowLength() const { return rowLength; }
 
   coef_t getCF() const { return multCF; }

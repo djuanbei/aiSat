@@ -358,19 +358,16 @@ void SOSP::title() {
 void SOSP::solve() {
   title();
 
-  vector<Poly_t *> resP;
+  vector<Poly_t > resP;
   int re = problem->sdp_solver(resP, "pro.txt", "result.txt");
   if (re == 0) {
     map<int, string>::iterator it = left_printMap.begin();
     while (it != left_printMap.end()) {
-      std::cout << it->second << " := " << *(resP[it->first]) << endl;
-
+      std::cout << it->second << " := " << (resP[it->first]) << endl;
       it++;
     }
-    int i;
-    for (i = 0; i < problem->size(); i++) {
-      delete resP[i];
-    }
+
+
   } else {
     printf("can not find a feasiable solution\n");
   }

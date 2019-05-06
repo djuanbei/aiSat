@@ -91,216 +91,27 @@ class Poly {
 
   typedef Poly<C, T> poly_t;
 
- private:
-  size_t id;
-  int varId;  /// the variables id of this polynomial
-  int varNum;
-  vector<T> indices;
-  vector<C> coef;
 
-  void add_term_with_sort(const vector<T> &key, const C cf) {
-    int i, j;
-    int length = coef.size();
-    if (coef.empty()) {
-      return add_term(key, cf);
-    }
-    int location = findIndex(key);
-    if (location > -1) {
-      coef[location] += cf;
-    } else {
-      location = findLocationBettwen(key);
-      coef.push_back(0);
-      for (j = 0; j < varNum; j++) {
-        indices.push_back(0);
-      }
-      for (i = length; i > location; i--) {
-        for (j = 0; j < varNum; j++) {
-          indices[i * varNum + j] = indices[(i - 1) * varNum + j];
-        }
-        coef[i] = coef[i - 1];
-      }
-      for (j = 0; j < varNum; j++) {
-        indices[location * varNum + j] = key[j];
-      }
-      coef[location] = cf;
-    }
-  }
-
-  void add_term(const term_t &t) {
-    indices.insert(indices.end(), t.key.begin(), t.key.begin() + varNum);
-    coef.push_back(t.cf);
-  }
-
-  void add_term(const vector<T> &key, const C cf) {
-    indices.insert(indices.end(), key.begin(), key.begin() + varNum);
-    coef.push_back(cf);
-  }
-
-  void add_term(const T *key, const C cf) {
-    for (int i = 0; i < varNum; i++) {
-      indices.push_back(key[i]);
-    }
-    coef.push_back(cf);
-  }
-
-  Poly<C, T> operator+(const term_t &t) const {
-    Poly<C, T> temp = *this;
-    temp.add_term(t);
-    return temp;
-  }
-
-  void mult_term(const term_t &t) {
-    int j;
-    for (size_t i = 0; i < coef.size(); i++) {
-      for (j = 0; j < varNum; j++) {
-        indices[i * varNum + j] += t.key[j];
-      }
-      coef[i] *= t.cf;
-    }
-  }
-
-  Poly<C, T> operator*(const term_t &t) const {
-    Poly<C, T> temp = *this;
-    temp.mult_term(t);
-    return temp;
-  }
-
-  int compare(const int k1, const int k2) const {
-    int i = 0;
-    for (i = 0; i < varNum; i++) {
-      if (indices[k1 + i] > indices[k2 + i]) {
-        return 1;
-      } else if (indices[k1 + i] < indices[k2 + i]) {
-        return -1;
-      }
-    }
-    return 0;
-  }
-
-  int compare(const vector<T> &key, int loc) const {
-    for (int i = 0; i < varNum; i++) {
-      if (key[i] > indices[loc + i]) {
-        return 1;
-      } else if (key[i] < indices[loc + i]) {
-        return -1;
-      }
-    }
-    return 0;
-  }
-  /**
-   * @param key an element which been found in map
-   * @param map an ascending array
-   * @param length the length of map
-   * @param n the size of key
-   *
-   * @return  loc if loc in [ 0, length ) if map[ loc ]==key
-   * otherwise -1
-   */
-  int findIndex(const vector<T> &key) const {
-    if (coef.empty()) {
-      return -1;
-    }
-    int length = coef.size();
-
-    int low = 0;
-    int high = length - 1;
-    int mid, comp;
-    while (high >= low) {
-      mid = (high + low) / 2;
-      if ((comp = compare(key, mid * varNum)) < 0) {
-        high = mid - 1;
-      } else if (comp > 0) {
-        low = mid + 1;
-      } else {
-        return mid;
-      }
-    }
-    return -1;
-  }
-
-  /**
-   * bi-search method
-   *
-   * @param key the element need find
-   *
-   * @return i if   indices[i-1]<=key< indices[i] or  indices[i]=key
-   */
-  int findLocationBettwen(const vector<T> &key) const {
-    int length = coef.size();
-    int low = 0;
-    int high = length - 1;
-    int mid;
-
-    while (high > low) {
-      mid = (high + low) / 2;
-
-      if (compare(key, mid * varNum) > 0) {
-        low = mid + 1;
-      } else {
-        high = mid - 1;
-      }
-    }
-
-    if (compare(key, low * varNum) < 0) {
-      return low;
-    } else {
-      return low + 1;
-    }
-  }
-
-  void swapT(const int i, const int j) {
-    int k;
-    int iindex = i * varNum;
-    int jindex = j * varNum;
-    T temp;
-
-    for (k = 0; k < varNum; k += 1) {
-      temp = indices[iindex + k];
-      indices[iindex + k] = indices[jindex + k];
-      indices[jindex + k] = temp;
-    }
-    C ctemp = coef[i];
-    coef[i] = coef[j];
-    coef[j] = ctemp;
-  }
-  /**
-   * @brief  sort arrary vars by ascending order
-   *
-   * @param left
-   * @param right
-   */
-  void qsort(const int left, const int right) {
-    int i, last;
-    if (left >= right) {
-      return;
-    }
-    swapT(left, (left + right) / 2);
-
-    last = left;
-    for (i = left + 1; i <= right; i += 1) {
-      if (compare(i * varNum, left * varNum) < 0) {
-        swapT(++last, i);
-      }
-    }
-
-    swapT(left, last);
-    qsort(left, last - 1);
-    qsort(last + 1, right);
-  }
 
  public:
-  Poly() {
-    varId = 0;
-    varNum = 0;
-    id = POLY_ID++;
+  bool  getInit( )const{
+    return isInit;
   }
+ explicit Poly( double x= 0.0) {
+   isInit=true;
+   varId = 0;
+   varNum = 0;
+   id = POLY_ID++;
+ }
+  
   Poly(const int vid) {
+    isInit=true;
     varId = vid;
     varNum = getVarTable<T>().getVarNum(varId);
     id = POLY_ID++;
   }
   Poly(bool totalVars) {
-
+    isInit=true;
 
     varNum = getVarTable<T>().getAllVarNum();
 
@@ -317,6 +128,7 @@ class Poly {
 
   Poly(const int evarId, const C coefDomain, const int termLength,
        const int indiceDomain) {
+    isInit=true;
     id = POLY_ID++;
     varId = evarId;
     varNum = getVarTable<T>().getVarNum(varId);
@@ -335,6 +147,7 @@ class Poly {
   }
 
   Poly(const poly_t &other) {
+    isInit=true;
     id = POLY_ID++;
     varId = other.varId;
     varNum = other.varNum;
@@ -817,7 +630,7 @@ class Poly {
     if (varId == vid) {
       return;
     }
-    int length = coef.size();
+    int length = (int)coef.size();
     const int oldSize = varNum;
     const int newSize = getVarTable<T>().getVarNum(vid);
 
@@ -1093,6 +906,205 @@ class Poly {
 
   template <typename CC, typename TT>
   friend ostream &operator<<(ostream &os, Poly<CC, TT> &p);
+
+
+ private:
+  bool isInit;
+  size_t id;
+  int varId;  /// the variables id of this polynomial
+  int varNum;
+  vector<T> indices;
+  vector<C> coef;
+
+  void add_term_with_sort(const vector<T> &key, const C cf) {
+    int i, j;
+    int length = coef.size();
+    if (coef.empty()) {
+      return add_term(key, cf);
+    }
+    int location = findIndex(key);
+    if (location > -1) {
+      coef[location] += cf;
+    } else {
+      location = findLocationBettwen(key);
+      coef.push_back(0);
+      for (j = 0; j < varNum; j++) {
+        indices.push_back(0);
+      }
+      for (i = length; i > location; i--) {
+        for (j = 0; j < varNum; j++) {
+          indices[i * varNum + j] = indices[(i - 1) * varNum + j];
+        }
+        coef[i] = coef[i - 1];
+      }
+      for (j = 0; j < varNum; j++) {
+        indices[location * varNum + j] = key[j];
+      }
+      coef[location] = cf;
+    }
+  }
+
+  void add_term(const term_t &t) {
+    indices.insert(indices.end(), t.key.begin(), t.key.begin() + varNum);
+    coef.push_back(t.cf);
+  }
+
+  void add_term(const vector<T> &key, const C cf) {
+    indices.insert(indices.end(), key.begin(), key.begin() + varNum);
+    coef.push_back(cf);
+  }
+
+  void add_term(const T *key, const C cf) {
+    for (int i = 0; i < varNum; i++) {
+      indices.push_back(key[i]);
+    }
+    coef.push_back(cf);
+  }
+
+  Poly<C, T> operator+(const term_t &t) const {
+    Poly<C, T> temp = *this;
+    temp.add_term(t);
+    return temp;
+  }
+
+  void mult_term(const term_t &t) {
+    int j;
+    for (size_t i = 0; i < coef.size(); i++) {
+      for (j = 0; j < varNum; j++) {
+        indices[i * varNum + j] += t.key[j];
+      }
+      coef[i] *= t.cf;
+    }
+  }
+
+  Poly<C, T> operator*(const term_t &t) const {
+    Poly<C, T> temp = *this;
+    temp.mult_term(t);
+    return temp;
+  }
+
+  int compare(const int k1, const int k2) const {
+    int i = 0;
+    for (i = 0; i < varNum; i++) {
+      if (indices[k1 + i] > indices[k2 + i]) {
+        return 1;
+      } else if (indices[k1 + i] < indices[k2 + i]) {
+        return -1;
+      }
+    }
+    return 0;
+  }
+
+  int compare(const vector<T> &key, int loc) const {
+    for (int i = 0; i < varNum; i++) {
+      if (key[i] > indices[loc + i]) {
+        return 1;
+      } else if (key[i] < indices[loc + i]) {
+        return -1;
+      }
+    }
+    return 0;
+  }
+  /**
+   * @param key an element which been found in map
+   * @param map an ascending array
+   * @param length the length of map
+   * @param n the size of key
+   *
+   * @return  loc if loc in [ 0, length ) if map[ loc ]==key
+   * otherwise -1
+   */
+  int findIndex(const vector<T> &key) const {
+    if (coef.empty()) {
+      return -1;
+    }
+    int length = coef.size();
+
+    int low = 0;
+    int high = length - 1;
+    int mid, comp;
+    while (high >= low) {
+      mid = (high + low) / 2;
+      if ((comp = compare(key, mid * varNum)) < 0) {
+        high = mid - 1;
+      } else if (comp > 0) {
+        low = mid + 1;
+      } else {
+        return mid;
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * bi-search method
+   *
+   * @param key the element need find
+   *
+   * @return i if   indices[i-1]<=key< indices[i] or  indices[i]=key
+   */
+  int findLocationBettwen(const vector<T> &key) const {
+    int length = coef.size();
+    int low = 0;
+    int high = length - 1;
+    int mid;
+
+    while (high > low) {
+      mid = (high + low) / 2;
+
+      if (compare(key, mid * varNum) > 0) {
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+
+    if (compare(key, low * varNum) < 0) {
+      return low;
+    } else {
+      return low + 1;
+    }
+  }
+
+  void swapT(const int i, const int j) {
+    int k;
+    int iindex = i * varNum;
+    int jindex = j * varNum;
+    T temp;
+
+    for (k = 0; k < varNum; k += 1) {
+      temp = indices[iindex + k];
+      indices[iindex + k] = indices[jindex + k];
+      indices[jindex + k] = temp;
+    }
+    C ctemp = coef[i];
+    coef[i] = coef[j];
+    coef[j] = ctemp;
+  }
+  /**
+   * @brief  sort arrary vars by ascending order
+   *
+   * @param left
+   * @param right
+   */
+  void qsort(const int left, const int right) {
+    int i, last;
+    if (left >= right) {
+      return;
+    }
+    swapT(left, (left + right) / 2);
+
+    last = left;
+    for (i = left + 1; i <= right; i += 1) {
+      if (compare(i * varNum, left * varNum) < 0) {
+        swapT(++last, i);
+      }
+    }
+
+    swapT(left, last);
+    qsort(left, last - 1);
+    qsort(last + 1, right);
+  }
 };
 
 template <typename CC, typename TT>
