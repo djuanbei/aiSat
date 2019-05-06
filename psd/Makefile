@@ -38,7 +38,7 @@ else
 	LFLAGS    =   -pedantic -W -Wall 
 endif
 
-
+CFLAGS+= -fdiagnostics-absolute-paths #the error path is absolute path
 #CC        =gcc
 #CXX       = g++
 #CFLAGS    = -Wall -Wno-parentheses -pedantic

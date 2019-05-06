@@ -39,6 +39,7 @@ else
 
 	LFLAGS    =   -pedantic -W -Wall 
 endif
+CFLAGS+= -fdiagnostics-absolute-paths #the error path is absolute path
 
 #CC         ?= gcc
 #CXX       ?= g++
@@ -113,17 +114,17 @@ lib$(LIB)_release.a:	$(filter-out */$(MAINFILE).or, $(RCOBJS))
 otherlib:  libutil libsdp  libpoly  libpsd
 
 libutil:
-	cd util; make libr
+	cd util; make libd
 
 
 libpoly:
-	cd poly; make libr
+	cd poly; make libd
 
 libsdp:
-	cd sdp; make libr
+	cd sdp; make libd
 
 libpsd:
-	cd psd; make libr
+	cd psd; make libd
 
 test:
 	cd test; ./runtest.sh

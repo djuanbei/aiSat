@@ -300,6 +300,8 @@ class Poly {
     id = POLY_ID++;
   }
   Poly(bool totalVars) {
+
+
     varNum = getVarTable<T>().getAllVarNum();
 
     vector<T> vars;
@@ -310,6 +312,7 @@ class Poly {
     varId = getVarTable<T>().addVarElem(vars);
 
     id = POLY_ID++;
+
   }
 
   Poly(const int evarId, const C coefDomain, const int termLength,
@@ -615,7 +618,7 @@ class Poly {
       varname[i] = getVarTable<T>().getVarName(vars[i]);
     }
 
-    size_t size = locs.size();
+    int size = (int)locs.size();
 
     for (i = 0; i < size; i += 1) {
       int loc = locs[i];

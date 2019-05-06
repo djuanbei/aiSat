@@ -38,7 +38,7 @@ else
 	CFLAGS    ?= -Wall -Wno-parentheses -pedantic  -ansi -Wall -DNOSHORTS -DUSEGETTIME 
 	LFLAGS    =   -pedantic -W -Wall 
 endif
-
+CFLAGS+= -fdiagnostics-absolute-paths #the error path is absolute path
 
 LFLAGS    ?= -Wall  
 

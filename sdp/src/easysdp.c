@@ -16,6 +16,8 @@ int csdp_verbose = 1;
 
 int checkc(int n, struct blockmatrix C, int printlevel);
 
+int checkconstraints(int n, int kk, struct blockmatrix C, struct constraintmatrix*  constraints, int printlevel);
+    
 int easy_sdp(n, k, C, a, constraints, constant_offset, pX, py, pZ, ppobj,
              pdobj) int n;
 int k;
@@ -566,10 +568,7 @@ int checkc(int n, struct blockmatrix C, int printlevel) {
  * Sanity tests on the constraints data structure.
  */
 
-int checkconstraints(n, k, C, constraints, printlevel) int n;
-int k;
-struct blockmatrix C;
-struct constraintmatrix *constraints;
+int checkconstraints(int n, int k, struct blockmatrix C, struct constraintmatrix * constraints, int printlevel) 
 {
   int i, j;
   struct sparseblock *p;

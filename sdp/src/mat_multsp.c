@@ -43,17 +43,17 @@
 #define SPARSELIMC 0.01
 #endif
 
-void mat_multspb(scale1, scale2, A, B, C, fill) double scale1, scale2;
-struct blockmatrix A, B, C;
-struct constraintmatrix fill;
+void mat_multspb(double scale1, double scale2, struct blockmatrix A, struct blockmatrix B, struct blockmatrix  C, struct constraintmatrix fill) 
 {
   int blk, i, ii, j;
   int blksize, p, q;
   struct sparseblock *ptr;
   double temp;
+#ifdef USEOPENMP
   int total_threads;
   int thread_num;
-
+#endif
+  
   if (scale2 == 0.0) {
     zero_mat(C);
 
@@ -262,8 +262,10 @@ struct constraintmatrix fill;
   int blksize, p, q;
   struct sparseblock *ptr;
   double temp;
+#ifdef USEOPENMP
   int total_threads;
   int thread_num;
+#endif
 
   if (scale2 == 0.0) {
     zero_mat(C);

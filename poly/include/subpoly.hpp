@@ -37,7 +37,7 @@ class Subpoly {
     uint8_t id = parent.getId();
     md5_update(ctx, &id, 1);
 
-    for (int i = 0; i < locs.size(); i++) {
+    for (size_t i = 0; i < locs.size(); i++) {
       uint8_t loc = locs[i];
       md5_update(ctx, &loc, 1);
     }

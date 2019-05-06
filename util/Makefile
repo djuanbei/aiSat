@@ -39,6 +39,7 @@ else
 	LFLAGS    =   -pedantic -W -Wall 
 endif
 
+CFLAGS+= -fdiagnostics-absolute-paths #the error path is absolute path
 
 LFLAGS    ?= -Wall  
 

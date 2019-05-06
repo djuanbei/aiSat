@@ -153,7 +153,7 @@ class VarTable {
     if (0 == n) {
       return 0;
     }
-    ASSERT(n <= variateSymbol.size(), "");
+    ASSERT(n <= (int)variateSymbol.size(), "");
 
     int re = findVarElem(vars);
     if (re > -1) {
@@ -211,7 +211,7 @@ class VarTable {
     int i, j, k, len;
     int n = vars.size();
     i = 1;
-    while (i + 1 < startLocation.size()) {
+    while (i + 1 < (int)startLocation.size()) {
       k = startLocation[i];
 
       len = startLocation[i + 1] - startLocation[i];
@@ -238,7 +238,7 @@ class VarTable {
 
   void getVarElem(const int id, vector<T> &re) {
     re.clear();
-    if (id + 1 >= startLocation.size()) {
+    if (id + 1 >= (int)startLocation.size()) {
       return;
     }
     int num = startLocation[id + 1] - startLocation[id];
@@ -249,7 +249,7 @@ class VarTable {
   }
 
   int getVarNum(const int id) {
-    if (id + 1 >= startLocation.size()) {
+    if (id + 1 >= (int)startLocation.size()) {
       return -1;
     }
     return startLocation[id + 1] - startLocation[id];
