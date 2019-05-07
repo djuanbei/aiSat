@@ -14,6 +14,7 @@
 #include <cstdint>
 #include "poly.hpp"
 #include "subpoly.hpp"
+#include "polynomialconstraint.h"
 #include "util.h"
 namespace aiSat {
 namespace psd {
@@ -52,17 +53,6 @@ struct MonomialConstraint {
   MonomialConstraint() { linCoefs = NULL; }
 };
 
-enum PolyConstraintType { EQ, GE, GT, NE };
-
-struct PolyConstraint {
-  PolyConstraintType type;
-  int supportId;
-  PolyConstraint() {}
-  PolyConstraint(PolyConstraint *other) {
-    type = other->type;
-    supportId = other->supportId;
-  }
-};
 
 enum SupportType { NORMAL, SUB_POLY, INDICE };
 

@@ -60,18 +60,10 @@ using namespace std;
 template <typename C = double, typename T = int>
 class Poly {
   friend class aiSat::psd::ConvexGenerator;
-
   friend class aiSat::psd::SOSChecker;
   friend class Subpoly<C, T>;
 
- private:
-  struct term {
-    vector<T> key;
-    C cf;
-    term() {}
-    term(const vector<T> &k, const C &c) : key(k), cf(c) {}
-  };
-  typedef Poly<C, T>::term term_t;
+
 
  public:
   struct Term {
@@ -97,7 +89,10 @@ class Poly {
   bool  getInit( )const{
     return isInit;
   }
- explicit Poly( double x= 0.0) {
+  void setInit( bool b){
+    isInit=b;
+  }
+  Poly() {
    isInit=true;
    varId = 0;
    varNum = 0;
@@ -110,19 +105,23 @@ class Poly {
     varNum = getVarTable<T>().getVarNum(varId);
     id = POLY_ID++;
   }
+  
   Poly(bool totalVars) {
-    isInit=true;
-
-    varNum = getVarTable<T>().getAllVarNum();
-
-    vector<T> vars;
-    for (int i = 0; i < varNum; i++) {
-      vars.push_back(i);
+    if(totalVars ){
+      isInit=true;
+      varNum = getVarTable<T>().getAllVarNum();
+      vector<T> vars;
+      for (int i = 0; i < varNum; i++) {
+        vars.push_back(i);
+      }
+      varId = getVarTable<T>().addVarVec(vars);
+      id = POLY_ID++;
+    }else{
+      isInit=true;
+      varId = 0;
+      varNum = 0;
+      id = POLY_ID++;
     }
-
-    varId = getVarTable<T>().addVarElem(vars);
-
-    id = POLY_ID++;
 
   }
 
@@ -156,7 +155,7 @@ class Poly {
     update();
   }
 
-  int getSize() const { return coef.size(); }
+  int getSize() const { return (int)coef.size(); }
 
   int getId() const { return id; }
   int getVarId() const { return varId; }
@@ -184,7 +183,7 @@ class Poly {
   C getCF(const Term &term) const {
     map<int, int> mapIndex;
     vector<T> vars;
-    getVarTable<T>().getVarElem(varId, vars);
+    getVarTable<T>().getVarVec(varId, vars);
     for (int i = 0; i < varNum; i++) {
       mapIndex[vars[i]] = i;
     }
@@ -242,7 +241,7 @@ class Poly {
     vector<C> ncoef(coef);
     map<int, int> mapIndex;
     vector<T> vars;
-    getVarTable<T>().getVarElem(varId, vars);
+    getVarTable<T>().getVarVec(varId, vars);
     vector<C> values(varNum);
     vector<bool> haveAssign(varNum, false);
     for (int i = 0; i < varNum; i++) {
@@ -264,7 +263,7 @@ class Poly {
     }
 
     int nvarNum = nvars.size();
-    int nvid = getVarTable<T>().addVarElem(nvars);
+    int nvid = getVarTable<T>().addVarVec(nvars);
     Poly<C, T> re(nvid);
     vector<indice_t> nindices(coef.size() * nvarNum);
 
@@ -303,7 +302,7 @@ class Poly {
     if (coef.empty()) {
       return;
     }
-    qsort(0, coef.size() - 1);
+    qsort(0, ((int)coef.size()) - 1);
 
     j = 0;
     size_t size = coef.size();
@@ -342,7 +341,7 @@ class Poly {
     vector<T> usedVars;
     vector<T> vars;
     vector<bool> exists(varNum, false);
-    getVarTable<T>().getVarElem(varId, vars);
+    getVarTable<T>().getVarVec(varId, vars);
     int size = coef.size();
     for (int i = 0; i < varNum; i++) {
       int j = 0;
@@ -358,7 +357,7 @@ class Poly {
     }
 
     if (usedVars.size() < varNum) {
-      varId = getVarTable<T>().addVarElem(usedVars);
+      varId = getVarTable<T>().addVarVec(usedVars);
       varNum = usedVars.size();
       int i, j;
       i = j = 0;
@@ -404,9 +403,14 @@ class Poly {
     return toString(MIN_COEF, 4);
   }
 
+    string toString() const{
+       
+        return toString(MIN_COEF, 4);
+    }
+
   string toString(const float minValue, const int prec) const {
     vector<int> locs;
-    for (size_t i = 0; i < coef.size(); i++) {
+    for (int i = 0; i < (int)coef.size(); i++) {
       locs.push_back(i);
     }
     return toString(locs, minValue, prec);
@@ -419,7 +423,7 @@ class Poly {
     stringstream str;
 
     vector<T> vars;
-    getVarTable<T>().getVarElem(varId, vars);
+    getVarTable<T>().getVarVec(varId, vars);
 
     vector<string> varname(varNum);
 
@@ -514,8 +518,8 @@ class Poly {
     }
   }
 
-  bool isZero() {
-    update();
+  bool isZero() const {
+    //update();
     if (0 == coef.size()) {
       return true;
     }
@@ -552,8 +556,8 @@ class Poly {
     return false;
   }
 
-  bool isConstant() {
-    update();
+  bool isConstant()const {
+    //    update();
     if (1 != coef.size()) {
       return false;
     }
@@ -577,7 +581,7 @@ class Poly {
    *
    * @return
    */
-  bool isPositive() {
+  bool isPositive() const {
     if (isZero()) {
       return true;
     }
@@ -670,7 +674,7 @@ class Poly {
     } else if (newSize < oldSize) {
       vector<T> temp(newSize);
 
-      for (i = 0; i < coef.size(); i += 1) {
+      for (i = 0; i < (int)coef.size(); i += 1) {
         for (j = 0; j < newSize; j += 1) {
           temp[j] = 0;
         }
@@ -727,7 +731,7 @@ class Poly {
   void add_term(const Term &term) {
     map<int, int> mapIndex;
     vector<T> vars;
-    getVarTable<T>().getVarElem(varId, vars);
+    getVarTable<T>().getVarVec(varId, vars);
     for (int i = 0; i < varNum; i++) {
       mapIndex[vars[i]] = i;
     }
@@ -766,7 +770,7 @@ class Poly {
 
     map<int, int> mapIndex;
     vector<T> vars;
-    getVarTable<T>().getVarElem(varId, vars);
+    getVarTable<T>().getVarVec(varId, vars);
     for (int i = 0; i < varNum; i++) {
       mapIndex[vars[i]] = i;
     }
@@ -818,7 +822,7 @@ class Poly {
 
   Poly<C, T> operator+(const poly_t &poly2) const {
     Poly<C, T> temp = *this;
-    temp, add_poly(poly2);
+    temp.add_poly(poly2);
     return temp;
   }
 
@@ -905,10 +909,20 @@ class Poly {
   }
 
   template <typename CC, typename TT>
-  friend ostream &operator<<(ostream &os, Poly<CC, TT> &p);
+  friend ostream &operator<<(ostream &os, const Poly<CC, TT> &p);
 
 
  private:
+    private:
+    struct term {
+        vector<T> key;
+        C cf;
+        term() {}
+        term(const vector<T> &k, const C &c) : key(k), cf(c) {}
+    };
+    typedef Poly<C, T>::term term_t;
+    
+    
   bool isInit;
   size_t id;
   int varId;  /// the variables id of this polynomial
@@ -1108,7 +1122,7 @@ class Poly {
 };
 
 template <typename CC, typename TT>
-ostream &operator<<(ostream &os, Poly<CC, TT> &p) {
+ostream &operator<<(ostream &os, const Poly<CC, TT> &p) {
   os << p.toString();
   return os;
 }

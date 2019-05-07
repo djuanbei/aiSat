@@ -44,7 +44,7 @@ PointVector *vector_newByL(void (*del)(void *), unsigned length) {
 }
 
 void reScale_V(PointVector *p) {
-  int origCap = p->capacity;
+  size_t origCap =  p->capacity;
 
   p->capacity *= ENLARGE_RAT;
   p->capacity += 2;

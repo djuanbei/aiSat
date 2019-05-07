@@ -376,8 +376,6 @@ INTEGER
 NUM{
   $$=new Poly_t(true);
   $$->add($1);
-
-
 }
 |
 VAR
@@ -543,19 +541,19 @@ constraint_left  SOSGEQ constraint_right
   
   $$=$1;
 
-  Poly_t &lrhs=$$->getRhs();
+  Poly_t &leftRhs=$$->getRhs();
 
-  Poly_t &rrhs=$3->getRhs();
+  Poly_t &rightRhs=$3->getRhs();
   
-  if(lrhs.getInit( )){
+  if(leftRhs.getInit( )){
     
-    if( rrhs.getInit( )){
-      lrhs.add_poly(rrhs);
+    if( rightRhs.getInit( )){
+      leftRhs.add_poly(rightRhs);
     }
 
   }else{
-    if(rrhs.getInit( )){
-      $$->setRhs(rrhs);
+    if(rightRhs.getInit( )){
+      $$->setRhs(rightRhs);
     }
   }
   
@@ -627,10 +625,7 @@ constraint_left '+' poly '*' UNHNOW
 {
   $$=$1;
 
-  PolyConstraint *pcons=new PolyConstraint($5);
-
-
-  int index=$$-> addElem($3, pcons );
+  int index=$$-> addElem(*$3, *$5 );
   problem.left_printMap[index]=unkown_name;
 }
 
@@ -639,9 +634,8 @@ constraint_left '+' poly '*' UNHNOW
 constraint_left '+' UNHNOW '*' poly
 {
   $$=$1;
-  PolyConstraint *pcons=new PolyConstraint($3);
 
-  int index=$$->addElem($5, pcons );
+  int index=$$->addElem(*$5, *$3 );
   problem.left_printMap[index]=unkown_name;
 }
 
@@ -651,26 +645,20 @@ constraint_left '-' poly '*' UNHNOW
 {
   $$=$1;
 
-  PolyConstraint *pcons=new PolyConstraint($5);
-
   $3->mult(-1);
 
-  int index=$$->addElem($3, pcons );
+  int index=$$->addElem(*$3, *$5 );
   problem.left_printMap[index]=unkown_name;
 }
 
-
 |
-
 
 constraint_left '-' UNHNOW '*' poly
 {
   $$=$1;
   $5->mult(-1);
 
-  PolyConstraint *pcons=new PolyConstraint($3);
-
-  int index=$$->addElem( $5, pcons );
+  int index=$$->addElem( *$5, *$3 );
   problem.left_printMap[index]=unkown_name;
 }
 |
@@ -685,7 +673,6 @@ constraint_left '+' poly
     $$->setRhs($3);
   }else{
     $$->getRhs().add_poly($3);
-
   }
 }
 |
@@ -705,24 +692,19 @@ constraint_left '-' poly
 constraint_left '+' UNHNOW
 {
   $$=$1;
-  Poly_t * poly=new Poly_t();
-  poly->add(1);
-
-  PolyConstraint *pcons=new PolyConstraint( $3);
-
-  int index=$$->addElem(poly, pcons );
+  Poly_t  poly;
+  poly.add(1);
+  int index=$$->addElem(poly, *$3 );
   problem.left_printMap[index]=unkown_name;
 }
 |
 constraint_left '-' UNHNOW
 {
   $$=$1;
-  Poly_t * poly= new Poly_t();
-  poly->add(-1);
+  Poly_t  poly;
+  poly.add(-1);
 
-  PolyConstraint *pcons=new PolyConstraint( $3);
-
-  int index=$$->addElem(poly, pcons );
+  int index=$$->addElem(poly, $3 );
   problem.left_printMap[index]=unkown_name;
   
 }
@@ -735,9 +717,9 @@ constraint_left '-' UNHNOW
 poly '*' UNHNOW
 {
   $$=problem.problem;
-  PolyConstraint *pcons=new  PolyConstraint( $3);
 
-  int index=$$->addElem($1, pcons);
+  cout<<"const: "<<*$1<<endl;
+  int index=$$->addElem(*$1, *$3);
   problem.left_printMap[index]=unkown_name;
   
 }
@@ -745,9 +727,8 @@ poly '*' UNHNOW
 UNHNOW '*' poly
 {
   $$=problem.problem;
-  PolyConstraint *pcons=new PolyConstraint($1);
 
-  int index=$$->addElem($3, pcons );
+  int index=$$->addElem(*$3, *$1 );
   problem.left_printMap[index]=unkown_name;
   
 }
@@ -757,13 +738,11 @@ UNHNOW '*' poly
 UNHNOW
 {
   $$ =problem.problem;
-  Poly_t *poly=new Poly_t();
-  poly->add(1);
+  Poly_t poly;
+  poly.add(1);
 
-  
-  PolyConstraint *pcons=new PolyConstraint($1);
 
-  int index=$$->addElem(poly, pcons );
+  int index=$$->addElem(poly, *$1 );
   problem.left_printMap[index]=unkown_name;
 }
 ;
@@ -776,9 +755,7 @@ constraint_right '+' poly  '*' UNHNOW
   $$=$1;
   $3->mult(-1);
 
-  PolyConstraint *pcons=new PolyConstraint($5);
-
-  int index=$$->addElem($3, pcons );
+  int index=$$->addElem(*$3, *$5 );
   problem.right_printMap[index]=unkown_name;
 }
 |
@@ -787,10 +764,8 @@ constraint_right '+' UNHNOW '*' poly
 {
   $5->mult(-1);
 
-  PolyConstraint *pcons=new PolyConstraint($3);
-
   $$=$1;
-  int index=$$->addElem($5, pcons );
+  int index=$$->addElem(*$5, *$3 );
   problem.right_printMap[index]=unkown_name;
 }
 
@@ -799,9 +774,7 @@ constraint_right '-' poly '*' UNHNOW
 {
   $$=$1;
 
-  PolyConstraint *pcons=new PolyConstraint($5);
-
-  int index=$$->addElem($3, pcons );
+  int index=$$->addElem(*$3, *$5 );
   problem.right_printMap[index]=unkown_name;
 }
 
@@ -811,9 +784,7 @@ constraint_right '-' UNHNOW '*' poly
 {
   $$=$1;
 
-  PolyConstraint *pcons= new PolyConstraint($3);
-
-  int index=$$->addElem( $5, pcons );
+  int index=$$->addElem( *$5, *$3 );
   problem.right_printMap[index]=unkown_name;
 
 }
@@ -847,23 +818,20 @@ constraint_right '-' poly
 constraint_right '+' UNHNOW
 {
   $$=$1;
-  Poly_t * poly= new Poly_t();
-  poly->add(-1);
+  Poly_t  poly;;
+  poly.add(-1);
 
-  PolyConstraint *pcons=new PolyConstraint($3);
-
-  int index=$$->addElem(poly, pcons );
+  int index=$$->addElem(poly, *$3 );
   problem.right_printMap[index]=unkown_name;
 }
 |
 constraint_right '-' UNHNOW
 {
   $$=$1;
-  Poly_t * poly=new Poly_t();
-  poly->add(1);
+  Poly_t  poly;
+  poly.add(1);
 
-  PolyConstraint *pcons=new PolyConstraint($3);
-  int index=$$->addElem(poly, pcons );
+  int index=$$->addElem(poly, *$3 );
   problem.right_printMap[index]=unkown_name;
 }
 |
@@ -874,20 +842,19 @@ constraint_right '-' UNHNOW
 poly '*' UNHNOW{
 
   $$ =new SOSProblem();
-  PolyConstraint *pcons=new PolyConstraint($3);
   $1->mult(-1);
 
-  int index=$$->addElem($1, pcons );
+  int index=$$->addElem(*$1, *$3 );
   
   problem.right_printMap[index]=unkown_name;    
 }
 |
 UNHNOW '*' poly{
   $$ =new SOSProblem();
-  PolyConstraint *pcons=new PolyConstraint($1);
+
   $3->mult(-1);
 
-  int index=$$->addElem($3, pcons );
+  int index=$$->addElem(*$3, *$1 );
   
   problem.right_printMap[index]=unkown_name;    
   
@@ -898,11 +865,11 @@ UNHNOW
 {
   $$ =new SOSProblem();
   
-  Poly_t *poly=new Poly_t();
-  poly->add(-1);
+  Poly_t poly;
+  poly.add(-1);
 
-  PolyConstraint *pcons=new PolyConstraint($1);
-  int index=$$->addElem(poly, pcons );
+ 
+  int index=$$->addElem(poly, *$1 );
   problem.right_printMap[index]=unkown_name;
 }
 ;

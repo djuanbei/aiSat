@@ -110,7 +110,7 @@ class Supporttable {
 
   void setGsup(const int id, const int len, indice_t *value);
 
-  int addconvexsosSup(Subpoly_t &poly);
+  int addconvexsosSup( Subpoly_t &poly);
 
   int getsosSLength(const int id);
 

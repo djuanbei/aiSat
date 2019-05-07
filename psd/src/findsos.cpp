@@ -16,7 +16,7 @@
 
 #include "iostream"
 #include "psdutil.h"
-#include "sdpsolver.h"
+#include "sosproblem.h"
 #include "search.h"
 #include "selfassert.h"
 #include "sort.h"
@@ -83,7 +83,7 @@ bool SOSChecker::sosrepresent(PointList *sosList, double *X,
       Poly_t *p1 = new Poly_t();
       p1->changeVarId(SUPPORT_TABLE.getSupElem(sosMid)->varId);
       vector<indice_t> vars;
-      getVarTable<indice_t>().getVarElem(
+      getVarTable<indice_t>().getVarVec(
           SUPPORT_TABLE.getSupElem(sosMid)->varId, vars);
 
       for (j = 0; j < blockSize; j += 1) {
@@ -540,7 +540,7 @@ int SOSChecker::overConvexChecking(const Subpoly_t &subpoly,
  * false otherwise
  */
 
-bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
+bool SOSChecker::polyIsSOS( Subpoly_t &subpoly, PointList *ans,
                            const int verbose) {
   int i, k, j, sosId, sosLength, gLength, genLength, tempLength = 0;
   bool even;
@@ -674,6 +674,7 @@ bool SOSChecker::polyIsSOS(Subpoly_t &subpoly, PointList *ans,
     free(*b);
     return false;
   }
+  return false;
 }
 
 bool SOSChecker::checksos(bool print) {

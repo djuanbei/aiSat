@@ -14,41 +14,38 @@
 
 #include <assert.h>
 #include "psdutil.h"
-#include "sdpsolver.h"
+#include "sosproblem.h"
 #include "search.h"
 
 namespace aiSat {
 namespace psd {
 
-Poly_t *SOSProblem::getConstraintPoly(const int index, const int sosMId[],
+Poly_t SOSProblem::getConstraintPoly(const int index, const int sosMId[],
                                       const int sosMap[], const int blockSize[],
                                       const int blockMap[],
-                                      Blockmatrix *const X) {
-  int size = polys.size();
+                                      Blockmatrix *const X) const {
+  int size = (int)polys.size();
   ASSERT(index < size && index >= 0, "overflow ");
   int i, k;
   k = 0;
   for (i = 0; i < size; ++i) {
     if (index == i) {
       if (polyConstraints[i].type == EQ) {
-        Poly_t *posPoly = sosConvertPoly(X, k, blockSize[k],
+        Poly_t posPoly = sosConvertPoly(X, k, blockSize[k],
                                          sosMId[sosMap[abs(blockMap[k]) - 1]]);
 
         k++;
-        Poly_t *negPoly = sosConvertPoly(X, k, blockSize[k],
+        Poly_t negPoly = sosConvertPoly(X, k, blockSize[k],
                                          sosMId[sosMap[abs(blockMap[k]) - 1]]);
 
-        negPoly->mult(-1);
+        negPoly.mult(-1);
 
-        // p_mult_cons_assign(negPoly, -1);
-        posPoly->mult_poly(*negPoly);
-        delete negPoly;
-        // p_add_Poly_assign_del(posPoly, negPoly);
+        posPoly.mult_poly(negPoly);
+
         return posPoly;
       } else {
-        Poly_t *poly = sosConvertPoly(X, k, blockSize[k],
+        return  sosConvertPoly(X, k, blockSize[k],
                                       sosMId[sosMap[abs(blockMap[k]) - 1]]);
-        return poly;
       }
     }
 
@@ -58,7 +55,8 @@ Poly_t *SOSProblem::getConstraintPoly(const int index, const int sosMId[],
       k++;
     }
   }
-  return NULL;
+  Poly_t p;
+  return p;
 }
 
 /**
@@ -73,7 +71,7 @@ Poly_t *SOSProblem::getConstraintPoly(const int index, const int sosMId[],
  */
 void SOSProblem::wellform(const int sep, const int sosMId[], const int sosMap[],
                           const int blockSize[], const int blockMap[],
-                          Blockmatrix *const X) {
+                          Blockmatrix *const X) const{
   int i, k;
 
   Poly_t check;
@@ -88,33 +86,33 @@ void SOSProblem::wellform(const int sep, const int sosMId[], const int sosMap[],
     cout << "....................................." << endl;
 
     if (polyConstraints[i].type == EQ) {
-      Poly_t *posPoly = sosConvertPoly(X, k, blockSize[k],
+      Poly_t posPoly = sosConvertPoly(X, k, blockSize[k],
                                        sosMId[sosMap[abs(blockMap[k]) - 1]]);
 
       k++;
-      Poly_t *negPoly = sosConvertPoly(X, k, blockSize[k],
+      Poly_t negPoly = sosConvertPoly(X, k, blockSize[k],
                                        sosMId[sosMap[abs(blockMap[k]) - 1]]);
-      negPoly->mult(-1.0);
+      negPoly.mult(-1.0);
 
-      posPoly->add_poly(*negPoly);
-      delete negPoly;
+      posPoly.add_poly(negPoly);
+
 
       cout << i + 1 << " normal polynomial :" << endl;
-      string str = posPoly->toString();
+      string str = posPoly.toString();
       cout << str;
-      Poly_t mult = (polys[i]) * (*posPoly);
+      Poly_t mult = (polys[i]) * posPoly;
 
       if (i + 1 >= sep) {
         interpolant.add_poly(mult);
       }
       check.add_poly(mult);
-      delete posPoly;
+
 
     } else {
-      Poly_t *poly = sosConvertPoly(X, k, blockSize[k],
+      Poly_t poly = sosConvertPoly(X, k, blockSize[k],
                                     sosMId[sosMap[abs(blockMap[k]) - 1]]);
 
-      Poly_t mult = (polys[i]) * (*poly);
+      Poly_t mult = (polys[i]) * (poly);
 
       if (i + 1 >= sep) {
         interpolant.add_poly(mult);
@@ -123,14 +121,13 @@ void SOSProblem::wellform(const int sep, const int sosMId[], const int sosMap[],
 
       cout << i + 1 << " sos polynomial :" << endl;
 
-      string str = poly->toString();
+      string str = poly.toString();
       cout << str;
 
       if (0 == i) {
-        poly->mult(0.5);
-        interpolant.add_poly(*poly);
+        poly.mult(0.5);
+        interpolant.add_poly(poly);
       }
-      delete poly;
     }
     k++;
   }
@@ -265,7 +262,7 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
                                         int const *lengthM, int reSize[],
                                         vector<vector<indice_t> > &varMap,
                                         vector<vector<indice_t> > &polyVarMap,
-                                        vector<vector<indice_t> > &sosVarMap) {
+                                        vector<vector<indice_t> > &sosVarMap) const {
   int i, k, p, pi, si;
   int choose;
   int psize;
@@ -295,9 +292,9 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
         lengthM[sosmMap[i]] * ENLARGE_RAT /
         (i * i * i + 1); /* here can have more smart method to deal with */
 
-    getVarTable<indice_t>().getVarElem(polys[i].getVarId(), polyVarMap[i]);
+    getVarTable<indice_t>().getVarVec(polys[i].getVarId(), polyVarMap[i]);
 
-    getVarTable<indice_t>().getVarElem(
+    getVarTable<indice_t>().getVarVec(
         SUPPORT_TABLE.getSupElem((polyConstraints[i]).supportId)->varId,
         sosVarMap[i]);
 
@@ -305,7 +302,7 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
         polys[i].getVarId(),
         SUPPORT_TABLE.getSupElem((polyConstraints[i]).supportId)->varId);
 
-    getVarTable<indice_t>().getVarElem(multVarId[i], varMap[i]);
+    getVarTable<indice_t>().getVarVec(multVarId[i], varMap[i]);
 
     varSize[i] = getVarTable<indice_t>().getVarNum(multVarId[i]);
   }
@@ -412,8 +409,8 @@ indice_t **SOSProblem::createAllIndices(int *const sosmMap,
 
       if (choose) {
         for (i = 0; i < p; i += 1) {
-          if (findlocation(re[i], reSize[i], temp1, varMap[i].size(),
-                           &(varMap[i])[0], varMap[p].size(),
+          if (findlocation(re[i], reSize[i], temp1, (int)varMap[i].size(),
+                           &(varMap[i])[0], (int)varMap[p].size(),
                            &(varMap[p])[0]) > -1)
             break;  // check whether have added
         }
@@ -486,7 +483,7 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
                                                     int sosMId[], int sosmMap[],
                                                     int blockSize[],
                                                     int blockMap[],
-                                                    int *blockNum, double **b) {
+                                                    int *blockNum, double **b) const {
   int i, j, k, h, p, pi, si, sum, tempI;
   int pSize, sSize, mSize;
   int index, tempIndex;
@@ -494,12 +491,12 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
   Sparseblock *blockptr;
   /*    int sosMId[sys->size];
    */
-  int size = polys.size();
+  int polySize = (int)polys.size();
   int diffSOSMIdSize;
-  int everyConstraintSize[size];
-  vector<vector<indice_t> > varMap(size);
-  vector<vector<indice_t> > polyVarMap(size);
-  vector<vector<indice_t> > sosVarMap(size);
+  int everyConstraintSize[polySize];
+  vector<vector<indice_t> > varMap(polySize);
+  vector<vector<indice_t> > polyVarMap(polySize);
+  vector<vector<indice_t> > sosVarMap(polySize);
 
   /*-----------------------------------------------------------------------------
    *  At now  multiplied sos polynomials to difference polynomials are same.
@@ -542,7 +539,7 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
   }
 
   *blockNum = 0;
-  for (i = 0; i < size; i += 1) {
+  for (i = 0; i < polySize; i += 1) {
     if (polyConstraints[i].type == EQ) {
       blockSize[*blockNum] = tempblockSize[sosmMap[i]];
       blockMap[*blockNum] = i + 1; /* more attention on +1 */
@@ -567,37 +564,38 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
 
   (*numofCons) = 0;
 
-  for (i = 0; i < size; i += 1) {
+  for (i = 0; i < polySize; i += 1) {
     (*numofCons) += everyConstraintSize[i];
   }
 
   *b = (double *)calloc_d(((*numofCons) + 1), sizeof(double));
 
   if ( rhs.getInit( )) {
-    rhs.update();
+    //    rhs.update();
 
     vector<indice_t> rhsVars;
-    getVarTable<indice_t>().getVarElem(rhs.getVarId(), rhsVars);
+    getVarTable<indice_t>().getVarVec(rhs.getVarId(), rhsVars);
 
-    int size = rhs.getSize();
-    for (i = 0; i < size; i++) {
+    int len = rhs.getSize();
+    for (i = 0; i < len; i++) {
       vector<indice_t> key;
       rhs.getDegreeAt(i, key);
       index = 0;
       k = 0;
-      while (k < size) {
+      while (k < polySize) {
         tempIndex = findlocation(allM[k], everyConstraintSize[k], &key[0],
-                                 varMap[k].size(), &(varMap[k])[0],
-                                 rhsVars.size(), &rhsVars[0]);
+                                 (int)varMap[k].size(), &(varMap[k])[0],
+                                 (int)rhsVars.size(), &rhsVars[0]);
         if (tempIndex > -1) {
           index += tempIndex;
           break;
-        } else
+        } else{
           index += everyConstraintSize[k];
+        }
 
         k++;
       }
-      if (k < size) {
+      if (k < polySize) {
         (*b)[index + 1] = rhs.getCF(i);  // b start from 1
       }
     }
@@ -662,8 +660,8 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
         k = 0;
         while (k < size) {
           tempIndex = findlocation(allM[k], everyConstraintSize[k], key,
-                                   varMap[k].size(), &(varMap[k])[0],
-                                   varMap[p].size(), &(varMap[p])[0]);
+                                   (int)varMap[k].size(), &(varMap[k])[0],
+                                   (int)varMap[p].size(), &(varMap[p])[0]);
           if (tempIndex > -1) {
             index += tempIndex;
             break;
@@ -746,7 +744,7 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
   /*    deleteW(W, diffSOSMIdSize, lengthM );
    */
 
-  deleteAllIndices(allM, size);
+  deleteAllIndices(allM, polySize);
 
   return re;
 } /* -----  end of function createConstraintmatrix  ----- */
@@ -780,10 +778,10 @@ Constraintmatrix *SOSProblem::createConstraintmatrx(int *const numofCons,
  *   otherwise failure
  */
 int SOSProblem::inter_sdp(const int sep, char const *fprobname,
-                          char const *fsolname) {
+                          char const *fsolname) const{
   int ret = 0;
   int numofCons;
-  int size = polys.size();
+  int size = (int)polys.size();
   int blockSize[2 * (size)]; /* the blockmatrix size */
   int blockMap[2 * (size)];  /* block -> poly map */
   int sosMId[size];          /* sosMId: coefPoly-> sosMid*/
@@ -905,10 +903,10 @@ int SOSProblem::inter_sdp(const int sep, char const *fprobname,
  * @return
  */
 int SOSProblem::sdp_solver(vector<Poly_t > &resP, char const *fprobname,
-                           char const *fsolname) {
+                           char const *fsolname) const {
   int ret = 0;
   int numofCons;
-  int size = polys.size();
+  int size = (int)polys.size();
 
   int blockSize[2 * (size)]; /* the blockmatrix size */
   int blockMap[2 * (size)];  /* block -> poly map */
@@ -1008,7 +1006,7 @@ int SOSProblem::sdp_solver(vector<Poly_t > &resP, char const *fprobname,
  * @return the different support if accour in sys
  */
 
-int SOSProblem::getSOSMsize(int sosmMap[], int sosMId[]) {
+int SOSProblem::getSOSMsize(int sosmMap[], int sosMId[]) const{
   int size = polys.size();
   int re = 0;
   int i = 0;

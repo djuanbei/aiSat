@@ -149,8 +149,8 @@ void sortVar(indice_t *const vars, const int n) {
            0 otherwise
  */
 
-int compareM(const int s1, const indice_t *key1, const indice_t *varMap1,
-             const int s2, const indice_t *key2, const indice_t *varMap2) {
+int compareM(const int s1, const indice_t *const key1, const indice_t *varMap1,
+             const int s2, const indice_t * const key2, const indice_t *varMap2) {
   int i, j;
 
   i = j = 0;

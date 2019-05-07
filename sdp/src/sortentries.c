@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "declarations.h"
 
-struct entry {
+struct Entry {
   int indexi;
   int indexj;
   int indexk;
@@ -12,17 +12,17 @@ struct entry {
 };
 
 int mycompare(const void *p1, const void *p2) {
-  if (((struct entry *)p1)->indexi < ((struct entry *)p2)->indexi) {
+  if (((struct Entry *)p1)->indexi < ((struct Entry *)p2)->indexi) {
     return (-1);
   };
-  if (((struct entry *)p1)->indexi == ((struct entry *)p2)->indexi) {
-    if (((struct entry *)p1)->indexj < ((struct entry *)p2)->indexj) {
+  if (((struct Entry *)p1)->indexi == ((struct Entry *)p2)->indexi) {
+    if (((struct Entry *)p1)->indexj < ((struct Entry *)p2)->indexj) {
       return (-1);
     };
-    if (((struct entry *)p1)->indexj == ((struct entry *)p2)->indexj) {
+    if (((struct Entry *)p1)->indexj == ((struct Entry *)p2)->indexj) {
       return (0);
     };
-    if (((struct entry *)p1)->indexj > ((struct entry *)p2)->indexj) {
+    if (((struct Entry *)p1)->indexj > ((struct Entry *)p2)->indexj) {
       return (1);
     };
   };
@@ -41,7 +41,7 @@ struct constraintmatrix *constraints;
   int i, j;
   struct sparseblock *ptr;
   int maxentries;
-  struct entry *entries;
+  struct Entry *entries;
 
   /*
    * First, find out who has the most entries.
@@ -60,7 +60,7 @@ struct constraintmatrix *constraints;
    * Allocate space for entries.
    */
 
-  entries = (struct entry *)malloc_d(maxentries * sizeof(struct entry));
+  entries = (struct Entry *)malloc_d(maxentries * sizeof(struct Entry));
 
   for (i = 1; i <= k; i++) {
     ptr = constraints[i].blocks;
@@ -79,7 +79,7 @@ struct constraintmatrix *constraints;
        * Sort
        */
 
-      qsort(entries, (size_t)ptr->numentries, sizeof(struct entry), mycompare);
+      qsort(entries, (size_t)ptr->numentries, sizeof(struct Entry), mycompare);
 
       /*
        * Copy out.

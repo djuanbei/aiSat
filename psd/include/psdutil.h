@@ -4,7 +4,7 @@
 #include <psdtype.h>
 
 #include "blockmat.h"
-#include "sdpsolver.h"
+#include "sosproblem.h"
 #include "sparse.h"
 
 namespace aiSat {
@@ -37,8 +37,10 @@ void deleteW(ArrangeMatrix **s[], const int size, const int len[]);
 
 void deleteSparseA(ArrangeMatrix **s, const int len);
 
-Poly_t *sosConvertPoly(Blockmatrix *const X, const int blockId,
+Poly_t sosConvertPoly(Blockmatrix *const X, const int blockId,
                        const int blockSize, const int sosmId);
+
+
 }
 }
 

@@ -31,7 +31,7 @@ int PolyConstraintTable::addcoefElem(const PolyConstraintType type,
     return loc;
   }
 
-  int last = values.size();
+  int last = (int) values.size();
   values.push_back(new PolyConstraint());
   values[last]->type = type;
   values[last]->supportId = mId;

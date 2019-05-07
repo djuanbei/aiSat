@@ -13,7 +13,7 @@
 #define FINDSOS_INC
 #include "monomial.h"
 #include "psdtype.h"
-#include "sdpsolver.h"
+#include "sosproblem.h"
 
 namespace aiSat {
 namespace psd {
@@ -26,12 +26,36 @@ struct Params {
 };
 
 class SOSChecker {
+
+ public:
+  SOSChecker(const Poly_t &poly) : p(poly) {}
+  void setPara(const Params &p) { para = p; }
+  /**
+   *
+   *
+   * @param polyvec the sos representaion polynomials
+   *
+   * @return true if find SOS presentation for a given polynomial, otherwise,
+   * false
+   */
+  bool checksos(bool print = true);
+  /**
+   *
+   *
+   * @param polyvec the sos representaion polynomials
+   *
+   * @return true if find SOS presentation for a given polynomial, otherwise,
+   * false
+   */
+ bool findSOS( vector<Poly_t> &sosPolyvec);
+
+  
  private:
   int dim;
   Params para;
-  Poly_t &p;
+ const  Poly_t &p;
 
-  bool polyIsSOS(Subpoly_t &subpoly, PointList *ans, const int verbose = 0);
+  bool polyIsSOS( Subpoly_t &subpoly, PointList *ans, const int verbose = 0);
 
   /**
    *
@@ -65,27 +89,6 @@ class SOSChecker {
                                            const int sosLength,
                                            const int gLength);
 
- public:
-  SOSChecker(Poly_t &poly) : p(poly) {}
-  void setPara(const Params &p) { para = p; }
-  /**
-   *
-   *
-   * @param polyvec the sos representaion polynomials
-   *
-   * @return true if find SOS presentation for a given polynomial, otherwise,
-   * false
-   */
-  bool checksos(bool print = true);
-  /**
-   *
-   *
-   * @param polyvec the sos representaion polynomials
-   *
-   * @return true if find SOS presentation for a given polynomial, otherwise,
-   * false
-   */
-  bool findSOS(vector<Poly_t> &polyvec);
 };
 }
 }

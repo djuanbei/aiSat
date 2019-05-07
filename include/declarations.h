@@ -266,20 +266,20 @@ int bisect_(int *n, double *eps1, double *d, double *e, double *e2, double *lb,
   #else
 */
 #define MY_DNRM2 dnrm2_
-double dnrm2_();
+extern double dnrm2_();
 #define MY_DASUM dasum_
-double dasum_();
+extern double dasum_();
 #define MY_DDOT ddot_
-double ddot_();
+extern double ddot_();
 #define MY_IDAMAX idamax_
-int idamax_();
+extern int idamax_();
 #define MY_DGEMM dgemm_
-void dgemm_();
+extern void dgemm_();
 #define MY_DGEMV dgemv_
-void dgemv_();
-void dger_();
-void dtrsm_();
-void dtrmv_();
+extern void dgemv_();
+extern void dger_();
+extern void dtrsm_();
+extern void dtrmv_();
 /*
  * #endif
  * #endif
@@ -319,12 +319,12 @@ void dtrmv_();
  * #else
  */
 #define MY_DPOTRF dpotrf_
-void dpotrf_();
+extern void dpotrf_();
 #define MY_DPOTRS dpotrs_
-void dpotrs_();
-void dpotri_();
+extern void dpotrs_();
+extern void dpotri_();
 #define MY_DTRTRI dtrtri_
-void dtrtri_();
+extern void dtrtri_();
 /* #endif
  * #endif
  */

@@ -26,14 +26,7 @@ namespace aiSat {
 namespace psd {
 using namespace ::std;
 
-struct SparseSOSblock {
-  vector<coef_t> value;
-  vector<int> index; /* location of sosM */
 
-  void addSparse(const int index, const coef_t value);
-
-  SparseSOSblock() {}
-};
 
 typedef sparseblock Sparseblock;
 
@@ -74,14 +67,20 @@ class SOSProblem {
     polys.clear();
     polyConstraints.clear();
   }
-  void setRhs(const Poly_t &r) { rhs = r; }
+  void setRhs(const Poly_t &r) {
+    rhs = r;
+    rhs.update( );
+  }
 
   Poly_t &getRhs(void) { return rhs; }
 
   void deleteRhs(void) {
+   
     rhs=Poly_t( );
+    rhs.setInit( false);
+    
   }
-  int size() const { return polys.size(); }
+  int size() const { return (int)polys.size(); }
 
   Poly_t &getPoly(const int id)  { return polys[id]; }
 
@@ -90,16 +89,17 @@ class SOSProblem {
   }
 
   int addElem(const Poly_t &poly, const PolyConstraint &polycons) {
-    int re = polys.size();
+    int re = (int)polys.size();
     polys.push_back(poly);
+    polys[ re].update( );
     polyConstraints.push_back(polycons);
     return re;
   }
 
-  int inter_sdp(const int sep, const char *fproname, const char *fsolname);
+  int inter_sdp(const int sep, const char *fproname, const char *fsolname) const;
 
   int sdp_solver(vector<Poly_t > &resP, const char *fproname,
-                 const char *fsolname);
+                 const char *fsolname) const;
 
  private:
   Poly_t rhs;
@@ -109,22 +109,22 @@ class SOSProblem {
   vector<PolyConstraint > polyConstraints;
 
   void wellform(const int sep, const int sosMId[], const int sosMap[],
-                const int blockSize[], const int blockMap[], Blockmatrix *X);
+                const int blockSize[], const int blockMap[], Blockmatrix *X) const;
 
   indice_t **createAllIndices(int *const sosmMap, indice_t **const SOSM,
                               int const *lengthM, int size[],
                               vector<vector<indice_t> > &varMap,
                               vector<vector<indice_t> > &pvarMap,
-                              vector<vector<indice_t> > &svarMap);
+                              vector<vector<indice_t> > &svarMap) const;
 
   Constraintmatrix *createConstraintmatrx(int *consSize, int sosMId[],
                                           int sosMap[], int blockSize[],
-                                          int blockMap[], int *bnum, double **);
-  int getSOSMsize(int sosmMap[], int sosMId[]);
+                                          int blockMap[], int *bnum, double **) const;
+  int getSOSMsize(int sosmMap[], int sosMId[]) const;
 
-  Poly_t *getConstraintPoly(const int index, const int sosMId[],
+  Poly_t getConstraintPoly(const int index, const int sosMId[],
                             const int sosMap[], const int blockSize[],
-                            const int blockMap[], Blockmatrix *const X); 
+                            const int blockMap[], Blockmatrix *const X) const;  
 };
 }
 }

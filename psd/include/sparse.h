@@ -18,6 +18,15 @@
 namespace aiSat {
 namespace psd {
 
+struct SparseSOSblock {
+  vector<coef_t> value;
+  vector<int> index; /* location of sosM */
+
+  void addSparse(const int index, const coef_t value);
+
+  SparseSOSblock() {}
+};
+
 /*-----------------------------------------------------------------------------
  *  struct sparse is a special matrix have few same nonzero element
  *-----------------------------------------------------------------------------*/

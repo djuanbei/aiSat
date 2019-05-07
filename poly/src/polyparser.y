@@ -123,7 +123,7 @@ TERM
   VarTable<indice_t> &table=getVarTable<indice_t>();
 
   vector<indice_t> vars;
-  table.getVarElem(varId, vars);
+  table.getVarVec(varId, vars);
   for(size_t i=0; i< vars.size(); i++){
     keyMap[vars[i]]=i;
   }
@@ -230,7 +230,7 @@ Poly_t aiSat::poly::parse(const string &str){
   }
   vector<indice_t> varsids(vars.begin(), vars.end());
 
-  varId=table.addVarElem(varsids);
+  varId=table.addVarVec(varsids);
   yyin=tmpfile();
   fputs( str.c_str(), yyin);
   rewind(yyin);

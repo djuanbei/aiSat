@@ -77,7 +77,7 @@ int Supporttable::findSupElem(const int deg, const int varId, const int consNum,
    */
   /* when deg==0 the sosM is constant 1 */
 
-  for (i = 0; i < values.size(); i += 1) {
+  for (i = 0; i < (int)values.size(); i += 1) {
     if (values[i]->type == NORMAL) {
       if (deg == values[i]->deg && varId == values[i]->varId &&
           consNum == values[i]->constNum) {
@@ -100,7 +100,7 @@ int Supporttable::findSupElem(const int deg, const int varId, const int consNum,
 
 int Supporttable::findSupByPoly(const Subpoly_t &subpoly) {
   int i = 0;
-  for (i = 0; i < values.size(); i += 1) {
+  for (i = 0; i < (int)values.size(); i += 1) {
     if (values[i]->type == SUB_POLY) {
       if (0 == memcmp(values[i]->md5sum, subpoly.getmd5(), DIGEST_SIZE)) {
         return findBimapByValue(loc, i);
@@ -115,7 +115,7 @@ int Supporttable::findSupElemByIndice(const int varId, const indice_t *indices,
   int i;
   uint8_t md5sum[DIGEST_SIZE];
   md5sumbyIndice(md5sum, varId, indices, value_size);
-  for (i = 0; i < values.size(); i++) {
+  for (i = 0; i < (int)values.size(); i++) {
     if (values[i]->type == INDICE &&
         0 == memcmp(values[i]->md5sum, md5sum, DIGEST_SIZE)) {
       return findBimapByValue(loc, i);
@@ -127,12 +127,12 @@ int Supporttable::findSupElemByIndice(const int varId, const indice_t *indices,
 int Supporttable::addSOSup(const int deg, const int varId, const int consNum,
                            int *consIds) {
   int re = findSupElem(deg, varId, consNum, consIds);
-  int value_size = values.size();
+ 
   if (re > -1) {
     return re;
   }
 
-  re = values.size();
+  re = (int)values.size();
   values.push_back(createSupport(deg, varId, consNum, consIds));
 
   SOSsup.push_back(NULL);
@@ -215,7 +215,7 @@ void Supporttable::setGsup(const int id, const int len, indice_t *value) {
   Gsup[index] = value;
 }
 
-int Supporttable::addconvexsosSup(Subpoly_t &poly) {
+int Supporttable::addconvexsosSup( Subpoly_t &poly) {
   int re = findSupByPoly(poly);
   if (re > -1) {
     return re;
@@ -262,7 +262,7 @@ ArrangeMatrix **Supporttable::getAMIndex(const int id, int *egLength) {
 
 void Supporttable::clearSupportTable(void) {
   if (!values.empty()) {
-    int value_size = values.size();
+    int value_size = (int)values.size();
     int i;
     for (i = 0; i < value_size; i += 1) {
       delete values[i];
@@ -285,7 +285,7 @@ void Supporttable::clearSupportTable(void) {
 }
 Supporttable::Supporttable() { loc = createBimap(); }
 Supporttable::~Supporttable() {
-  int value_size = values.size();
+  int value_size = (int)values.size();
 
   for (int i = 0; i < value_size; i += 1) {
     delete values[i];

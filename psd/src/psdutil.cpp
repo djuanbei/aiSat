@@ -287,15 +287,15 @@ void deleteSparseA(ArrangeMatrix **s, const int len) {
   free(s);
 }
 
-Poly_t *sosConvertPoly(Blockmatrix *const X, const int k, const int blockSize,
+Poly_t sosConvertPoly(Blockmatrix *const X, const int k, const int blockSize,
                        const int supportId) {
   int vid = SUPPORT_TABLE.getSupElem(supportId)->varId;
-  Poly_t *re = new Poly_t(vid);
+  Poly_t re( vid);
   coef_t cf;
   int i, j, row, col;
 
   vector<indice_t> vars;
-  getVarTable<indice_t>().getVarElem(vid, vars);
+  getVarTable<indice_t>().getVarVec(vid, vars);
   const int varSize = vars.size();
 
   const int length = SUPPORT_TABLE.getsosSLength(supportId);
@@ -309,7 +309,6 @@ Poly_t *sosConvertPoly(Blockmatrix *const X, const int k, const int blockSize,
     Poly_t::Term temp_term;
     for (int k = 0; k < varSize; k++) {
       temp_term.key.push_back(make_pair(vars[k], support[i * varSize + k]));
-      // temp_term.key[i] = support[i * varSize + k];
     }
 
     cf = 0;
@@ -325,10 +324,13 @@ Poly_t *sosConvertPoly(Blockmatrix *const X, const int k, const int blockSize,
     }
 
     temp_term.cf = cf;
-    re->add_term(temp_term);
+    re.add_term(temp_term);
   }
 
   return re;
 }
+
+
+
 }
 }

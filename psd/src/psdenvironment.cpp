@@ -1,11 +1,11 @@
-#include "psdproblem.h"
+#include "psdenvironment.h"
 #include <iostream>
 #include <map>
 #include "convexhull.h"
 #include "findsos.h"
 #include "monomial.h"
 #include "psdutil.h"
-#include "sdpsolver.h"
+#include "sosproblem.h"
 #include "search.h"
 #include "sort.h"
 
@@ -160,7 +160,7 @@ static int reduceConvexHulll(const int DIM, indice_t *Gsup, int &GLength,
     }
   }
 
-  sosLength = monMap.size();
+  sosLength = (int)monMap.size();
 
   *SOSM = (indice_t *)malloc_d(sosLength * node_size);
 
@@ -177,22 +177,22 @@ static int reduceConvexHulll(const int DIM, indice_t *Gsup, int &GLength,
   return sosLength;
 }
 
-int SOSP::addSOSsup(vector<SOSMonomial *> *indices_vec) {
+int PSDEnvironment::addSupport(const vector<Power > &indices_vec) {
   int varNum = getVarTable<indice_t>()
                    .getAllVarNum();  // getvarNum(1);//all num of vaiable
 
   int *varOccur = new int[varNum];
   int i, j;
 
-  int length = indices_vec->size();
+  int length = indices_vec.size();
 
   for (i = 0; i < varNum; i++) {
     varOccur[i] = 0;
   }
-  vector<SOSMonomial *>::iterator it = indices_vec->begin();
-  for (; it != indices_vec->end(); it++) {
+  vector<Power>::const_iterator it = indices_vec.begin();
+  for (; it != indices_vec.end(); it++) {
     for (i = 0; i < varNum; i++) {
-      if ((*it)->indices[i] > 0) varOccur[i] = 1;
+      if ((*it).indices[i] > 0) varOccur[i] = 1;
     }
   }
 
@@ -212,15 +212,15 @@ int SOSP::addSOSsup(vector<SOSMonomial *> *indices_vec) {
     exactVarNum = getVarTable<indice_t>().getAllVarNum();
     for (i = 0; i < exactVarNum; i++) vars[i] = i;
   }
-  int varId = getVarTable<indice_t>().addVarElem(vars, exactVarNum);
+  int varId = getVarTable<indice_t>().addVarVec(vars, exactVarNum);
 
   indice_t *indices = new indice_t[exactVarNum * length];
 
-  it = indices_vec->begin();
+  it = indices_vec.begin();
   j = 0;
-  for (; it != indices_vec->end(); it++) {
+  for (; it != indices_vec.end(); it++) {
     for (i = 0; i < exactVarNum; i++) {
-      indices[j * exactVarNum + i] = (*it)->indices[vars[i]];
+      indices[j * exactVarNum + i] = (*it).indices[vars[i]];
     }
     j++;
   }
@@ -266,21 +266,25 @@ int SOSP::addSOSsup(vector<SOSMonomial *> *indices_vec) {
   return supportId;
 }
 
-int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec) {
-  std::sort(varVec->begin(), varVec->end());
-  std::sort(degVec->begin(), degVec->end());
-  vector<indice_t> vars(varVec->begin(), varVec->end());
+int PSDEnvironment::addSupport(const vector<int> &vars, const vector<int> &degs) {
 
-  int varNum = varVec->size();
+
+  vector<int>  degVec( degs);
+  std::sort(degVec.begin(), degVec.end());
+    
+  vector<indice_t> varVec(vars.begin( ), vars.end( ));
+  std::sort(varVec.begin(), varVec.end());
+
+  int varNum = varVec.size();
 
   vector<int>::iterator it;
   int i, j;
   i = 0;
 
-  int varId = getVarTable<indice_t>().addVarElem(vars);
+  int varId = getVarTable<indice_t>().addVarVec(varVec);
   int length = 0;
 
-  for (it = degVec->begin(); it != degVec->end(); it++) {
+  for (it = degVec.begin(); it != degVec.end(); it++) {
     if (0 == *it)
       length++;
     else
@@ -292,7 +296,7 @@ int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec) {
   length = 0;
   int tempLen = 0;
 
-  for (it = degVec->begin(); it != degVec->end(); it++) {
+  for (it = degVec.begin(); it != degVec.end(); it++) {
     if (0 == *it) {
       for (i = 0; i < varNum; i++) indices[length * varNum + i] = 0;
       length++;
@@ -347,7 +351,7 @@ int SOSP::addSOSsup(vector<int> *varVec, vector<int> *degVec) {
   return supportId;
 }
 
-void SOSP::title() {
+void PSDEnvironment::title() {
   sos_num++;
   std::cout << "====================================" << std::endl;
   std::cout << "             aiSat                  " << std::endl;
@@ -355,31 +359,29 @@ void SOSP::title() {
   std::cout << "$" << sos_num << ": " << std::endl;
 }
 
-void SOSP::solve() {
+void PSDEnvironment::solve(const SOSProblem & problem)  {
   title();
 
   vector<Poly_t > resP;
-  int re = problem->sdp_solver(resP, "pro.txt", "result.txt");
+  int re = problem.sdp_solver(resP, "pro.txt", "result.txt");
   if (re == 0) {
     map<int, string>::iterator it = left_printMap.begin();
     while (it != left_printMap.end()) {
       std::cout << it->second << " := " << (resP[it->first]) << endl;
       it++;
     }
-
-
+ 
   } else {
     printf("can not find a feasiable solution\n");
   }
 
-  problem->clear();
 
   left_printMap.clear();
 }
 
-void SOSP::findSOS(Poly_t *poly) {
+void PSDEnvironment::findSOS(const Poly_t& poly)  {
   title();
-  SOSChecker checker(*poly);
+  SOSChecker checker(poly);
   if (checker.checksos(false)) {
     cout << "SOS" << endl;
   } else
@@ -387,21 +389,13 @@ void SOSP::findSOS(Poly_t *poly) {
   left_printMap.clear();
 }
 
-void SOSP::interpolant(SOSProblem *sys, const int sep) {
+void PSDEnvironment::interpolant(const SOSProblem &sys, const int sep) {
   title();
-  sys->inter_sdp(sep, "pro.txt", "result.txt");
+  sys.inter_sdp(sep, "pro.txt", "result.txt");
   left_printMap.clear();
 }
-void SOSP::clear() {
-  problem->clear();
-  for (map<string, Poly_t *>::iterator it = polyMap.begin();
-       it != polyMap.end(); it++) {
-    delete it->second;
-  }
-  for (map<string, PolyConstraint *>::iterator it = polyConsMap.begin();
-       it != polyConsMap.end(); it++) {
-    delete it->second;
-  }
+void PSDEnvironment::clear() {
+
 
   varMap.clear();
   monoMap.clear();
@@ -410,17 +404,21 @@ void SOSP::clear() {
   right_printMap.clear();
 }
 
+int PSDEnvironment::addVar( const string & var){
+
+  return getVarTable<indice_t>().addVar( var);
+}
+
 /*
   return true if str is a new key
 */
 
-bool SOSP::addVarElem(const string &str, vector<int> *value) {
-  if (varMap.find(str) == varMap.end()) {
-    varMap[str] = value;
+bool PSDEnvironment::addVarVec(const string &strID, const vector<int> &value) {
+  if (varMap.find(strID) == varMap.end()) {
+    varMap[strID] = value;
     return true;
   } else {
-    delete varMap[str];
-    varMap[str] = value;
+    varMap[strID] = value;
     return false;
   }
 }
@@ -428,25 +426,24 @@ bool SOSP::addVarElem(const string &str, vector<int> *value) {
   return true if str is a new key
 */
 
-bool SOSP::addMonoElem(const string &str, const int value) {
-  if (monoMap.find(str) == monoMap.end()) {
-    monoMap[str] = value;
+bool PSDEnvironment::addMonoElem(const string &strID, const int monomialListID) {
+  if (monoMap.find(strID) == monoMap.end()) {
+    monoMap[strID] = monomialListID;
     return false;
   }
-  monoMap[str] = value;
+  monoMap[strID] = monomialListID;
   return false;
 }
 /*
   return true if str is a new key
 */
 
-bool SOSP::addPolyElem(const string &str, Poly_t *poly) {
-  if (polyMap.find(str) == polyMap.end()) {
-    polyMap[str] = poly;
+bool PSDEnvironment::addPolyElem(const string &strID, const Poly_t &poly) {
+  if (polyMap.find(strID) == polyMap.end()) {
+    polyMap[strID] = poly;
     return true;
   } else {
-    delete polyMap[str];
-    polyMap[str] = poly;
+    polyMap[strID] = poly;
     return false;
   }
 }
@@ -454,14 +451,14 @@ bool SOSP::addPolyElem(const string &str, Poly_t *poly) {
   return true if str is a new key
 */
 
-bool SOSP::addPolyConsElem(const string &str, PolyConstraint *polyCons) {
-  if (polyConsMap.find(str) == polyConsMap.end()) {
-    polyConsMap[str] = polyCons;
+bool PSDEnvironment::addPolyConsElem(const string &strID, const PolyConstraint &polyCons) {
+  if (polyConsMap.find(strID) == polyConsMap.end()) {
+    polyConsMap[strID] = polyCons;
     return true;
 
   } else {
-    delete polyConsMap[str];
-    polyConsMap[str] = polyCons;
+
+    polyConsMap[strID] = polyCons;
     return false;
   }
 }

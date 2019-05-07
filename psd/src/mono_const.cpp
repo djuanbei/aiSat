@@ -66,9 +66,9 @@ bool Khomog(indice_t *a, const int varId, const int cdeg, const int cvarId,
   vector<indice_t> varMap;
   VarTable<indice_t> &vartable = getVarTable<indice_t>();
 
-  vartable.getVarElem(varId, varMap);
+  vartable.getVarVec(varId, varMap);
   vector<indice_t> KvarMap;
-  vartable.getVarElem(cvarId, KvarMap);
+  vartable.getVarVec(cvarId, KvarMap);
 
   const int size = vartable.getVarNum(varId);
 
@@ -111,10 +111,10 @@ bool symm(indice_t *a, const int varId, const int cdeg, const int cvarId,
   vector<indice_t> varMap;
   VarTable<indice_t> &vartable = getVarTable<indice_t>();
 
-  vartable.getVarElem(varId, varMap);
+  vartable.getVarVec(varId, varMap);
 
   vector<indice_t> symvarMap;
-  vartable.getVarElem(cvarId, symvarMap);
+  vartable.getVarVec(cvarId, symvarMap);
 
   const int size = vartable.getVarNum(varId);
   const int symSize = vartable.getVarNum(cvarId);
@@ -157,10 +157,10 @@ bool linCons(indice_t *a, const int varId, const int cdeg, const int cvarId,
   vector<indice_t> varMap;
   VarTable<indice_t> &vartable = getVarTable<indice_t>();
 
-  vartable.getVarElem(varId, varMap);
+  vartable.getVarVec(varId, varMap);
 
   vector<indice_t> linvarMap;
-  vartable.getVarElem(cvarId, linvarMap);
+  vartable.getVarVec(cvarId, linvarMap);
 
   const int size = vartable.getVarNum(varId);
   const int linSize = vartable.getVarNum(cvarId);
