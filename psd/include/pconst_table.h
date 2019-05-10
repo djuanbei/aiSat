@@ -18,19 +18,19 @@ namespace aiSat {
 namespace psd {
 
 class PolyConstraintTable {
- private:
-  vector<PolyConstraint*> values;
+private:
+  vector<PolyConstraint *> values;
 
- public:
-  void initcoefTable(void);
+public:
+  void initcoefTable( void );
 
-  int addcoefElem(const PolyConstraintType type, const int mId);
+  int addcoefElem( const PolyConstraintType type, const int mId );
 
-  int findcoefElem(const PolyConstraintType type, const int mId);
+  int findcoefElem( const PolyConstraintType type, const int mId );
 };
 
 extern PolyConstraintTable POLY_CONS_Table;
-}
-}
+} // namespace psd
+} // namespace aiSat
 
 #endif

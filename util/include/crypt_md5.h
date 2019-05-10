@@ -55,21 +55,21 @@
 
 /* Data structure for MD5 (Message Digest) computation */
 typedef struct {
-  uint32_t i[2];      /* number of _bits_ handled mod 2^64 */
-  uint32_t buf[4];    /* scratch buffer */
-  uint8_t in[64];     /* input buffer */
-  uint8_t digest[16]; /* actual digest after md5_finalize call */
+  uint32_t i[ 2 ];       /* number of _bits_ handled mod 2^64 */
+  uint32_t buf[ 4 ];     /* scratch buffer */
+  uint8_t  in[ 64 ];     /* input buffer */
+  uint8_t  digest[ 16 ]; /* actual digest after md5_finalize call */
 } md5_ctx_t;
 
-#define MD5_DIGEST(ctx) ((ctx)->digest)
+#define MD5_DIGEST( ctx ) ( ( ctx )->digest )
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void md5_init(md5_ctx_t *ctx);
-void md5_update(md5_ctx_t *ctx, const uint8_t *in, size_t len);
-void md5_finalize(md5_ctx_t *ctx);
+void md5_init( md5_ctx_t *ctx );
+void md5_update( md5_ctx_t *ctx, const uint8_t *in, size_t len );
+void md5_finalize( md5_ctx_t *ctx );
 
 #ifdef __cplusplus
 }

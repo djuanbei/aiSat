@@ -22,28 +22,28 @@ namespace aiSat {
 
 namespace psd {
 
-bool indiceEqual(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
-                 int *bvarMap) {
+bool indiceEqual( coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
+                  int *bvarMap ) {
   int i, j;
   i = j = 1;
   /* The first index of a or b is the id location */
-  while (i <= aSize && j <= bSize) {
-    if (avarMap[i] < bvarMap[j]) {
-      if (a[i] > 0) {
+  while ( i <= aSize && j <= bSize ) {
+    if ( avarMap[ i ] < bvarMap[ j ] ) {
+      if ( a[ i ] > 0 ) {
         return false;
       }
       i++;
 
-    } else if (avarMap[i] > bvarMap[j]) {
-      if (b[j] > 0) {
+    } else if ( avarMap[ i ] > bvarMap[ j ] ) {
+      if ( b[ j ] > 0 ) {
         return false;
       }
       j++;
 
     } else {
-      if (a[i] > b[j]) {
+      if ( a[ i ] > b[ j ] ) {
         return false;
-      } else if (a[i] < b[j]) {
+      } else if ( a[ i ] < b[ j ] ) {
         return false;
       }
       i++;
@@ -51,13 +51,13 @@ bool indiceEqual(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
     }
   }
 
-  while (i <= aSize) {
-    if (a[i++] > 0) {
+  while ( i <= aSize ) {
+    if ( a[ i++ ] > 0 ) {
       return false;
     }
   }
-  while (j <= bSize) {
-    if (b[j++] > 0) {
+  while ( j <= bSize ) {
+    if ( b[ j++ ] > 0 ) {
       return false;
     }
   }
@@ -81,28 +81,28 @@ bool indiceEqual(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
  * if (a1,...,an) == (b1,...,bn) return YES,
  * otherwise, return false;
  */
-bool lex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
-         int *bvarMap) {
+bool lex( coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
+          int *bvarMap ) {
   int i, j;
   i = j = 1;
 
-  while (i <= aSize && j <= bSize) {
-    if (avarMap[i] < bvarMap[j]) {
-      if (a[i] > 0) {
+  while ( i <= aSize && j <= bSize ) {
+    if ( avarMap[ i ] < bvarMap[ j ] ) {
+      if ( a[ i ] > 0 ) {
         return true;
       }
       i++;
 
-    } else if (avarMap[i] > bvarMap[j]) {
-      if (b[j] > 0) {
+    } else if ( avarMap[ i ] > bvarMap[ j ] ) {
+      if ( b[ j ] > 0 ) {
         return false;
       }
       j++;
 
     } else {
-      if (a[i] > b[j]) {
+      if ( a[ i ] > b[ j ] ) {
         return true;
-      } else if (a[i] < b[j]) {
+      } else if ( a[ i ] < b[ j ] ) {
         return false;
       }
       i++;
@@ -110,12 +110,12 @@ bool lex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
     }
   }
 
-  while (i <= aSize)
-    if (a[i++] > 0) {
+  while ( i <= aSize )
+    if ( a[ i++ ] > 0 ) {
       return true;
     }
-  while (j <= bSize)
-    if (b[j++] > 0) {
+  while ( j <= bSize )
+    if ( b[ j++ ] > 0 ) {
       return false;
     }
 
@@ -137,25 +137,25 @@ bool lex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
  *  if Sum(a1,...,an) < Sum(b1,...,bn) return NO,
  *  otherwise, return lex(a,b)
  */
-bool grlex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
-           int *bvarMap) {
+bool grlex( coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
+            int *bvarMap ) {
   int i, j, sumA, sumB;
   sumA = sumB = 0;
   i = j = 1;
-  for (i = 1; i <= aSize; i += 1) {
-    sumA += a[i];
+  for ( i = 1; i <= aSize; i += 1 ) {
+    sumA += a[ i ];
   }
 
-  for (j = 1; j <= bSize; j += 1) {
-    sumB += b[i];
+  for ( j = 1; j <= bSize; j += 1 ) {
+    sumB += b[ i ];
   }
-  if (sumA > sumB) {
+  if ( sumA > sumB ) {
     return true;
-  } else if (sumA < sumB) {
+  } else if ( sumA < sumB ) {
     return false;
   }
 
-  return lex(a, aSize, avarMap, b, bSize, bvarMap);
+  return lex( a, aSize, avarMap, b, bSize, bvarMap );
 }
 
 /**
@@ -174,40 +174,40 @@ bool grlex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
  *  if the rightmose nonzero enry of a-b is negative return YES
  *   otherwise return NO
  */
-bool grevlex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
-             int *bvarMap) {
+bool grevlex( coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
+              int *bvarMap ) {
   int i, j, sumA, sumB;
   sumA = sumB = 0;
   i = j = 1;
-  for (i = 1; i <= aSize; i += 1) {
-    sumA += a[i];
+  for ( i = 1; i <= aSize; i += 1 ) {
+    sumA += a[ i ];
   }
 
-  for (j = 1; j <= bSize; j += 1) {
-    sumB += b[j];
+  for ( j = 1; j <= bSize; j += 1 ) {
+    sumB += b[ j ];
   }
 
-  if (sumA > sumB) {
+  if ( sumA > sumB ) {
     return true;
-  } else if (sumA < sumB) {
+  } else if ( sumA < sumB ) {
     return false;
   }
 
-  while (i > 0 && j > 0) {
-    if (avarMap[i] > bvarMap[j]) {
-      if (a[i] > 0) {
+  while ( i > 0 && j > 0 ) {
+    if ( avarMap[ i ] > bvarMap[ j ] ) {
+      if ( a[ i ] > 0 ) {
         return true;
       }
       i--;
-    } else if (avarMap[i] < bvarMap[j]) {
-      if (b[j] > 0) {
+    } else if ( avarMap[ i ] < bvarMap[ j ] ) {
+      if ( b[ j ] > 0 ) {
         return false;
       }
       j--;
     } else {
-      if (a[i] > b[j]) {
+      if ( a[ i ] > b[ j ] ) {
         return true;
-      } else if (a[i] < b[j]) {
+      } else if ( a[ i ] < b[ j ] ) {
         return false;
       }
       i--;
@@ -215,17 +215,17 @@ bool grevlex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
     }
   }
 
-  while (i > 0) {
-    if (a[i--] > 0) {
+  while ( i > 0 ) {
+    if ( a[ i-- ] > 0 ) {
       return true;
     }
   }
-  while (j > 0) {
-    if (b[j--] > 0) {
+  while ( j > 0 ) {
+    if ( b[ j-- ] > 0 ) {
       return false;
     }
   }
   return true;
 }
-}
-}
+} // namespace psd
+} // namespace aiSat

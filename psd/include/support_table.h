@@ -15,8 +15,8 @@
  *
  * f= G^T M G=<G G^T,M > = \sum_{i=1}^s g_i^2
  * G called half monomial set
- * all the elements occouring in GG^T called all monomial set
- * we define an ArrangeMatrix by the location   x^a  occurring in  for every
+ * all the elements occouring in GG^T called all monomial set.
+ * We define an ArrangeMatrix by the location   x^a  occurring in  for every
  * element x^a
  * in  GG^T. For example G=[ 1 x y z ]
  * G G^T=[ 1  x    y    z ]
@@ -40,10 +40,10 @@
 namespace aiSat {
 namespace psd {
 
-Support *createSupport(const int deg, const int varId, const int consNum,
-                       int *consId);
+Support *createSupport( const int deg, const int varId, const int consNum,
+                        int *consId );
 
-void deleteSupport(Support *S);
+void deleteSupport( Support *S );
 
 class Supporttable {
   /**
@@ -60,7 +60,7 @@ class Supporttable {
      *Gsup=[ 1 x y z ], SOSsup=[ 1 x y z x^2 xy xz y^2 yz z^2]
      */
 
- private:
+private:
   // int value_capacity;
   // int value_size;
   Bimap *loc;
@@ -84,48 +84,50 @@ class Supporttable {
 
   vector<Support *> values;
 
-  int findSupElem(const int deg, const int varId, const int consNum,
-                  const int *consIds);
+  int findSupElem( const int deg, const int varId, const int consNum,
+                   const int *consIds );
 
-  int findSupElemByIndice(const int varId, const indice_t *indices,
-                          const int value_size);
+  int findSupElemByIndice( const int varId, const indice_t *indices,
+                           const int value_size );
 
- public:
+public:
   Supporttable();
   ~Supporttable();
 
-  int findSupByPoly(const Subpoly_t &subpoly);
+  int findSupByPoly( const Subpoly_t &subpoly );
 
-  int addSOSup(const int deg, const int varId, const int consNum, int *consIds);
-  int addSOSsupByIndice(const int varId, indice_t *indices,
-                        const int value_size);
+  int addSOSup( const int deg, const int varId, const int consNum,
+                int *consIds );
 
-  Support *getSupElem(const int id);
+  int addSOSsupByIndice( const int varId, indice_t *indices,
+                         const int value_size );
 
-  indice_t *getSOSsup(const int id, int *length);
+  Support *getSupElem( const int id );
 
-  indice_t *getGsup(const int id, int *length);
+  indice_t *getSOSsup( const int id, int *length );
 
-  void setSOSsup(const int id, const int len, indice_t *value);
+  indice_t *getGsup( const int id, int *length );
 
-  void setGsup(const int id, const int len, indice_t *value);
+  void setSOSsup( const int id, const int len, indice_t *value );
 
-  int addconvexsosSup( Subpoly_t &poly);
+  void setGsup( const int id, const int len, indice_t *value );
 
-  int getsosSLength(const int id);
+  int addconvexsosSup( Subpoly_t &poly );
 
-  void setArrangeM(const int id, ArrangeMatrix **value, const int gLength);
+  int getsosSLength( const int id );
 
-  ArrangeMatrix **getAMIndex(const int id, int *gLength);
+  void setArrangeM( const int id, ArrangeMatrix **value, const int gLength );
 
-  void clearSupportTable(void);
+  ArrangeMatrix **getAMIndex( const int id, int *gLength );
 
-  void deleteSupportTable(void);
+  void clearSupportTable( void );
+
+  void deleteSupportTable( void );
 
 }; /* ----------  end of struct coefMtable  ---------- */
 
 extern Supporttable SUPPORT_TABLE;
-}
-}
+} // namespace psd
+} // namespace aiSat
 
 #endif

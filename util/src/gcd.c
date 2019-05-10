@@ -25,10 +25,10 @@
 
 #include "gcd.h"
 
-unsigned long gcd(unsigned long a, unsigned long b) {
+unsigned long gcd( unsigned long a, unsigned long b ) {
   unsigned long r;
 
-  while (b) {
+  while ( b ) {
     r = a % b;
     a = b;
     b = r;
@@ -36,8 +36,8 @@ unsigned long gcd(unsigned long a, unsigned long b) {
   return a;
 }
 
-void egcd(unsigned long a, unsigned long b, long *x, long *y) {
-  long x1, x2, x3, y1, y2, y3;
+void egcd( unsigned long a, unsigned long b, long *x, long *y ) {
+  long          x1, x2, x3, y1, y2, y3;
   unsigned long r, q;
 
   x1 = 1;
@@ -45,11 +45,11 @@ void egcd(unsigned long a, unsigned long b, long *x, long *y) {
   y1 = 0;
   y2 = 1;
 
-  while (b != 0) {
-    q = a / b;
-    r = a % b;
-    a = b;
-    b = r;
+  while ( b != 0 ) {
+    q  = a / b;
+    r  = a % b;
+    a  = b;
+    b  = r;
     x3 = x1 - q * x2;
     x1 = x2;
     x2 = x3;
@@ -61,11 +61,11 @@ void egcd(unsigned long a, unsigned long b, long *x, long *y) {
   *y = y1;
 }
 
-unsigned long invert(unsigned long m, unsigned long b) {
+unsigned long invert( unsigned long m, unsigned long b ) {
   long s, t;
 
-  egcd(m, b, &t, &s);
+  egcd( m, b, &t, &s );
 
-  if (s < 0) return m + s;
+  if ( s < 0 ) return m + s;
   return s;
 }

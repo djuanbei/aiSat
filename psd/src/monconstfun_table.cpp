@@ -21,18 +21,18 @@
 namespace aiSat {
 namespace psd {
 
-fn_ptr_t getconsFunById(const int id) {
-  switch (id) {
-    case 1:
-      return homog;
-    case 2:
-      return Khomog;
-    case 3:
-      return symm;
-    case 4:
-      return linCons;
+fn_ptr_t getconsFunById( const int id ) {
+  switch ( id ) {
+  case 1:
+    return homog;
+  case 2:
+    return Khomog;
+  case 3:
+    return symm;
+  case 4:
+    return linCons;
   }
   return NULL;
 }
-}
-}
+} // namespace psd
+} // namespace aiSat

@@ -27,9 +27,9 @@ enum BOOL { FALSE = 0, TRUE = 1 };
 
 typedef enum BOOL BOOL;
 
-typedef long scalar_t;
+typedef long          scalar_t;
 typedef unsigned long uscalar_t;
-typedef void *pointer_t;
+typedef void *        pointer_t;
 #ifdef __cplusplus
 }
 #endif

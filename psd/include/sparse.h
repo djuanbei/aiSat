@@ -20,9 +20,9 @@ namespace psd {
 
 struct SparseSOSblock {
   vector<coef_t> value;
-  vector<int> index; /* location of sosM */
+  vector<int>    index; /* location of sosM */
 
-  void addSparse(const int index, const coef_t value);
+  void addSparse( const int index, const coef_t value );
 
   SparseSOSblock() {}
 };
@@ -31,9 +31,9 @@ struct SparseSOSblock {
  *  struct sparse is a special matrix have few same nonzero element
  *-----------------------------------------------------------------------------*/
 class ArrangeMatrix {
- private:
+private:
   coef_t multCF; /* coefficient of this matrix */
-  int rowLength;
+  int    rowLength;
 
   /**
    *   start from 0  all elements of matrix is one or zero
@@ -42,27 +42,27 @@ class ArrangeMatrix {
    */
   vector<SparseRowCol> data;
 
- public:
-  ArrangeMatrix(const int rowLength);
+public:
+  ArrangeMatrix( const int rowLength );
 
-  int size() const { return (int)data.size(); }
+  int size() const { return (int) data.size(); }
   int getRowLength() const { return rowLength; }
 
   coef_t getCF() const { return multCF; }
 
   void printS();
 
-  void addSparseElem(int i, int j);
+  void addSparseElem( int i, int j );
 
-  coef_t getValue(int i, int j);
+  coef_t getValue( int i, int j );
 
-  void mult(const double a);
+  void mult( const double a );
 
   string toString() const;
 
-  const SparseRowCol& operator[](int i) const { return data[i]; }
+  const SparseRowCol &operator[]( int i ) const { return data[ i ]; }
 };
-}
-}
+} // namespace psd
+} // namespace aiSat
 
 #endif

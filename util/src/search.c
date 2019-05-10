@@ -23,20 +23,20 @@
  * @return  loc if loc in [ 0, length ) if map[ loc ]==key
  * otherwise -1
  */
-int findIndex(const indice_t key[], const indice_t *map, const int length,
-              const int n) {
-  if (length <= 0) return -1;
-  int low = 0;
+int findIndex( const indice_t key[], const indice_t *map, const int length,
+               const int n ) {
+  if ( length <= 0 ) return -1;
+  int low  = 0;
   int high = length - 1;
   int mid;
   int comp;
 
-  while (high >= low) {
-    mid = (high + low) / 2;
+  while ( high >= low ) {
+    mid = ( high + low ) / 2;
 
-    if ((comp = compare(key, map + mid * n, n)) < 0) {
+    if ( ( comp = compare( key, map + mid * n, n ) ) < 0 ) {
       high = mid - 1;
-    } else if (comp > 0) {
+    } else if ( comp > 0 ) {
       low = mid + 1;
     } else {
       return mid;
@@ -57,16 +57,16 @@ int findIndex(const indice_t key[], const indice_t *map, const int length,
  * @return i if   map[i-1]<=key< map[i]
  * i  if map[i] ==key
  */
-int findLocationBettwen(const indice_t key[], const indice_t *map,
-                        const int length, const int size) {
-  int low = 0;
+int findLocationBettwen( const indice_t key[], const indice_t *map,
+                         const int length, const int size ) {
+  int low  = 0;
   int high = length - 1;
   int mid;
 
-  while (high > low) {
-    mid = (high + low) / 2;
+  while ( high > low ) {
+    mid = ( high + low ) / 2;
 
-    if (compare(key, map + mid * size, size) > 0) {
+    if ( compare( key, map + mid * size, size ) > 0 ) {
       low = mid + 1;
     } else {
       high = mid - 1;
@@ -74,7 +74,7 @@ int findLocationBettwen(const indice_t key[], const indice_t *map,
   }
   //  if(low==length) return low;
 
-  if (compare(map + low * size, key, size) > 0) {
+  if ( compare( map + low * size, key, size ) > 0 ) {
     return low;
   } else
     return low + 1;
@@ -94,33 +94,33 @@ int findLocationBettwen(const indice_t key[], const indice_t *map,
  * @return  k in [0, size)  the return k  sortedList[k-1]<key<=sortedListp[k],
 otherwise -1.
  */
-int bisearch(const void *sortedList, const void *key, const int size,
-             const size_t NSIZE, int (*cmp)(const void *, const void *),
-             int *info) {
+int bisearch( const void *sortedList, const void *key, const int size,
+              const size_t NSIZE, int ( *cmp )( const void *, const void * ),
+              int *        info ) {
   int low, high, mid = 0;
-  low = 0;
-  int cond = 0;
-  high = size - 1;
-  *info = 0;
-  char *list = (char *)sortedList;
+  low        = 0;
+  int cond   = 0;
+  high       = size - 1;
+  *info      = 0;
+  char *list = (char *) sortedList;
 
-  while (low <= high) {
-    mid = (low + high) / 2;
-    if ((cond = cmp(key, list + mid * NSIZE)) < 0)
+  while ( low <= high ) {
+    mid = ( low + high ) / 2;
+    if ( ( cond = cmp( key, list + mid * NSIZE ) ) < 0 )
       high = mid - 1;
-    else if (cond > 0)
+    else if ( cond > 0 )
       low = mid + 1;
     else
       return mid;
   }
   *info = -1;
-  if (0 == mid) {
+  if ( 0 == mid ) {
     return mid;
   }
   /*-----------------------------------------------------------------------------
    *  no match
    *-----------------------------------------------------------------------------*/
-  if (cond < 0)
+  if ( cond < 0 )
     return mid;
   else
     return mid - 1;
@@ -139,33 +139,33 @@ int bisearch(const void *sortedList, const void *key, const int size,
  *  sortedList[k-1]<key<=sortedListp[k],
  * otherwise -1.
  */
-int bisearchLocBettwen(const void *sortedList, const void *key, const int size,
-                       const size_t NSIZE,
-                       int (*cmp)(const void *, const void *)) {
+int bisearchLocBettwen( const void *sortedList, const void *key, const int size,
+                        const size_t NSIZE,
+                        int ( *cmp )( const void *, const void * ) ) {
   int low, high, mid;
-  low = 0;
-  int cond = 0;
-  high = size - 1;
-  int *list = (int *)sortedList;
-  mid = -1;
-  while (low <= high) {
-    mid = (low + high) / 2;
-    if ((cond = cmp(key, list + mid * NSIZE)) < 0)
+  low       = 0;
+  int cond  = 0;
+  high      = size - 1;
+  int *list = (int *) sortedList;
+  mid       = -1;
+  while ( low <= high ) {
+    mid = ( low + high ) / 2;
+    if ( ( cond = cmp( key, list + mid * NSIZE ) ) < 0 )
       high = mid - 1;
-    else if (cond > 0)
+    else if ( cond > 0 )
       low = mid + 1;
     else {
       return mid;
     }
   }
 
-  if (cmp(key, list + (size - 1) * NSIZE) > 0) return -1;
+  if ( cmp( key, list + ( size - 1 ) * NSIZE ) > 0 ) return -1;
 
-  if (0 == mid) return mid;
+  if ( 0 == mid ) return mid;
   /*-----------------------------------------------------------------------------
    *  no match
    *-----------------------------------------------------------------------------*/
-  if (cond < 0)
+  if ( cond < 0 )
     return mid;
   else
     return mid - 1;
@@ -185,35 +185,37 @@ int bisearchLocBettwen(const void *sortedList, const void *key, const int size,
  * @return k in [ 0,  size) if M[ k ]==key,
  -1 otherwise
  */
-int findlocation(const indice_t *M, const int size, indice_t key[], int var1Num,
-                 indice_t *varMap1, int var2Num, indice_t *varMap2) {
-  if (0 == size) {
+int findlocation( const indice_t *M, const int size, indice_t key[],
+                  int var1Num, indice_t *varMap1, int var2Num,
+                  indice_t *varMap2 ) {
+  if ( 0 == size ) {
     return -1;
   }
 
-  int low = 0;
+  int low  = 0;
   int high = size;
   int mid;
   int comp;
 
-  while (high > low) {
-    mid = (high + low) / 2;
-    comp = compareM(var1Num, M + mid * var1Num, varMap1, var2Num, key, varMap2);
+  while ( high > low ) {
+    mid = ( high + low ) / 2;
+    comp =
+        compareM( var1Num, M + mid * var1Num, varMap1, var2Num, key, varMap2 );
 
-    if (comp == 0) {
+    if ( comp == 0 ) {
       return mid;
-    } else if (comp > 0) {
+    } else if ( comp > 0 ) {
       high = mid;
     } else {
       low = mid + 1;
     }
   }
-  if (size == low) {
+  if ( size == low ) {
     return -1;
   }
 
-  if (compareM(var1Num, M + low * var1Num, varMap1, var2Num, key, varMap2) ==
-      0) {
+  if ( compareM( var1Num, M + low * var1Num, varMap1, var2Num, key, varMap2 ) ==
+       0 ) {
     return low;
   }
 

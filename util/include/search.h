@@ -29,8 +29,8 @@ extern "C" {
  * otherwise -1
  */
 
-int findIndex(const indice_t key[], const indice_t *map, const int length,
-              const int size);
+int findIndex( const indice_t key[], const indice_t *map, const int length,
+               const int size );
 
 /**
  *
@@ -44,8 +44,8 @@ int findIndex(const indice_t key[], const indice_t *map, const int length,
  * i  if map[i] ==key
  */
 
-int findLocationBettwen(const indice_t key[], const indice_t *map,
-                        const int length, const int size);
+int findLocationBettwen( const indice_t key[], const indice_t *map,
+                         const int length, const int size );
 
 /**
  *
@@ -61,9 +61,9 @@ int findLocationBettwen(const indice_t key[], const indice_t *map,
  * @return  k in [0, size)  the return k  sortedList[k-1]<key<=sortedListp[k],
  otherwise -1.
 */
-int bisearch(const void *sortedList, const void *key, const int size,
-             const size_t NSIZE, int (*com)(const void *, const void *),
-             int *info);
+int bisearch( const void *sortedList, const void *key, const int size,
+              const size_t NSIZE, int ( *com )( const void *, const void * ),
+              int *        info );
 
 /**
  *
@@ -79,9 +79,9 @@ int bisearch(const void *sortedList, const void *key, const int size,
  * otherwise -1.
  */
 
-int bisearchLocBettwen(const void *sortedList, const void *key, const int size,
-                       const size_t NSIZE,
-                       int (*cmp)(const void *, const void *));
+int bisearchLocBettwen( const void *sortedList, const void *key, const int size,
+                        const size_t NSIZE,
+                        int ( *cmp )( const void *, const void * ) );
 
 /**
  *
@@ -95,8 +95,9 @@ int bisearchLocBettwen(const void *sortedList, const void *key, const int size,
  * @return k in [ 0,  size) if M[ k ]==key,
  -1 otherwise
 */
-int findlocation(const indice_t *M, const int size, indice_t key[], int var1Num,
-                 indice_t *varMap1, int var2Num, indice_t *varMap2);
+int findlocation( const indice_t *M, const int size, indice_t key[],
+                  int var1Num, indice_t *varMap1, int var2Num,
+                  indice_t *varMap2 );
 
 #ifdef __cplusplus
 }

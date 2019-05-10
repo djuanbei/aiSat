@@ -17,8 +17,8 @@ namespace aiSat {
 
 namespace psd {
 
-bool indiceEqual(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
-                 int *bvarMap);
+bool indiceEqual( coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
+                  int *bvarMap );
 
 /**
  *
@@ -36,8 +36,8 @@ bool indiceEqual(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
  * if (a1,...,an) == (b1,...,bn) return YES
  * otherwise return false;
  */
-bool lex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
-         int *bvarMap);
+bool lex( coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
+          int *bvarMap );
 
 /**
  *
@@ -53,8 +53,8 @@ bool lex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
  *  if Sum(a1,...,an) < Sum(b1,...,bn) return NO
  *  otherwise return lex(a,b)
  */
-bool grlex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
-           int *bvarMap);
+bool grlex( coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
+            int *bvarMap );
 
 /**
  *
@@ -72,8 +72,8 @@ bool grlex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
  *  if the rightmose nonzero enry of a-b is negative return YES
  *   otherwise return NO
  */
-bool grevlex(coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
-             int *bvarMap);
-}
-}
+bool grevlex( coef_t *a, int aSize, int *avarMap, coef_t *b, int bSize,
+              int *bvarMap );
+} // namespace psd
+} // namespace aiSat
 #endif

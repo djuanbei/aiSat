@@ -26,45 +26,46 @@ namespace psd {
 
 MonomialConstTable MONO_CONS_TABLE;
 
-int MonomialConstTable::addconsElem(const int deg, const int varId,
-                                    const int* linCoef, int minValue,
-                                    const int consFunId) {
-  int re = findconsElem(deg, varId, linCoef, minValue, consFunId);
-  if (re > -1) {
+int MonomialConstTable::addconsElem( const int deg, const int varId,
+                                     const int *linCoef, int minValue,
+                                     const int consFunId ) {
+  int re = findconsElem( deg, varId, linCoef, minValue, consFunId );
+  if ( re > -1 ) {
     return re;
   }
 
   int last = values.size();
 
-  values.push_back(new MonomialConstraint());
-  values[last]->deg = deg;
-  values[last]->varId = varId;
-  values[last]->minValue = minValue;
-  values[last]->consFunId = consFunId;
-  values[last]->id = re;
+  values.push_back( new MonomialConstraint() );
+  values[ last ]->deg       = deg;
+  values[ last ]->varId     = varId;
+  values[ last ]->minValue  = minValue;
+  values[ last ]->consFunId = consFunId;
+  values[ last ]->id        = re;
 
   return re;
 }
 
-int MonomialConstTable::findconsElem(const int deg, const int varId,
-                                     const int* linCoef, int minValue,
-                                     const int consFunId) {
+int MonomialConstTable::findconsElem( const int deg, const int varId,
+                                      const int *linCoef, int minValue,
+                                      const int consFunId ) {
   int i, j, num;
   int last = values.size();
-  for (i = 0; i < last; i += 1) {
-    if (deg == values[i]->deg && varId == values[i]->varId &&
-        minValue == values[i]->minValue && consFunId == values[i]->consFunId) {
-      if (linCoef == NULL) {
+  for ( i = 0; i < last; i += 1 ) {
+    if ( deg == values[ i ]->deg && varId == values[ i ]->varId &&
+         minValue == values[ i ]->minValue &&
+         consFunId == values[ i ]->consFunId ) {
+      if ( linCoef == NULL ) {
         return i;
       }
-      num = getVarTable<indice_t>().getVarNum(varId);
+      num = getVarTable<indice_t>().getVarNum( varId );
 
-      for (j = 0; j < num; j += 1) {
-        if (linCoef[j] != values[i]->linCoefs[j]) {
+      for ( j = 0; j < num; j += 1 ) {
+        if ( linCoef[ j ] != values[ i ]->linCoefs[ j ] ) {
           break;
         }
       }
-      if (j == num) {
+      if ( j == num ) {
         return i;
       }
     }
@@ -72,19 +73,19 @@ int MonomialConstTable::findconsElem(const int deg, const int varId,
   return -1;
 }
 
-MonomialConstraint* MonomialConstTable::getconsElem(const int id) {
-  if (id >= values.size()) {
+MonomialConstraint *MonomialConstTable::getconsElem( const int id ) {
+  if ( id >= values.size() ) {
     return NULL;
   }
-  return values[id];
+  return values[ id ];
 }
 
-void MonomialConstTable::clear(void) {
+void MonomialConstTable::clear( void ) {
   int i;
-  for (i = 0; i < values.size(); i += 1) {
-    delete values[i];
+  for ( i = 0; i < values.size(); i += 1 ) {
+    delete values[ i ];
   }
   values.clear();
 }
-}
-}
+} // namespace psd
+} // namespace aiSat

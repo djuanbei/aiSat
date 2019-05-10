@@ -23,56 +23,60 @@ const uint32_t valueMap[] = {
     1u << 28, 1u << 29, 1u << 30, 1u << 31};
 struct Monomial {
   const indice_t *indice;
-  int dim;
+  int             dim;
 
   /*-----------------------------------------------------------------------------
    *  at most 128 vertex
    *-----------------------------------------------------------------------------*/
-  Monomial(const indice_t *m, const int d) : indice(m), dim(d) {}
+  Monomial( const indice_t *m, const int d )
+      : indice( m )
+      , dim( d ) {}
   operator size_t() const;
 
-  bool operator==(const Monomial &other) const;
+  bool operator==( const Monomial &other ) const;
 };
 
 struct Monomialvalue {
-  uint32_t relation[4];
-  bool change;
+  uint32_t relation[ 4 ];
+  bool     change;
 
   int value;
 
-  Monomialvalue() : change(false), value(0) {
-    relation[0] = 0u;
-    relation[1] = 0u;
-    relation[2] = 0u;
-    relation[3] = 0u;
+  Monomialvalue()
+      : change( false )
+      , value( 0 ) {
+    relation[ 0 ] = 0u;
+    relation[ 1 ] = 0u;
+    relation[ 2 ] = 0u;
+    relation[ 3 ] = 0u;
   }
-  static void add(uint32_t set[], const int v);
+  static void add( uint32_t set[], const int v );
 
-  static void add(uint32_t set[], const Monomialvalue &other);
+  static void add( uint32_t set[], const Monomialvalue &other );
 
-  static bool contain(const uint32_t set[], const Monomialvalue &other);
+  static bool contain( const uint32_t set[], const Monomialvalue &other );
 
-  static bool conjunction(const uint32_t set[], const Monomialvalue &other);
+  static bool conjunction( const uint32_t set[], const Monomialvalue &other );
 
-  void add(const int k);
+  void add( const int k );
 
-  void clear(void);
+  void clear( void );
 
-  void add(const Monomialvalue &other);
+  void add( const Monomialvalue &other );
 
-  bool contain(const Monomialvalue &other) const;
+  bool contain( const Monomialvalue &other ) const;
 
-  bool contain(const int k) const;
+  bool contain( const int k ) const;
 
-  bool conjunction(const Monomialvalue &other) const;
+  bool conjunction( const Monomialvalue &other ) const;
 
-  bool conjunction(const uint32_t set[]) const;
+  bool conjunction( const uint32_t set[] ) const;
 
-  void remove(const Monomialvalue &other);
+  void remove( const Monomialvalue &other );
 
   int size() const;
 };
-}
-}
+} // namespace psd
+} // namespace aiSat
 
 #endif

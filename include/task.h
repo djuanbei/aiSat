@@ -13,15 +13,15 @@
 typedef bool Membership_result;
 
 typedef struct {
-  bool is_equal;
+  bool    is_equal;
   BitSet *counterexample;
 } equivalence_result_t;
 
 class Task {
   int mode;
 
- public:
-  virtual Membership_result membership(BitSet *bs) { return false; }
+public:
+  virtual Membership_result membership( BitSet *bs ) { return false; }
 
-  virtual equivalence_result_t *equivalence(BitSet *bs) { return NULL; }
+  virtual equivalence_result_t *equivalence( BitSet *bs ) { return NULL; }
 };

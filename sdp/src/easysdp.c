@@ -7,76 +7,77 @@
  *
  */
 
+#include "declarations.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "declarations.h"
 
 int csdp_verbose = 1;
 
-int checkc(int n, struct blockmatrix C, int printlevel);
+int checkc( int n, struct blockmatrix C, int printlevel );
 
-int checkconstraints(int n, int kk, struct blockmatrix C, struct constraintmatrix*  constraints, int printlevel);
-    
-int easy_sdp(n, k, C, a, constraints, constant_offset, pX, py, pZ, ppobj,
-             pdobj) int n;
+int checkconstraints( int n, int kk, struct blockmatrix C,
+                      struct constraintmatrix *constraints, int printlevel );
+
+int easy_sdp( n, k, C, a, constraints, constant_offset, pX, py, pZ, ppobj,
+              pdobj ) int n;
 int k;
-struct blockmatrix C;
-double *a;
+struct blockmatrix       C;
+double *                 a;
 struct constraintmatrix *constraints;
-double constant_offset;
-struct blockmatrix *pX;
-double **py;
-struct blockmatrix *pZ;
-double *ppobj;
-double *pdobj;
+double                   constant_offset;
+struct blockmatrix *     pX;
+double **                py;
+struct blockmatrix *     pZ;
+double *                 ppobj;
+double *                 pdobj;
 {
-  int ret;
+  int                     ret;
   struct constraintmatrix fill;
-  struct paramstruc params;
-  struct blockmatrix work1;
-  struct blockmatrix work2;
-  struct blockmatrix work3;
-  struct blockmatrix bestx;
-  struct blockmatrix bestz;
-  struct blockmatrix Zi;
-  struct blockmatrix dZ;
-  struct blockmatrix dX;
-  struct blockmatrix cholxinv;
-  struct blockmatrix cholzinv;
-  double *workvec1;
-  double *workvec2;
-  double *workvec3;
-  double *workvec4;
-  double *workvec5;
-  double *workvec6;
-  double *workvec7;
-  double *workvec8;
-  double *diagO;
-  double *Fp;
-  double *O;
-  double *dy;
-  double *dy1;
-  double *rhs;
-  double *besty;
-  int printlevel;
-  int ldam;
-  struct sparseblock **byblocks;
-  struct sparseblock *ptr;
-  struct sparseblock *oldptr;
-  int i;
-  int j;
-  int blk;
-  struct sparseblock *p;
-  struct sparseblock *q;
-  struct sparseblock *prev = NULL;
-  double gap;
-  int nnz;
+  struct paramstruc       params;
+  struct blockmatrix      work1;
+  struct blockmatrix      work2;
+  struct blockmatrix      work3;
+  struct blockmatrix      bestx;
+  struct blockmatrix      bestz;
+  struct blockmatrix      Zi;
+  struct blockmatrix      dZ;
+  struct blockmatrix      dX;
+  struct blockmatrix      cholxinv;
+  struct blockmatrix      cholzinv;
+  double *                workvec1;
+  double *                workvec2;
+  double *                workvec3;
+  double *                workvec4;
+  double *                workvec5;
+  double *                workvec6;
+  double *                workvec7;
+  double *                workvec8;
+  double *                diagO;
+  double *                Fp;
+  double *                O;
+  double *                dy;
+  double *                dy1;
+  double *                rhs;
+  double *                besty;
+  int                     printlevel;
+  int                     ldam;
+  struct sparseblock **   byblocks;
+  struct sparseblock *    ptr;
+  struct sparseblock *    oldptr;
+  int                     i;
+  int                     j;
+  int                     blk;
+  struct sparseblock *    p;
+  struct sparseblock *    q;
+  struct sparseblock *    prev = NULL;
+  double                  gap;
+  int                     nnz;
 
   /*
    *  Initialize the parameters.
    */
-  initparams(&params, &printlevel);
+  initparams( &params, &printlevel );
 
   printlevel = csdp_verbose;
 
@@ -84,92 +85,92 @@ double *pdobj;
    *  Allocate working storage
    */
 
-  alloc_mat(C, &work1);
-  alloc_mat(C, &work2);
-  alloc_mat(C, &work3);
-  alloc_mat_packed(C, &bestx);
-  alloc_mat_packed(C, &bestz);
-  alloc_mat_packed(C, &cholxinv);
-  alloc_mat_packed(C, &cholzinv);
+  alloc_mat( C, &work1 );
+  alloc_mat( C, &work2 );
+  alloc_mat( C, &work3 );
+  alloc_mat_packed( C, &bestx );
+  alloc_mat_packed( C, &bestz );
+  alloc_mat_packed( C, &cholxinv );
+  alloc_mat_packed( C, &cholzinv );
 
-  besty = (double *)malloc_d(sizeof(double) * (k + 1));
+  besty = (double *) malloc_d( sizeof( double ) * ( k + 1 ) );
 
-  if (n > k) {
-    workvec1 = (double *)malloc_d(sizeof(double) * (n + 1));
+  if ( n > k ) {
+    workvec1 = (double *) malloc_d( sizeof( double ) * ( n + 1 ) );
   } else {
-    workvec1 = (double *)malloc_d(sizeof(double) * (k + 1));
+    workvec1 = (double *) malloc_d( sizeof( double ) * ( k + 1 ) );
   };
 
-  if (n > k) {
-    workvec2 = (double *)malloc_d(sizeof(double) * (n + 1));
+  if ( n > k ) {
+    workvec2 = (double *) malloc_d( sizeof( double ) * ( n + 1 ) );
   } else {
-    workvec2 = (double *)malloc_d(sizeof(double) * (k + 1));
+    workvec2 = (double *) malloc_d( sizeof( double ) * ( k + 1 ) );
   };
 
-  if (n > k) {
-    workvec3 = (double *)malloc_d(sizeof(double) * (n + 1));
+  if ( n > k ) {
+    workvec3 = (double *) malloc_d( sizeof( double ) * ( n + 1 ) );
   } else {
-    workvec3 = (double *)malloc_d(sizeof(double) * (k + 1));
+    workvec3 = (double *) malloc_d( sizeof( double ) * ( k + 1 ) );
   };
 
-  if (n > k) {
-    workvec4 = (double *)malloc_d(sizeof(double) * (n + 1));
+  if ( n > k ) {
+    workvec4 = (double *) malloc_d( sizeof( double ) * ( n + 1 ) );
   } else {
-    workvec4 = (double *)malloc_d(sizeof(double) * (k + 1));
+    workvec4 = (double *) malloc_d( sizeof( double ) * ( k + 1 ) );
   };
 
-  if (n > k) {
-    workvec5 = (double *)malloc_d(sizeof(double) * (n + 1));
+  if ( n > k ) {
+    workvec5 = (double *) malloc_d( sizeof( double ) * ( n + 1 ) );
   } else {
-    workvec5 = (double *)malloc_d(sizeof(double) * (k + 1));
+    workvec5 = (double *) malloc_d( sizeof( double ) * ( k + 1 ) );
   };
 
-  if (n > k) {
-    workvec6 = (double *)malloc_d(sizeof(double) * (n + 1));
+  if ( n > k ) {
+    workvec6 = (double *) malloc_d( sizeof( double ) * ( n + 1 ) );
   } else {
-    workvec6 = (double *)malloc_d(sizeof(double) * (k + 1));
+    workvec6 = (double *) malloc_d( sizeof( double ) * ( k + 1 ) );
   };
 
-  if (n > k) {
-    workvec7 = (double *)malloc_d(sizeof(double) * (n + 1));
+  if ( n > k ) {
+    workvec7 = (double *) malloc_d( sizeof( double ) * ( n + 1 ) );
   } else {
-    workvec7 = (double *)malloc_d(sizeof(double) * (k + 1));
+    workvec7 = (double *) malloc_d( sizeof( double ) * ( k + 1 ) );
   };
 
-  if (n > k) {
-    workvec8 = (double *)malloc_d(sizeof(double) * (n + 1));
+  if ( n > k ) {
+    workvec8 = (double *) malloc_d( sizeof( double ) * ( n + 1 ) );
   } else {
-    workvec8 = (double *)malloc_d(sizeof(double) * (k + 1));
+    workvec8 = (double *) malloc_d( sizeof( double ) * ( k + 1 ) );
   };
 
-  if (n > k) {
-    diagO = (double *)malloc_d(sizeof(double) * (n + 1));
+  if ( n > k ) {
+    diagO = (double *) malloc_d( sizeof( double ) * ( n + 1 ) );
   } else {
-    diagO = (double *)malloc_d(sizeof(double) * (k + 1));
+    diagO = (double *) malloc_d( sizeof( double ) * ( k + 1 ) );
   }
 
-  rhs = malloc_d(sizeof(double) * (k + 1));
+  rhs = malloc_d( sizeof( double ) * ( k + 1 ) );
 
-  dy = malloc_d(sizeof(double) * (k + 1));
+  dy = malloc_d( sizeof( double ) * ( k + 1 ) );
 
-  dy1 = malloc_d(sizeof(double) * (k + 1));
+  dy1 = malloc_d( sizeof( double ) * ( k + 1 ) );
 
-  Fp = malloc_d(sizeof(double) * (k + 1));
+  Fp = malloc_d( sizeof( double ) * ( k + 1 ) );
 
   /*
    *  Work out the leading dimension for the array.  Note that we may not
    *  want to use k itself, for cache issues.
    */
-  if ((k % 2) == 0)
+  if ( ( k % 2 ) == 0 )
     ldam = k + 1;
   else
     ldam = k;
 
-  O = malloc_d(sizeof(double) * ldam * ldam);
+  O = malloc_d( sizeof( double ) * ldam * ldam );
 
-  alloc_mat(C, &Zi);
-  alloc_mat(C, &dZ);
-  alloc_mat(C, &dX);
+  alloc_mat( C, &Zi );
+  alloc_mat( C, &dZ );
+  alloc_mat( C, &dX );
 
   /*
    *  Fill in lots of details in the constraints data structure that haven't
@@ -185,54 +186,55 @@ double *pdobj;
    * Next, setup issparse and NULL out all nextbyblock pointers.
    */
 
-  for (i = 1; i <= k; i++) {
-    p = constraints[i].blocks;
-    while (p != NULL) {
+  for ( i = 1; i <= k; i++ ) {
+    p = constraints[ i ].blocks;
+    while ( p != NULL ) {
       /*
        * First, set issparse.
        */
-      if (((p->numentries) > 0.25 * (p->blocksize)) && ((p->numentries) > 15)) {
+      if ( ( ( p->numentries ) > 0.25 * ( p->blocksize ) ) &&
+           ( ( p->numentries ) > 15 ) ) {
         p->issparse = 0;
       } else {
         p->issparse = 1;
       };
 
-      if (C.blocks[p->blocknum].blockcategory == DIAG) p->issparse = 1;
+      if ( C.blocks[ p->blocknum ].blockcategory == DIAG ) p->issparse = 1;
 
       /*
        * Setup the cross links.
        */
 
       p->nextbyblock = NULL;
-      p = p->next;
+      p              = p->next;
     };
   };
 
   /*
    * Now, cross link.
    */
-  for (i = 1; i <= k; i++) {
-    p = constraints[i].blocks;
-    while (p != NULL) {
-      if (p->nextbyblock == NULL) {
+  for ( i = 1; i <= k; i++ ) {
+    p = constraints[ i ].blocks;
+    while ( p != NULL ) {
+      if ( p->nextbyblock == NULL ) {
         blk = p->blocknum;
 
         /*
          * link in the remaining blocks.
          */
-        for (j = i + 1; j <= k; j++) {
-          q = constraints[j].blocks;
+        for ( j = i + 1; j <= k; j++ ) {
+          q = constraints[ j ].blocks;
 
-          while (q != NULL) {
-            if (q->blocknum == p->blocknum) {
-              if (p->nextbyblock == NULL) {
+          while ( q != NULL ) {
+            if ( q->blocknum == p->blocknum ) {
+              if ( p->nextbyblock == NULL ) {
                 p->nextbyblock = q;
                 q->nextbyblock = NULL;
-                prev = q;
+                prev           = q;
               } else {
                 prev->nextbyblock = q;
-                q->nextbyblock = NULL;
-                prev = q;
+                q->nextbyblock    = NULL;
+                prev              = q;
               };
               break;
             };
@@ -248,11 +250,11 @@ double *pdobj;
    * If necessary, print out information on sparsity of blocks.
    */
 
-  if (printlevel >= 4) {
-    for (i = 1; i <= k; i++) {
-      p = constraints[i].blocks;
-      while (p != NULL) {
-        printf("%d,%d,%d,%d \n", i, p->blocknum, p->issparse, p->numentries);
+  if ( printlevel >= 4 ) {
+    for ( i = 1; i <= k; i++ ) {
+      p = constraints[ i ].blocks;
+      while ( p != NULL ) {
+        printf( "%d,%d,%d,%d \n", i, p->blocknum, p->issparse, p->numentries );
         p = p->next;
       };
     };
@@ -262,19 +264,20 @@ double *pdobj;
    * Allocate space for byblocks pointers.
    */
 
-  byblocks = (struct sparseblock **)malloc_d((C.nblocks + 1) *
-                                             sizeof(struct sparseblock *));
+  byblocks = (struct sparseblock **) malloc_d( ( C.nblocks + 1 ) *
+                                               sizeof( struct sparseblock * ) );
 
-  for (i = 1; i <= C.nblocks; i++) byblocks[i] = NULL;
+  for ( i = 1; i <= C.nblocks; i++ )
+    byblocks[ i ] = NULL;
 
   /*
    * Fill in byblocks pointers.
    */
-  for (i = 1; i <= k; i++) {
-    ptr = constraints[i].blocks;
-    while (ptr != NULL) {
-      if (byblocks[ptr->blocknum] == NULL) {
-        byblocks[ptr->blocknum] = ptr;
+  for ( i = 1; i <= k; i++ ) {
+    ptr = constraints[ i ].blocks;
+    while ( ptr != NULL ) {
+      if ( byblocks[ ptr->blocknum ] == NULL ) {
+        byblocks[ ptr->blocknum ] = ptr;
       };
       ptr = ptr->next;
     };
@@ -287,93 +290,97 @@ double *pdobj;
    *
    */
 
-  makefill(k, C, constraints, &fill, work1, printlevel);
+  makefill( k, C, constraints, &fill, work1, printlevel );
 
   /*
    * Compute the nonzero structure of O.
    */
 
-  nnz = structnnz(n, k, C, constraints);
+  nnz = structnnz( n, k, C, constraints );
 
-  if (printlevel >= 3)
-    printf("Structural density of O %d, %e \n", nnz, nnz * 1.0 / (k * k * 1.0));
+  if ( printlevel >= 3 )
+    printf( "Structural density of O %d, %e \n", nnz,
+            nnz * 1.0 / ( k * k * 1.0 ) );
 
   /*
    * Sort entries in diagonal blocks of constraints.
    */
 
-  sort_entries(k, C, constraints);
+  sort_entries( k, C, constraints );
 
   /*
    * Check the symmetry of C.
    */
 
-  checkc(n, C, printlevel);
+  checkc( n, C, printlevel );
 
   /*
    * Check constraints.
    */
 
-  checkconstraints(n, k, C, constraints, printlevel);
+  checkconstraints( n, k, C, constraints, printlevel );
 
   /*
    *  Now, call sdp().
    */
 
-  ret = sdp(n, k, C, a, constant_offset, constraints, byblocks, fill, *pX, *py,
-            *pZ, cholxinv, cholzinv, ppobj, pdobj, work1, work2, work3,
-            workvec1, workvec2, workvec3, workvec4, workvec5, workvec6,
-            workvec7, workvec8, diagO, bestx, besty, bestz, Zi, O, rhs, dZ, dX,
-            dy, dy1, Fp, printlevel, params);
+  ret = sdp( n, k, C, a, constant_offset, constraints, byblocks, fill, *pX, *py,
+             *pZ, cholxinv, cholzinv, ppobj, pdobj, work1, work2, work3,
+             workvec1, workvec2, workvec3, workvec4, workvec5, workvec6,
+             workvec7, workvec8, diagO, bestx, besty, bestz, Zi, O, rhs, dZ, dX,
+             dy, dy1, Fp, printlevel, params );
 
-  if (printlevel >= 1) {
-    if (ret == 0) printf("Success: SDP solved\n");
-    if (ret == 1) printf("Success: SDP is primal infeasible\n");
-    if (ret == 2) printf("Success: SDP is dual infeasible\n");
-    if (ret == 3) printf("Partial Success: SDP solved with reduced accuracy\n");
-    if (ret >= 4) printf("Failure: return code is %d \n", ret);
+  if ( printlevel >= 1 ) {
+    if ( ret == 0 ) printf( "Success: SDP solved\n" );
+    if ( ret == 1 ) printf( "Success: SDP is primal infeasible\n" );
+    if ( ret == 2 ) printf( "Success: SDP is dual infeasible\n" );
+    if ( ret == 3 )
+      printf( "Partial Success: SDP solved with reduced accuracy\n" );
+    if ( ret >= 4 ) printf( "Failure: return code is %d \n", ret );
 
-    if (ret == 1) {
-      op_at(k, *py, constraints, work1);
-      addscaledmat(work1, -1.0, *pZ, work1);
+    if ( ret == 1 ) {
+      op_at( k, *py, constraints, work1 );
+      addscaledmat( work1, -1.0, *pZ, work1 );
       printf(
           "Certificate of primal infeasibility: a'*y=%.5e, ||A'(y)-Z||=%.5e\n",
-          -1.0, Fnorm(work1));
+          -1.0, Fnorm( work1 ) );
     };
 
-    if (ret == 2) {
-      op_a(k, constraints, *pX, workvec1);
-      printf("Certificate of dual infeasibility: tr(CX)=%.5e, ||A(X)||=%.5e\n",
-             trace_prod(C, *pX), norm2(k, workvec1 + 1));
+    if ( ret == 2 ) {
+      op_a( k, constraints, *pX, workvec1 );
+      printf( "Certificate of dual infeasibility: tr(CX)=%.5e, ||A(X)||=%.5e\n",
+              trace_prod( C, *pX ), norm2( k, workvec1 + 1 ) );
     };
 
-    if ((ret == 0) || (ret >= 3)) {
-      if (printlevel >= 3) {
-        printf("XZ Gap: %.7e \n", trace_prod(*pZ, *pX));
+    if ( ( ret == 0 ) || ( ret >= 3 ) ) {
+      if ( printlevel >= 3 ) {
+        printf( "XZ Gap: %.7e \n", trace_prod( *pZ, *pX ) );
         gap = *pdobj - *ppobj;
-        printf("Real Gap: %.7e \n", gap);
+        printf( "Real Gap: %.7e \n", gap );
       };
 
-      if (printlevel >= 1) {
+      if ( printlevel >= 1 ) {
         gap = *pdobj - *ppobj;
 
-        printf("Primal objective value: %.7e \n", *ppobj);
-        printf("Dual objective value: %.7e \n", *pdobj);
-        printf("Relative primal infeasibility: %.2e \n",
-               pinfeas(k, constraints, *pX, a, workvec1));
-        printf("Relative dual infeasibility: %.2e \n",
-               dinfeas(k, C, constraints, *py, *pZ, work1));
-        printf("Real Relative Gap: %.2e \n",
-               gap / (1 + fabs(*pdobj) + fabs(*ppobj)));
-        printf("XZ Relative Gap: %.2e \n",
-               trace_prod(*pZ, *pX) / (1 + fabs(*pdobj) + fabs(*ppobj)));
+        printf( "Primal objective value: %.7e \n", *ppobj );
+        printf( "Dual objective value: %.7e \n", *pdobj );
+        printf( "Relative primal infeasibility: %.2e \n",
+                pinfeas( k, constraints, *pX, a, workvec1 ) );
+        printf( "Relative dual infeasibility: %.2e \n",
+                dinfeas( k, C, constraints, *py, *pZ, work1 ) );
+        printf( "Real Relative Gap: %.2e \n",
+                gap / ( 1 + fabs( *pdobj ) + fabs( *ppobj ) ) );
+        printf( "XZ Relative Gap: %.2e \n",
+                trace_prod( *pZ, *pX ) /
+                    ( 1 + fabs( *pdobj ) + fabs( *ppobj ) ) );
 
-        printf("DIMACS error measures: %.2e %.2e %.2e %.2e %.2e %.2e\n",
-               pinfeas(k, constraints, *pX, a, workvec1) *
-                   (1 + norm2(k, a + 1)) / (1 + norminf(k, a + 1)),
-               0.0, dimacserr3(k, C, constraints, *py, *pZ, work1), 0.0,
-               gap / (1 + fabs(*pdobj) + fabs(*ppobj)),
-               trace_prod(*pZ, *pX) / (1 + fabs(*pdobj) + fabs(*ppobj)));
+        printf( "DIMACS error measures: %.2e %.2e %.2e %.2e %.2e %.2e\n",
+                pinfeas( k, constraints, *pX, a, workvec1 ) *
+                    ( 1 + norm2( k, a + 1 ) ) / ( 1 + norminf( k, a + 1 ) ),
+                0.0, dimacserr3( k, C, constraints, *py, *pZ, work1 ), 0.0,
+                gap / ( 1 + fabs( *pdobj ) + fabs( *ppobj ) ),
+                trace_prod( *pZ, *pX ) /
+                    ( 1 + fabs( *pdobj ) + fabs( *ppobj ) ) );
       };
     };
   };
@@ -382,83 +389,83 @@ double *pdobj;
    *  Now, free up all of the storage.
    */
 
-  free_mat(work1);
-  free_mat(work2);
-  free_mat(work3);
-  free_mat_packed(bestx);
-  free_mat_packed(bestz);
-  free_mat_packed(cholxinv);
-  free_mat_packed(cholzinv);
+  free_mat( work1 );
+  free_mat( work2 );
+  free_mat( work3 );
+  free_mat_packed( bestx );
+  free_mat_packed( bestz );
+  free_mat_packed( cholxinv );
+  free_mat_packed( cholzinv );
 
-  free_mat(Zi);
-  free_mat(dZ);
-  free_mat(dX);
+  free_mat( Zi );
+  free_mat( dZ );
+  free_mat( dX );
 
-  free(besty);
-  free(workvec1);
-  free(workvec2);
-  free(workvec3);
-  free(workvec4);
-  free(workvec5);
-  free(workvec6);
-  free(workvec7);
-  free(workvec8);
-  free(rhs);
-  free(dy);
-  free(dy1);
-  free(Fp);
-  free(O);
-  free(diagO);
-  free(byblocks);
+  free( besty );
+  free( workvec1 );
+  free( workvec2 );
+  free( workvec3 );
+  free( workvec4 );
+  free( workvec5 );
+  free( workvec6 );
+  free( workvec7 );
+  free( workvec8 );
+  free( rhs );
+  free( dy );
+  free( dy1 );
+  free( Fp );
+  free( O );
+  free( diagO );
+  free( byblocks );
 
   /*
    * Free up the fill data structure.
    */
 
   ptr = fill.blocks;
-  while (ptr != NULL) {
-    free(ptr->entries);
-    free(ptr->iindices);
-    free(ptr->jindices);
+  while ( ptr != NULL ) {
+    free( ptr->entries );
+    free( ptr->iindices );
+    free( ptr->jindices );
     oldptr = ptr;
-    ptr = ptr->next;
-    free(oldptr);
+    ptr    = ptr->next;
+    free( oldptr );
   };
 
   /*
    * Finally, free the constraints array.
    */
 
-  return (ret);
+  return ( ret );
 }
 
-int structnnz(n, k, C, constraints) int n;
-int k;
-struct blockmatrix C;
+int                      structnnz( n, k, C, constraints ) int n;
+int                      k;
+struct blockmatrix       C;
 struct constraintmatrix *constraints;
 {
-  int i, j;
-  int ii, jj;
-  int nnz;
+  int                 i, j;
+  int                 ii, jj;
+  int                 nnz;
   struct sparseblock *ptri;
   struct sparseblock *ptrj;
 
   nnz = 0;
-  for (i = 1; i <= k; i++)
-    for (j = 1; j <= k; j++) {
-      ptri = constraints[i].blocks;
+  for ( i = 1; i <= k; i++ )
+    for ( j = 1; j <= k; j++ ) {
+      ptri = constraints[ i ].blocks;
 
-      while (ptri != NULL) {
-        ptrj = constraints[j].blocks;
-        while (ptrj != NULL) {
-          if (ptri->blocknum == ptrj->blocknum) {
-            if (C.blocks[ptri->blocknum].blockcategory == MATRIX) {
+      while ( ptri != NULL ) {
+        ptrj = constraints[ j ].blocks;
+        while ( ptrj != NULL ) {
+          if ( ptri->blocknum == ptrj->blocknum ) {
+            if ( C.blocks[ ptri->blocknum ].blockcategory == MATRIX ) {
               nnz++;
               goto NEXTJ;
             } else { /* DIAG block */
-              for (ii = 1; ii <= ptri->numentries; ii++) {
-                for (jj = 1; jj <= ptrj->numentries; jj++) {
-                  if (ptri->iindices[ii] == ptrj->iindices[jj]) {
+              for ( ii = 1; ii <= ptri->numentries; ii++ ) {
+                for ( jj = 1; jj <= ptrj->numentries; jj++ ) {
+                  if ( ptri->iindices[ ii ] == ptrj->iindices[ jj ] ) {
                     nnz++;
                     goto NEXTJ;
                   };
@@ -475,32 +482,32 @@ struct constraintmatrix *constraints;
     NEXTJ:;
     }; /* end nested fors */
 
-  return (nnz);
+  return ( nnz );
 }
 
-int actnnz(n, lda, A) int n;
-int lda;
+int    actnnz( n, lda, A ) int n;
+int    lda;
 double A[];
 {
   int i, j;
   int nnz;
 
   nnz = 0;
-  for (i = 1; i <= n; i++) {
-    if (A[ijtok(i, i, lda)] != 0.0) nnz++;
-    for (j = i + 1; j <= n; j++) {
-      if (A[ijtok(i, j, lda)] != 0.0) {
+  for ( i = 1; i <= n; i++ ) {
+    if ( A[ ijtok( i, i, lda ) ] != 0.0 ) nnz++;
+    for ( j = i + 1; j <= n; j++ ) {
+      if ( A[ ijtok( i, j, lda ) ] != 0.0 ) {
         nnz++;
         nnz++;
       };
     };
   };
 
-  return (nnz);
+  return ( nnz );
 }
 
-int bandwidth(n, lda, A) int n;
-int lda;
+int    bandwidth( n, lda, A ) int n;
+int    lda;
 double A[];
 {
   int i;
@@ -508,16 +515,16 @@ double A[];
   int bw;
 
   bw = 0;
-  for (j = 2; j <= n; j++) {
-    for (i = 1; i <= j - 1; i++) {
-      if (A[ijtok(i, j, lda)] != 0.0) {
-        if ((j - i) > bw) bw = j - i;
+  for ( j = 2; j <= n; j++ ) {
+    for ( i = 1; i <= j - 1; i++ ) {
+      if ( A[ ijtok( i, j, lda ) ] != 0.0 ) {
+        if ( ( j - i ) > bw ) bw = j - i;
         break;
       };
     };
   };
 
-  return (bw);
+  return ( bw );
 }
 
 /*
@@ -526,106 +533,108 @@ double A[];
  * return 0;
  */
 
-int checkc(int n, struct blockmatrix C, int printlevel) {
+int checkc( int n, struct blockmatrix C, int printlevel ) {
   int i, j, k;
   int totalsize;
 
   totalsize = 0;
-  for (k = 1; k <= C.nblocks; k++) {
-    if (printlevel > 0)
-      printf("C block %d, blocksize, %d\n", k, C.blocks[k].blocksize);
-    if (C.blocks[k].blockcategory == DIAG) {
-      if (printlevel > 5) printf("blockcategory=diag\n");
+  for ( k = 1; k <= C.nblocks; k++ ) {
+    if ( printlevel > 0 )
+      printf( "C block %d, blocksize, %d\n", k, C.blocks[ k ].blocksize );
+    if ( C.blocks[ k ].blockcategory == DIAG ) {
+      if ( printlevel > 5 ) printf( "blockcategory=diag\n" );
     };
-    if (C.blocks[k].blockcategory == MATRIX) {
-      if (printlevel > 5) printf("blockcategory=matrix\n");
+    if ( C.blocks[ k ].blockcategory == MATRIX ) {
+      if ( printlevel > 5 ) printf( "blockcategory=matrix\n" );
     };
 
-    totalsize = totalsize + C.blocks[k].blocksize;
+    totalsize = totalsize + C.blocks[ k ].blocksize;
 
-    if (C.blocks[k].blockcategory == MATRIX) {
-      for (i = 1; i <= C.blocks[k].blocksize; i++) {
-        for (j = 1; j <= C.blocks[k].blocksize; j++) {
-          if (C.blocks[k].data.mat[ijtok(i, j, C.blocks[k].blocksize)] !=
-              C.blocks[k].data.mat[ijtok(j, i, C.blocks[k].blocksize)]) {
-            printf("C is not symmetric, %d, %d, %d\n", k, i, j);
-            exit(10);
+    if ( C.blocks[ k ].blockcategory == MATRIX ) {
+      for ( i = 1; i <= C.blocks[ k ].blocksize; i++ ) {
+        for ( j = 1; j <= C.blocks[ k ].blocksize; j++ ) {
+          if ( C.blocks[ k ]
+                   .data.mat[ ijtok( i, j, C.blocks[ k ].blocksize ) ] !=
+               C.blocks[ k ]
+                   .data.mat[ ijtok( j, i, C.blocks[ k ].blocksize ) ] ) {
+            printf( "C is not symmetric, %d, %d, %d\n", k, i, j );
+            exit( 10 );
           }
         };
       };
     };
   };
 
-  if (totalsize != n) {
-    printf("Sum of block sizes does not equal n!\n");
-    exit(10);
+  if ( totalsize != n ) {
+    printf( "Sum of block sizes does not equal n!\n" );
+    exit( 10 );
   };
 
-  return (0);
+  return ( 0 );
 }
 
 /*
  * Sanity tests on the constraints data structure.
  */
 
-int checkconstraints(int n, int k, struct blockmatrix C, struct constraintmatrix * constraints, int printlevel) 
-{
-  int i, j;
+int checkconstraints( int n, int k, struct blockmatrix C,
+                      struct constraintmatrix *constraints, int printlevel ) {
+  int                 i, j;
   struct sparseblock *p;
 
-  for (i = 1; i <= k; i++) {
-    if (printlevel > 2) printf("Checking constraint %d \n", i);
+  for ( i = 1; i <= k; i++ ) {
+    if ( printlevel > 2 ) printf( "Checking constraint %d \n", i );
 
-    p = constraints[i].blocks;
-    if (p == NULL) {
-      printf("Constraint %d is empty!\n", i);
-      exit(10);
+    p = constraints[ i ].blocks;
+    if ( p == NULL ) {
+      printf( "Constraint %d is empty!\n", i );
+      exit( 10 );
     };
-    while (p != NULL) {
-      if (p->constraintnum != i) {
-        printf("p->constraintnum != i, i=%d \n", i);
-        exit(10);
+    while ( p != NULL ) {
+      if ( p->constraintnum != i ) {
+        printf( "p->constraintnum != i, i=%d \n", i );
+        exit( 10 );
       };
-      if (p->blocksize != C.blocks[p->blocknum].blocksize) {
-        printf("p->blocksize is wrong, constraint %d \n", i);
-        exit(10);
+      if ( p->blocksize != C.blocks[ p->blocknum ].blocksize ) {
+        printf( "p->blocksize is wrong, constraint %d \n", i );
+        exit( 10 );
       };
-      if (printlevel > 5)
-        printf("Constraint %d, block %d, entries %d\n", i, p->blocknum,
-               p->numentries);
-      for (j = 1; j <= p->numentries; j++) {
-        if (printlevel > 6)
-          printf(" (%d, %d)=%lf\n", p->iindices[j], p->jindices[j],
-                 p->entries[j]);
+      if ( printlevel > 5 )
+        printf( "Constraint %d, block %d, entries %d\n", i, p->blocknum,
+                p->numentries );
+      for ( j = 1; j <= p->numentries; j++ ) {
+        if ( printlevel > 6 )
+          printf( " (%d, %d)=%lf\n", p->iindices[ j ], p->jindices[ j ],
+                  p->entries[ j ] );
 
-        if (p->iindices[j] > C.blocks[p->blocknum].blocksize) {
-          printf("i index is larger than blocksize!\n");
-          exit(10);
+        if ( p->iindices[ j ] > C.blocks[ p->blocknum ].blocksize ) {
+          printf( "i index is larger than blocksize!\n" );
+          exit( 10 );
         };
 
-        if (p->jindices[j] > C.blocks[p->blocknum].blocksize) {
-          printf("j index is larger than blocksize!\n");
-          exit(10);
+        if ( p->jindices[ j ] > C.blocks[ p->blocknum ].blocksize ) {
+          printf( "j index is larger than blocksize!\n" );
+          exit( 10 );
         };
 
-        if (p->iindices[j] < 1) {
-          printf("i index is less than 1!\n");
-          exit(10);
+        if ( p->iindices[ j ] < 1 ) {
+          printf( "i index is less than 1!\n" );
+          exit( 10 );
         };
-        if (p->jindices[j] < 1) {
-          printf("j index is less than 1!\n");
-          exit(10);
+        if ( p->jindices[ j ] < 1 ) {
+          printf( "j index is less than 1!\n" );
+          exit( 10 );
         };
 
-        if (C.blocks[p->blocknum].blockcategory == DIAG) {
-          if (p->iindices[j] != p->jindices[j]) {
-            printf("Off diagonal entry in diagonal block!\n");
-            exit(10);
+        if ( C.blocks[ p->blocknum ].blockcategory == DIAG ) {
+          if ( p->iindices[ j ] != p->jindices[ j ] ) {
+            printf( "Off diagonal entry in diagonal block!\n" );
+            exit( 10 );
           };
         };
       };
       p = p->next;
     };
   };
-  return (0);
+  return ( 0 );
 }

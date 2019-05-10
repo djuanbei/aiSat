@@ -22,15 +22,15 @@
 
 #include <stdlib.h>
 
-#if defined(__WIN32)
-void print_stack_trace(int fd) {}
+#if defined( __WIN32 )
+void print_stack_trace( int fd ) {}
 #else
 #include <execinfo.h>
 
-void print_stack_trace(int fd) {
-  void *array[256];
+void print_stack_trace( int fd ) {
+  void * array[ 256 ];
   size_t size;
-  size = backtrace(array, 256);
-  backtrace_symbols_fd(array, size, fd);
+  size = backtrace( array, 256 );
+  backtrace_symbols_fd( array, size, fd );
 }
 #endif

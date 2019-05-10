@@ -21,9 +21,9 @@
 extern "C" {
 #endif
 
-void* malloc_d(const size_t);
-void* calloc_d(const size_t, const size_t);
-void* realloc_d(void*, const size_t);
+void *malloc_d( const size_t );
+void *calloc_d( const size_t, const size_t );
+void *realloc_d( void *, const size_t );
 
 #ifdef __cplusplus
 }

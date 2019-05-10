@@ -21,36 +21,37 @@ namespace psd {
 
 enum POLY_SOS_T { NOSOS, CONVEX_POLY, EXACTLY_SOS, UNHNOW };
 
-indice_t* overConvexHull(const indice_t* genSet, const int length,
-                         const int dim, int* relength);
+indice_t *overConvexHull( const indice_t *genSet, const int length,
+                          const int dim, int *relength );
 
-int reduceByLestEignV(indice_t* candidateSet, const int candLength,
-                      const int dim, const indice_t* genSet,
-                      const int genLength, const int max[]);
+int reduceByLestEignV( indice_t *candidateSet, const int candLength,
+                       const int dim, const indice_t *genSet,
+                       const int genLength, const int max[] );
 
-int reduceByPlane(indice_t* candidateSet, const int length, const int dim,
-                  const int* coefs, int maxSum);
+int reduceByPlane( indice_t *candidateSet, const int length, const int dim,
+                   const int *coefs, int maxSum );
 
 class ConvexGenerator {
- private:
-  const Subpoly_t& subpoly;
+private:
+  const Subpoly_t &subpoly;
 
-  POLY_SOS_T checkThreeP(const int dim, PointList* ans);
+  POLY_SOS_T checkThreeP( const int dim, PointList *ans );
 
- public:
-  ConvexGenerator(const Subpoly_t& subp) : subpoly(subp) {}
+public:
+  ConvexGenerator( const Subpoly_t &subp )
+      : subpoly( subp ) {}
 
-  POLY_SOS_T easyCheck(PointList* ans);
+  POLY_SOS_T easyCheck( PointList *ans );
 
-  int onSameSurf(const int* checkPoints, const int size, indice_t* rePoints,
-                 const int limt);
+  int onSameSurf( const int *checkPoints, const int size, indice_t *rePoints,
+                  const int limt );
 
-  indice_t* randPointSet(const int length, const int dim, const int domain);
+  indice_t *randPointSet( const int length, const int dim, const int domain );
 
-  int reduceConvexHull(indice_t* candidateSet, const int length, const int dim,
-                       const indice_t* genSet, const int lengthG);
+  int reduceConvexHull( indice_t *candidateSet, const int length, const int dim,
+                        const indice_t *genSet, const int lengthG );
 };
-}
-}
+} // namespace psd
+} // namespace aiSat
 
 #endif

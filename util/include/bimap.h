@@ -17,25 +17,25 @@
 extern "C" {
 #endif
 struct bimap {
-  int capacity;
-  int size;
-  int *values;  // values[ 2*k ]=value; values[ 2*k+1 ]= key
-  int *keys;    // keys[ 2*i ]=key; keys[ 2*i+1 ]=value
+  int  capacity;
+  int  size;
+  int *values; // values[ 2*k ]=value; values[ 2*k+1 ]= key
+  int *keys;   // keys[ 2*i ]=key; keys[ 2*i+1 ]=value
 };
 
 typedef struct bimap Bimap;
 
-Bimap *createBimap(void);
+Bimap *createBimap( void );
 
-int addBimapElem(Bimap *, int value);
+int addBimapElem( Bimap *, int value );
 
-int findBimapByKey(Bimap *, const int key);
+int findBimapByKey( Bimap *, const int key );
 
-int findBimapByValue(Bimap *, const int value);
+int findBimapByValue( Bimap *, const int value );
 
-void deleteBimap(Bimap *);
+void deleteBimap( Bimap * );
 
-void clearBimap(Bimap *);
+void clearBimap( Bimap * );
 
 #ifdef __cplusplus
 }

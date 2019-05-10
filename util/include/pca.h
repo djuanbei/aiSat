@@ -15,7 +15,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-int lpca(double *A, const int n, const int m, double *VT, BOOL needCenter);
+int lpca( double *A, const int n, const int m, double *VT, BOOL needCenter );
 
 #ifdef __cplusplus
 }

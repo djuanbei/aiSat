@@ -4,12 +4,12 @@
   been factored.
 */
 
+#include "declarations.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "declarations.h"
 
-int solvesys(m, ldam, A, rhs) int m;
-int ldam;
+int     solvesys( m, ldam, A, rhs ) int m;
+int     ldam;
 double *A;
 double *rhs;
 {
@@ -17,11 +17,11 @@ double *rhs;
   int info;
 
   incx = 1;
-  MY_DPOTRS("U", &m, &incx, A, &ldam, rhs + 1, &ldam, &info);
+  MY_DPOTRS( "U", &m, &incx, A, &ldam, rhs + 1, &ldam, &info );
 
-  if (info != 0) {
-    return (6);
+  if ( info != 0 ) {
+    return ( 6 );
   };
 
-  return (0);
+  return ( 0 );
 }

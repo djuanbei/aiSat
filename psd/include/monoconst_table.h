@@ -20,23 +20,23 @@ namespace aiSat {
 namespace psd {
 
 class MonomialConstTable {
- private:
-  vector<MonomialConstraint*> values;
+private:
+  vector<MonomialConstraint *> values;
 
- public:
-  int addconsElem(const int deg, const int varId, const int* linCoef,
-                  int minValue, const int consFunId);
+public:
+  int addconsElem( const int deg, const int varId, const int *linCoef,
+                   int minValue, const int consFunId );
 
-  int findconsElem(const int deg, const int varId, const int* linCoef,
-                   int minValue, const int consFunId);
+  int findconsElem( const int deg, const int varId, const int *linCoef,
+                    int minValue, const int consFunId );
 
-  MonomialConstraint* getconsElem(const int id);
+  MonomialConstraint *getconsElem( const int id );
 
-  void clear(void);
+  void clear( void );
 };
 
 extern MonomialConstTable MONO_CONS_TABLE;
-}
-}
+} // namespace psd
+} // namespace aiSat
 
 #endif

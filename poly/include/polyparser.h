@@ -10,8 +10,8 @@ namespace aiSat {
 
 namespace poly {
 
-Poly<coef_t, indice_t> parse(const string &str);
+Poly<coef_t, indice_t> parse( const string &str );
 }
-}
+} // namespace aiSat
 
 #endif

@@ -11,22 +11,22 @@
 #ifndef __PSD_TYPE_H
 #define __PSD_TYPE_H
 
-#include <cstdint>
 #include "poly.hpp"
-#include "subpoly.hpp"
 #include "polynomialconstraint.h"
+#include "subpoly.hpp"
 #include "util.h"
+#include <cstdint>
 namespace aiSat {
 namespace psd {
 using namespace poly;
 
-typedef Poly<coef_t, indice_t> Poly_t;
+typedef Poly<coef_t, indice_t>    Poly_t;
 typedef Subpoly<coef_t, indice_t> Subpoly_t;
 
 /**
-*An array of spare two dimension coordinate
-*
-*/
+ *An array of spare two dimension coordinate
+ *
+ */
 
 struct sparseRowCol {
   uint32_t row : 16;
@@ -44,15 +44,14 @@ enum monomialConstraintType { HOMOG, KHOMOG, SYMM };
 typedef enum monomialConstraintType monomialConstraintType;
 
 struct MonomialConstraint {
-  int id;
-  int deg;
-  int varId;
+  int  id;
+  int  deg;
+  int  varId;
   int *linCoefs;
-  int minValue; /* only use in linconstraints */
-  int consFunId;
+  int  minValue; /* only use in linconstraints */
+  int  consFunId;
   MonomialConstraint() { linCoefs = NULL; }
 };
-
 
 enum SupportType { NORMAL, SUB_POLY, INDICE };
 
@@ -61,40 +60,40 @@ struct Support {
 
   Subpoly_t *subp;
 
-  uint8_t md5sum[DIGEST_SIZE];
+  uint8_t md5sum[ DIGEST_SIZE ];
 
-  int deg;
-  int varId;
+  int  deg;
+  int  varId;
   int *consId;
-  int constNum;
-  int consCap;
-  Support(const int evarId, const indice_t *indices, const int size) {
+  int  constNum;
+  int  consCap;
+  Support( const int evarId, const indice_t *indices, const int size ) {
     subp = NULL;
     type = INDICE;
-    md5sumbyIndice(md5sum, evarId, indices, size);
-    varId = evarId;
+    md5sumbyIndice( md5sum, evarId, indices, size );
+    varId  = evarId;
     consId = NULL;
   }
 
-  Support(Subpoly_t *subpoly) {
+  Support( Subpoly_t *subpoly ) {
     type = SUB_POLY;
     subp = subpoly;
 
-    memcpy(md5sum, subpoly->getmd5(), DIGEST_SIZE);
+    memcpy( md5sum, subpoly->getmd5(), DIGEST_SIZE );
 
     deg = subpoly->getTotalDegree();
 
-    varId = subpoly->getParent().getVarId();
+    varId    = subpoly->getParent().getVarId();
     constNum = 0;
-    consId = NULL;
-    consCap = 0;
+    consId   = NULL;
+    consCap  = 0;
   }
   ~Support() {
-    if (consId != NULL) {
-      free(consId);
+    if ( consId != NULL ) {
+      free( consId );
     }
   }
 };
-}
-}
+} // namespace psd
+} // namespace aiSat
 #endif

@@ -24,29 +24,29 @@ namespace psd {
 
 PolyConstraintTable POLY_CONS_Table;
 
-int PolyConstraintTable::addcoefElem(const PolyConstraintType type,
-                                     const int mId) {
-  int loc = findcoefElem(type, mId);
-  if (loc > -1) {
+int PolyConstraintTable::addcoefElem( const PolyConstraintType type,
+                                      const int                mId ) {
+  int loc = findcoefElem( type, mId );
+  if ( loc > -1 ) {
     return loc;
   }
 
   int last = (int) values.size();
-  values.push_back(new PolyConstraint());
-  values[last]->type = type;
-  values[last]->supportId = mId;
+  values.push_back( new PolyConstraint() );
+  values[ last ]->type      = type;
+  values[ last ]->supportId = mId;
 
   return last;
 }
 
-int PolyConstraintTable::findcoefElem(const PolyConstraintType type,
-                                      const int mId) {
+int PolyConstraintTable::findcoefElem( const PolyConstraintType type,
+                                       const int                mId ) {
   int i;
-  for (i = 0; i < values.size(); i += 1) {
-    if (values[i]->type == type && values[i]->supportId == mId) return i;
+  for ( i = 0; i < values.size(); i += 1 ) {
+    if ( values[ i ]->type == type && values[ i ]->supportId == mId ) return i;
   }
 
   return -1;
 }
-}
-}
+} // namespace psd
+} // namespace aiSat

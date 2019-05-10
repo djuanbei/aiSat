@@ -9,11 +9,11 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "poly.hpp"
 #include "polyparser.h"
 #include "subpoly.hpp"
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace aiSat::poly;
 
@@ -21,22 +21,22 @@ typedef Poly<coef_t, indice_t> Poly_t;
 
 typedef Subpoly<coef_t, indice_t> Subpoly_t;
 
-int main(int argc, char* argv[]) {
-  Poly_t p = parse("x^2+y^2+1+(x+23)^2");
+int main( int argc, char *argv[] ) {
+  Poly_t p = parse( "x^2+y^2+1+(x+23)^2" );
 
-  cout << p.getCF("x^2") << endl;
+  cout << p.getCF( "x^2" ) << endl;
 
   // Poly_t  p = parse("(x+1)*(y+1)+x^2+x^2*y+2*j+33*z");
 
   vector<int> locs1, lcos2;
-  locs1.push_back(1);
-  locs1.push_back(2);
-  locs1.push_back(3);
-  Subpoly_t sp1(p, locs1);
+  locs1.push_back( 1 );
+  locs1.push_back( 2 );
+  locs1.push_back( 3 );
+  Subpoly_t sp1( p, locs1 );
 
-  Subpoly_t sp2(p, locs1);
+  Subpoly_t sp2( p, locs1 );
 
-  if (sp1 == sp2) {
+  if ( sp1 == sp2 ) {
     cout << "sss" << endl;
   }
 

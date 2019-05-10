@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-void f2rat(const double orig, const int bound, int* den, int* num);
+void f2rat( const double orig, const int bound, int *den, int *num );
 
 #ifdef __cplusplus
 }

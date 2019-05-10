@@ -18,7 +18,7 @@
 namespace aiSat {
 namespace psd {
 
-bool consEval(indice_t *, const int varId, MonomialConstraint *C);
+bool consEval( indice_t *, const int varId, MonomialConstraint *C );
 
 /**
  * @brief
@@ -35,18 +35,18 @@ bool consEval(indice_t *, const int varId, MonomialConstraint *C);
  *
  * @return
  */
-bool homog(indice_t *a, const int varId, const int cdeg, const int cvarId,
-           const int *clinCoefs, const int cminValue);
+bool homog( indice_t *a, const int varId, const int cdeg, const int cvarId,
+            const int *clinCoefs, const int cminValue );
 
-bool Khomog(indice_t *a, const int varId, const int cdeg, const int cvarId,
-            const int *clinCoefs, const int cminValue);
+bool Khomog( indice_t *a, const int varId, const int cdeg, const int cvarId,
+             const int *clinCoefs, const int cminValue );
 
-bool symm(indice_t *a, const int varId, const int cdeg, const int cvarId,
-          const int *clinCoefs, const int cminValue);
+bool symm( indice_t *a, const int varId, const int cdeg, const int cvarId,
+           const int *clinCoefs, const int cminValue );
 
-bool linCons(indice_t *a, const int varId, const int cdeg, const int cvarId,
-             const int *clinCoefs, const int cminValue);
-}
-}
+bool linCons( indice_t *a, const int varId, const int cdeg, const int cvarId,
+              const int *clinCoefs, const int cminValue );
+} // namespace psd
+} // namespace aiSat
 
 #endif

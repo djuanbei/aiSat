@@ -17,12 +17,12 @@
 namespace aiSat {
 namespace psd {
 
-typedef bool (*fn_ptr_t)(indice_t *a, const int varId, const int cdeg,
-                         const int cvarId, const int *clinCoefs,
-                         const int cminValue);
+typedef bool ( *fn_ptr_t )( indice_t *a, const int varId, const int cdeg,
+                            const int cvarId, const int *clinCoefs,
+                            const int cminValue );
 
-fn_ptr_t getconsFunById(const int id);
-}
-}
+fn_ptr_t getconsFunById( const int id );
+} // namespace psd
+} // namespace aiSat
 
 #endif

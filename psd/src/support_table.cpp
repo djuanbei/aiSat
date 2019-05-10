@@ -33,63 +33,63 @@
 
 #include "support_table.h"
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include "crypt_md5.h"
 #include "psdutil.h"
 #include "sort.h"
 #include "sparse.h"
 #include "util.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 namespace aiSat {
 namespace psd {
 
-Support *createSupport(const int deg, const int varId, const int consNum,
-                       int *consId) {
+Support *createSupport( const int deg, const int varId, const int consNum,
+                        int *consId ) {
   Support *re;
-  re = (Support *)malloc_d(sizeof(Support));
+  re       = (Support *) malloc_d( sizeof( Support ) );
   re->type = NORMAL;
 
   re->varId = -1;
-  memset(re->md5sum, 0, DIGEST_SIZE);
+  memset( re->md5sum, 0, DIGEST_SIZE );
 
   /*-----------------------------------------------------------------------------
    *  have some problems
    *-----------------------------------------------------------------------------*/
-  re->md5sum[0] = (uint8_t)deg;
-  re->md5sum[1] = (uint8_t)varId;
-  re->md5sum[2] = (uint8_t)consNum;
+  re->md5sum[ 0 ] = (uint8_t) deg;
+  re->md5sum[ 1 ] = (uint8_t) varId;
+  re->md5sum[ 2 ] = (uint8_t) consNum;
 
-  re->deg = deg;
-  re->varId = varId;
+  re->deg      = deg;
+  re->varId    = varId;
   re->constNum = consNum;
-  re->consId = consId;
-  re->consCap = consNum;
+  re->consId   = consId;
+  re->consCap  = consNum;
   return re;
 }
 
-int Supporttable::findSupElem(const int deg, const int varId, const int consNum,
-                              const int *consIds) {
+int Supporttable::findSupElem( const int deg, const int varId,
+                               const int consNum, const int *consIds ) {
   int i, j;
 
   /* 	if(0==deg) return 0;
    */
   /* when deg==0 the sosM is constant 1 */
 
-  for (i = 0; i < (int)values.size(); i += 1) {
-    if (values[i]->type == NORMAL) {
-      if (deg == values[i]->deg && varId == values[i]->varId &&
-          consNum == values[i]->constNum) {
+  for ( i = 0; i < (int) values.size(); i += 1 ) {
+    if ( values[ i ]->type == NORMAL ) {
+      if ( deg == values[ i ]->deg && varId == values[ i ]->varId &&
+           consNum == values[ i ]->constNum ) {
         j = 0;
-        while (j < consNum) {
-          if (consIds[j] != values[i]->consId[j]) {
+        while ( j < consNum ) {
+          if ( consIds[ j ] != values[ i ]->consId[ j ] ) {
             break;
           }
           j++;
         }
-        if (j == consNum) {
-          return findBimapByValue(loc, i);
+        if ( j == consNum ) {
+          return findBimapByValue( loc, i );
         }
       }
     }
@@ -98,182 +98,182 @@ int Supporttable::findSupElem(const int deg, const int varId, const int consNum,
   return -1;
 }
 
-int Supporttable::findSupByPoly(const Subpoly_t &subpoly) {
+int Supporttable::findSupByPoly( const Subpoly_t &subpoly ) {
   int i = 0;
-  for (i = 0; i < (int)values.size(); i += 1) {
-    if (values[i]->type == SUB_POLY) {
-      if (0 == memcmp(values[i]->md5sum, subpoly.getmd5(), DIGEST_SIZE)) {
-        return findBimapByValue(loc, i);
+  for ( i = 0; i < (int) values.size(); i += 1 ) {
+    if ( values[ i ]->type == SUB_POLY ) {
+      if ( 0 == memcmp( values[ i ]->md5sum, subpoly.getmd5(), DIGEST_SIZE ) ) {
+        return findBimapByValue( loc, i );
       }
     }
   }
   return -1;
 }
 
-int Supporttable::findSupElemByIndice(const int varId, const indice_t *indices,
-                                      const int value_size) {
-  int i;
-  uint8_t md5sum[DIGEST_SIZE];
-  md5sumbyIndice(md5sum, varId, indices, value_size);
-  for (i = 0; i < (int)values.size(); i++) {
-    if (values[i]->type == INDICE &&
-        0 == memcmp(values[i]->md5sum, md5sum, DIGEST_SIZE)) {
-      return findBimapByValue(loc, i);
+int Supporttable::findSupElemByIndice( const int varId, const indice_t *indices,
+                                       const int value_size ) {
+  int     i;
+  uint8_t md5sum[ DIGEST_SIZE ];
+  md5sumbyIndice( md5sum, varId, indices, value_size );
+  for ( i = 0; i < (int) values.size(); i++ ) {
+    if ( values[ i ]->type == INDICE &&
+         0 == memcmp( values[ i ]->md5sum, md5sum, DIGEST_SIZE ) ) {
+      return findBimapByValue( loc, i );
     }
   }
   return -1;
 }
 
-int Supporttable::addSOSup(const int deg, const int varId, const int consNum,
-                           int *consIds) {
-  int re = findSupElem(deg, varId, consNum, consIds);
- 
-  if (re > -1) {
+int Supporttable::addSOSup( const int deg, const int varId, const int consNum,
+                            int *consIds ) {
+  int re = findSupElem( deg, varId, consNum, consIds );
+
+  if ( re > -1 ) {
     return re;
   }
 
-  re = (int)values.size();
-  values.push_back(createSupport(deg, varId, consNum, consIds));
+  re = (int) values.size();
+  values.push_back( createSupport( deg, varId, consNum, consIds ) );
 
-  SOSsup.push_back(NULL);
-  sosLength.push_back(0);
+  SOSsup.push_back( NULL );
+  sosLength.push_back( 0 );
 
-  Gsup.push_back(NULL);
-  gLength.push_back(0);
+  Gsup.push_back( NULL );
+  gLength.push_back( 0 );
 
-  arrangeM.push_back(NULL);
-  return addBimapElem(loc, re);
+  arrangeM.push_back( NULL );
+  return addBimapElem( loc, re );
 }
 
-int Supporttable::addSOSsupByIndice(const int varId, indice_t *indices,
-                                    const int esize) {
-  qsortM(indices, getVarTable<indice_t>().getVarNum(varId), 0, esize - 1,
-         compare);
+int Supporttable::addSOSsupByIndice( const int varId, indice_t *indices,
+                                     const int esize ) {
+  qsortKElem( indices, getVarTable<indice_t>().getVarNum( varId ), 0, esize - 1,
+              compare );
 
-  int re = findSupElemByIndice(varId, indices, esize);
+  int re = findSupElemByIndice( varId, indices, esize );
 
-  if (re > -1) {
+  if ( re > -1 ) {
     return re;
   }
-  re = values.size();
+  re             = values.size();
   int value_size = re;
-  values.push_back(new Support(varId, indices, value_size));
+  values.push_back( new Support( varId, indices, value_size ) );
 
-  SOSsup.push_back(NULL);
-  sosLength.push_back(0);
+  SOSsup.push_back( NULL );
+  sosLength.push_back( 0 );
 
-  Gsup.push_back(NULL);
-  gLength.push_back(0);
-  arrangeM.push_back(NULL);
+  Gsup.push_back( NULL );
+  gLength.push_back( 0 );
+  arrangeM.push_back( NULL );
 
-  return addBimapElem(loc, re);
+  return addBimapElem( loc, re );
 }
 
-Support *Supporttable::getSupElem(const int id) {
-  int index = findBimapByKey(loc, id);
+Support *Supporttable::getSupElem( const int id ) {
+  int index = findBimapByKey( loc, id );
 
-  if (index < 0) {
+  if ( index < 0 ) {
     return NULL;
   }
-  return values[index];
+  return values[ index ];
 }
 
-indice_t *Supporttable::getSOSsup(const int id, int *length) {
-  int index = findBimapByKey(loc, id);
-  if (index < 0) {
+indice_t *Supporttable::getSOSsup( const int id, int *length ) {
+  int index = findBimapByKey( loc, id );
+  if ( index < 0 ) {
     return NULL;
   }
-  *length = sosLength[index];
+  *length = sosLength[ index ];
 
-  return SOSsup[index];
+  return SOSsup[ index ];
 }
 
-indice_t *Supporttable::getGsup(const int id, int *length) {
-  int index = findBimapByKey(loc, id);
-  if (index < 0) {
+indice_t *Supporttable::getGsup( const int id, int *length ) {
+  int index = findBimapByKey( loc, id );
+  if ( index < 0 ) {
     return NULL;
   }
 
-  *length = gLength[index];
-  return Gsup[index];
+  *length = gLength[ index ];
+  return Gsup[ index ];
 }
 
-void Supporttable::setSOSsup(const int id, const int len, indice_t *value) {
-  int index = findBimapByKey(loc, id);
+void Supporttable::setSOSsup( const int id, const int len, indice_t *value ) {
+  int index = findBimapByKey( loc, id );
 
-  ASSERT(index > -1, "There are some bugs");
-  if (index < 0) return;
-  sosLength[index] = len;
-  SOSsup[index] = value;
+  ASSERT( index > -1, "There are some bugs" );
+  if ( index < 0 ) return;
+  sosLength[ index ] = len;
+  SOSsup[ index ]    = value;
 }
 
-void Supporttable::setGsup(const int id, const int len, indice_t *value) {
-  int index = findBimapByKey(loc, id);
-  ASSERT(index > -1, "There are some bugs");
-  if (index < 0) return;
-  gLength[index] = len;
-  Gsup[index] = value;
+void Supporttable::setGsup( const int id, const int len, indice_t *value ) {
+  int index = findBimapByKey( loc, id );
+  ASSERT( index > -1, "There are some bugs" );
+  if ( index < 0 ) return;
+  gLength[ index ] = len;
+  Gsup[ index ]    = value;
 }
 
-int Supporttable::addconvexsosSup( Subpoly_t &poly) {
-  int re = findSupByPoly(poly);
-  if (re > -1) {
+int Supporttable::addconvexsosSup( Subpoly_t &poly ) {
+  int re = findSupByPoly( poly );
+  if ( re > -1 ) {
     return re;
   }
 
   int value_size = values.size();
 
-  values.push_back(new Support(&poly));
+  values.push_back( new Support( &poly ) );
 
-  SOSsup.push_back(NULL);
-  sosLength.push_back(0);
+  SOSsup.push_back( NULL );
+  sosLength.push_back( 0 );
 
-  Gsup.push_back(NULL);
-  gLength.push_back(0);
+  Gsup.push_back( NULL );
+  gLength.push_back( 0 );
 
-  arrangeM.push_back(NULL);
+  arrangeM.push_back( NULL );
   re = value_size;
   value_size++;
-  return addBimapElem(loc, re);
+  return addBimapElem( loc, re );
 }
 
-int Supporttable::getsosSLength(const int id) {
-  int index = findBimapByKey(loc, id);
-  if (index < 0) return -1;
-  return sosLength[index];
+int Supporttable::getsosSLength( const int id ) {
+  int index = findBimapByKey( loc, id );
+  if ( index < 0 ) return -1;
+  return sosLength[ index ];
 }
 
-void Supporttable::setArrangeM(const int id, ArrangeMatrix **value,
-                               const int egLength) {
-  int index = findBimapByKey(loc, id);
-  ASSERT(index > -1, "There are some bugs");
-  if (index < 0) return;
-  gLength[index] = egLength;
-  arrangeM[index] = value;
+void Supporttable::setArrangeM( const int id, ArrangeMatrix **value,
+                                const int egLength ) {
+  int index = findBimapByKey( loc, id );
+  ASSERT( index > -1, "There are some bugs" );
+  if ( index < 0 ) return;
+  gLength[ index ]  = egLength;
+  arrangeM[ index ] = value;
 }
 
-ArrangeMatrix **Supporttable::getAMIndex(const int id, int *egLength) {
-  int index = findBimapByKey(loc, id);
-  if (index < 0) return NULL;
+ArrangeMatrix **Supporttable::getAMIndex( const int id, int *egLength ) {
+  int index = findBimapByKey( loc, id );
+  if ( index < 0 ) return NULL;
 
-  *egLength = gLength[index];
-  return arrangeM[index];
+  *egLength = gLength[ index ];
+  return arrangeM[ index ];
 }
 
-void Supporttable::clearSupportTable(void) {
-  if (!values.empty()) {
-    int value_size = (int)values.size();
+void Supporttable::clearSupportTable( void ) {
+  if ( !values.empty() ) {
+    int value_size = (int) values.size();
     int i;
-    for (i = 0; i < value_size; i += 1) {
-      delete values[i];
+    for ( i = 0; i < value_size; i += 1 ) {
+      delete values[ i ];
 
-      if (SOSsup[i] != NULL) free(SOSsup[i]);
-      if (Gsup[i] != NULL) free(Gsup[i]);
-      if (arrangeM[i] != NULL) {
-        deleteSparseA(arrangeM[i], sosLength[i]);
+      if ( SOSsup[ i ] != NULL ) free( SOSsup[ i ] );
+      if ( Gsup[ i ] != NULL ) free( Gsup[ i ] );
+      if ( arrangeM[ i ] != NULL ) {
+        deleteSparseA( arrangeM[ i ], sosLength[ i ] );
       }
     }
-    clearBimap(loc);
+    clearBimap( loc );
   }
   sosLength.clear();
   gLength.clear();
@@ -285,25 +285,25 @@ void Supporttable::clearSupportTable(void) {
 }
 Supporttable::Supporttable() { loc = createBimap(); }
 Supporttable::~Supporttable() {
-  int value_size = (int)values.size();
+  int value_size = (int) values.size();
 
-  for (int i = 0; i < value_size; i += 1) {
-    delete values[i];
+  for ( int i = 0; i < value_size; i += 1 ) {
+    delete values[ i ];
 
-    if (SOSsup[i] != NULL) {
-      free(SOSsup[i]);
+    if ( SOSsup[ i ] != NULL ) {
+      free( SOSsup[ i ] );
     }
-    if (Gsup[i] != NULL) {
-      free(Gsup[i]);
+    if ( Gsup[ i ] != NULL ) {
+      free( Gsup[ i ] );
     }
-    if (arrangeM[i] != NULL) {
-      deleteSparseA(arrangeM[i], sosLength[i]);
+    if ( arrangeM[ i ] != NULL ) {
+      deleteSparseA( arrangeM[ i ], sosLength[ i ] );
     }
   }
 
-  deleteBimap(loc);
+  deleteBimap( loc );
 }
 
 Supporttable SUPPORT_TABLE;
-}
-}
+} // namespace psd
+} // namespace aiSat

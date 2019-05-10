@@ -31,8 +31,8 @@ union blockdatarec {
 
 struct blockrec {
   union blockdatarec data;
-  enum blockcat blockcategory;
-  int blocksize;
+  enum blockcat      blockcategory;
+  int                blocksize;
 };
 
 /*
@@ -40,7 +40,7 @@ struct blockrec {
  */
 
 struct blockmatrix {
-  int nblocks;
+  int              nblocks;
   struct blockrec *blocks;
 };
 
@@ -54,14 +54,14 @@ struct blockmatrix {
 struct sparseblock {
   struct sparseblock *next;
   struct sparseblock *nextbyblock;
-  double *entries;
-  int *iindices;
-  int *jindices;
-  int numentries;
-  int blocknum;
-  int blocksize;
-  int constraintnum;
-  int issparse;
+  double *            entries;
+  int *               iindices;
+  int *               jindices;
+  int                 numentries;
+  int                 blocknum;
+  int                 blocksize;
+  int                 constraintnum;
+  int                 issparse;
 };
 
 /*

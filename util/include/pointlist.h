@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 struct pointElem {
-  void *value;
+  void *            value;
   struct pointElem *next;
 };
 
@@ -23,42 +23,42 @@ typedef struct pointElem PointElem;
 extern "C" {
 #endif
 
-PointElem *createElem(void *);
+PointElem *createElem( void * );
 
-void setValue(PointElem *, void *, void (*)(void *));
+void setValue( PointElem *, void *, void ( * )( void * ) );
 
-void delElem(PointElem *, void (*delfun)(void *));
+void delElem( PointElem *, void ( *delfun )( void * ) );
 
-void clear_E(PointElem *);
+void clear_E( PointElem * );
 
 struct pointList {
   PointElem *head;
   PointElem *tail;
-  void (*delfun)(void *);
+  void ( *delfun )( void * );
 };
 
 typedef struct pointList PointList;
 
-PointList *createList(void (*)(void *));
+PointList *createList( void ( * )( void * ) );
 
-void delList(PointList *list);
+void delList( PointList *list );
 
-void delListStart(PointList *list, const int start);
+void delListStart( PointList *list, const int start );
 
-int isEmpty_L(PointList *list);
+int isEmpty_L( PointList *list );
 
-void *front_L(PointList *list);
+void *front_L( PointList *list );
 
-void pop_front_L(PointList *list);
+void pop_front_L( PointList *list );
 
-void push_front_L(PointList *list, void *);
+void push_front_L( PointList *list, void * );
 
-void push_back_L(PointList *list, void *);
+void push_back_L( PointList *list, void * );
 
-void sortList(PointList *list, int (*com)(void *, void *));
-void clear_L(PointList *list);
+void sortList( PointList *list, int ( *com )( void *, void * ) );
+void clear_L( PointList *list );
 
-size_t size_L(PointList *);
+size_t size_L( PointList * );
 
 #ifdef __cplusplus
 }

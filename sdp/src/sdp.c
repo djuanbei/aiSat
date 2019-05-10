@@ -35,10 +35,10 @@
 
 */
 
+#include "declarations.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "declarations.h"
 
 #ifdef USEGETTIME
 /*
@@ -49,65 +49,65 @@
 #include <sys/time.h> /* definition of timeval struct and protyping of gettime
                            ofday */
 
-double opotime = 0.0;
-double factortime = 0.0;
-double totaltime = 0.0;
-double othertime = 0.0;
-double othertime1 = 0.0;
-double othertime2 = 0.0;
-double othertime3 = 0.0;
+double         opotime    = 0.0;
+double         factortime = 0.0;
+double         totaltime  = 0.0;
+double         othertime  = 0.0;
+double         othertime1 = 0.0;
+double         othertime2 = 0.0;
+double         othertime3 = 0.0;
 struct timeval tp;
-double t1 = 0.0;
-double t2 = 0.0;
-double starttime = 0.0;
-double endtime = 0.0;
+double         t1        = 0.0;
+double         t2        = 0.0;
+double         starttime = 0.0;
+double         endtime   = 0.0;
 
 #endif
 
-int sdp(n, k, C, a, constant_offset, constraints, byblocks, fill, X, y, Z,
-        cholxinv, cholzinv, pobj, dobj, work1, work2, work3, workvec1, workvec2,
-        workvec3, workvec4, workvec5, workvec6, workvec7, workvec8, diagO,
-        bestx, besty, bestz, Zi, O, rhs, dZ, dX, dy, dy1, Fp, printlevel,
-        parameters) int n;
+int sdp( n, k, C, a, constant_offset, constraints, byblocks, fill, X, y, Z,
+         cholxinv, cholzinv, pobj, dobj, work1, work2, work3, workvec1,
+         workvec2, workvec3, workvec4, workvec5, workvec6, workvec7, workvec8,
+         diagO, bestx, besty, bestz, Zi, O, rhs, dZ, dX, dy, dy1, Fp,
+         printlevel, parameters ) int n;
 int k;
-struct blockmatrix C;
-double *a;
-double constant_offset;
+struct blockmatrix       C;
+double *                 a;
+double                   constant_offset;
 struct constraintmatrix *constraints;
-struct sparseblock **byblocks;
-struct constraintmatrix fill;
-struct blockmatrix X;
-double *y;
-struct blockmatrix Z;
-struct blockmatrix cholxinv;
-struct blockmatrix cholzinv;
-double *pobj;
-double *dobj;
-struct blockmatrix work1;
-struct blockmatrix work2;
-struct blockmatrix work3;
-double *workvec1;
-double *workvec2;
-double *workvec3;
-double *workvec4;
-double *workvec5;
-double *workvec6;
-double *workvec7;
-double *workvec8;
-double *diagO;
-struct blockmatrix bestx;
-double *besty;
-struct blockmatrix bestz;
-struct blockmatrix Zi;
-double *O;
-double *rhs;
-struct blockmatrix dZ;
-struct blockmatrix dX;
-double *dy;
-double *dy1;
-double *Fp;
-int printlevel;
-struct paramstruc parameters;
+struct sparseblock **    byblocks;
+struct constraintmatrix  fill;
+struct blockmatrix       X;
+double *                 y;
+struct blockmatrix       Z;
+struct blockmatrix       cholxinv;
+struct blockmatrix       cholzinv;
+double *                 pobj;
+double *                 dobj;
+struct blockmatrix       work1;
+struct blockmatrix       work2;
+struct blockmatrix       work3;
+double *                 workvec1;
+double *                 workvec2;
+double *                 workvec3;
+double *                 workvec4;
+double *                 workvec5;
+double *                 workvec6;
+double *                 workvec7;
+double *                 workvec8;
+double *                 diagO;
+struct blockmatrix       bestx;
+double *                 besty;
+struct blockmatrix       bestz;
+struct blockmatrix       Zi;
+double *                 O;
+double *                 rhs;
+struct blockmatrix       dZ;
+struct blockmatrix       dX;
+double *                 dy;
+double *                 dy1;
+double *                 Fp;
+int                      printlevel;
+struct paramstruc        parameters;
 {
   double gap;
   double relgap;
@@ -129,21 +129,21 @@ struct paramstruc parameters;
   double bestrelpinfeas;
   double limreldinfeas;
   double bestreldinfeas;
-  double maxrelinfeas = 1.0e100;
+  double maxrelinfeas    = 1.0e100;
   double oldmaxrelinfeas = 1.0e100;
   double newpobj;
   double newdobj;
-  int iter = 0;
-  int m;
-  int ret;
-  int i;
-  int j;
-  int info;
-  int ldam;
-  int retries = 0;
-  int retcode = 0;
+  int    iter = 0;
+  int    m;
+  int    ret;
+  int    i;
+  int    j;
+  int    info;
+  int    ldam;
+  int    retries = 0;
+  int    retcode = 0;
   double bestmeas;
-  int lastimprove = 0;
+  int    lastimprove = 0;
   double diagnrm;
   double diagfact = 0.0;
   double diagadd;
@@ -155,7 +155,7 @@ struct paramstruc parameters;
   double relerr1;
   double relerr2 = 0.0;
 
-  int refinements;
+  int    refinements;
   double besterr;
   double relerr;
 
@@ -163,7 +163,7 @@ struct paramstruc parameters;
    * Stuff for iterative refinements.
    */
 
-  int lastimproverefinement;
+  int    lastimproverefinement;
   double mindiag;
 
   /*
@@ -209,12 +209,12 @@ struct paramstruc parameters;
    */
   double newalphap;
 
-/*
- * Stuff for keeping track of best solutions.
- */
+  /*
+   * Stuff for keeping track of best solutions.
+   */
 
 #define BASIZE 100
-  double bestarray[BASIZE + 1];
+  double bestarray[ BASIZE + 1 ];
 
   /*
    * Used in checking whether the primal-dual affine step gives us a new
@@ -229,11 +229,11 @@ struct paramstruc parameters;
    *
    */
 
-  norma = norm2(k, a + 1);
-  normC = Fnorm(C);
-  if (parameters.perturbobj > 0)
+  norma = norm2( k, a + 1 );
+  normC = Fnorm( C );
+  if ( parameters.perturbobj > 0 )
     /*    perturbfac=parameters.perturbobj*1.0e-6*normC/sqrt(1.0*n); */
-    perturbfac = 1.0e-6 * normC / sqrt(1.0 * n);
+    perturbfac = 1.0e-6 * normC / sqrt( 1.0 * n );
   else
     perturbfac = 0.0;
 
@@ -242,14 +242,16 @@ struct paramstruc parameters;
    *
    */
 
-  if (normC == 0.0) {
-    if (printlevel >= 1) printf("This is a pure primal feasibility problem.\n");
+  if ( normC == 0.0 ) {
+    if ( printlevel >= 1 )
+      printf( "This is a pure primal feasibility problem.\n" );
     ispfeasprob = 1;
   } else
     ispfeasprob = 0;
 
-  if (norma == 0.0) {
-    if (printlevel >= 1) printf("This is a pure dual feasibility problem.\n");
+  if ( norma == 0.0 ) {
+    if ( printlevel >= 1 )
+      printf( "This is a pure dual feasibility problem.\n" );
     isdfeasprob = 1;
   } else
     isdfeasprob = 0;
@@ -265,7 +267,7 @@ struct paramstruc parameters;
    *  Work out the leading dimension for the array.  Note that we may not
    *  want to use k itself, for cache issues.
    */
-  if ((k % 2) == 0)
+  if ( ( k % 2 ) == 0 )
     ldam = k + 1;
   else
     ldam = k;
@@ -274,88 +276,88 @@ struct paramstruc parameters;
    * Compute Cholesky factors of X and Z.
    */
 
-  copy_mat(X, work1);
-  ret = chol(work1);
+  copy_mat( X, work1 );
+  ret = chol( work1 );
 
   /*
    * If the matrix was singular, then just return with an error.
    */
 
-  if (ret != 0) {
-    if (printlevel >= 1) printf("X was singular!\n");
+  if ( ret != 0 ) {
+    if ( printlevel >= 1 ) printf( "X was singular!\n" );
     retcode = 8;
     goto RETURNBEST;
   };
 
-  chol_inv(work1, work2);
-  store_packed(work2, cholxinv);
+  chol_inv( work1, work2 );
+  store_packed( work2, cholxinv );
 
-  copy_mat(Z, work1);
-  ret = chol(work1);
+  copy_mat( Z, work1 );
+  ret = chol( work1 );
 
   /*
    * If the matrix was singular, then just return with an error.
    */
 
-  if (ret != 0) {
-    if (printlevel >= 1) printf("Z was singular!\n");
+  if ( ret != 0 ) {
+    if ( printlevel >= 1 ) printf( "Z was singular!\n" );
     retcode = 8;
     goto RETURNBEST;
   };
 
-  chol_inv(work1, work2);
-  store_packed(work2, cholzinv);
+  chol_inv( work1, work2 );
+  store_packed( work2, cholzinv );
 
   /*
     Compute Zi.
   */
 
-  copy_mat(work2, work1);
-  trans(work1);
+  copy_mat( work2, work1 );
+  trans( work1 );
   scale1 = 1.0;
   scale2 = 0.0;
-  mat_mult(scale1, scale2, work2, work1, Zi);
+  mat_mult( scale1, scale2, work2, work1, Zi );
 
-  if (printlevel >= 4) printf("Fnorm of Zi is %e \n", Fnorm(Zi));
+  if ( printlevel >= 4 ) printf( "Fnorm of Zi is %e \n", Fnorm( Zi ) );
 
   /*
     Compute primal and dual objective values.
   */
 
-  *pobj = calc_pobj(C, X, constant_offset);
-  *dobj = calc_dobj(k, a, y, constant_offset);
-  if (parameters.usexzgap == 0) {
+  *pobj = calc_pobj( C, X, constant_offset );
+  *dobj = calc_dobj( k, a, y, constant_offset );
+  if ( parameters.usexzgap == 0 ) {
     gap = *dobj - *pobj;
-    if (gap < 0.0) gap = 0.0;
-    relgap = gap / (1.0 + fabs(*dobj) + fabs(*pobj));
+    if ( gap < 0.0 ) gap = 0.0;
+    relgap = gap / ( 1.0 + fabs( *dobj ) + fabs( *pobj ) );
   } else {
-    gap = trace_prod(X, Z);
-    relgap = gap / (1.0 + fabs(*dobj) + fabs(*pobj));
+    gap    = trace_prod( X, Z );
+    relgap = gap / ( 1.0 + fabs( *dobj ) + fabs( *pobj ) );
   };
 
-  if (printlevel >= 3) {
-    printf("constant offset is %e \n", constant_offset);
-    printf("Fnorm of X is %e \n", Fnorm(X));
-    printf("Fnorm of C is %e \n", normC);
+  if ( printlevel >= 3 ) {
+    printf( "constant offset is %e \n", constant_offset );
+    printf( "Fnorm of X is %e \n", Fnorm( X ) );
+    printf( "Fnorm of C is %e \n", normC );
   };
 
-  if (printlevel >= 4) {
-    printf("pobj is %e \n", *pobj);
-    printf("dobj is %e \n", *dobj);
-    printf("gap is %e \n", gap);
+  if ( printlevel >= 4 ) {
+    printf( "pobj is %e \n", *pobj );
+    printf( "dobj is %e \n", *dobj );
+    printf( "gap is %e \n", gap );
   };
 
-  relpinfeas = pinfeas(k, constraints, X, a, workvec1);
+  relpinfeas     = pinfeas( k, constraints, X, a, workvec1 );
   bestrelpinfeas = relpinfeas;
-  reldinfeas = dinfeas(k, C, constraints, y, Z, work2);
+  reldinfeas     = dinfeas( k, C, constraints, y, Z, work2 );
   bestreldinfeas = reldinfeas;
 
-  if (relpinfeas < parameters.axtol) probpfeas = 1;
+  if ( relpinfeas < parameters.axtol ) probpfeas = 1;
 
-  if (reldinfeas < parameters.atytol) probdfeas = 1;
+  if ( reldinfeas < parameters.atytol ) probdfeas = 1;
 
   oldmaxrelinfeas = maxrelinfeas;
-  if (relpinfeas > reldinfeas) {
+  if ( relpinfeas > reldinfeas ) {
     maxrelinfeas = relpinfeas;
   } else {
     maxrelinfeas = reldinfeas;
@@ -366,9 +368,10 @@ struct paramstruc parameters;
    */
 
   bestmeas = 1.0e100;
-  store_packed(X, bestx);
-  store_packed(Z, bestz);
-  for (i = 1; i <= k; i++) besty[i] = y[i];
+  store_packed( X, bestx );
+  store_packed( Z, bestz );
+  for ( i = 1; i <= k; i++ )
+    besty[ i ] = y[ i ];
 
   /*
     Initialize the big loop.
@@ -381,31 +384,31 @@ struct paramstruc parameters;
     Print out some status information.
   */
 
-  if (printlevel >= 2) {
-    printf("Iter: %2d Ap: %.2e Pobj: % .7e Ad: %.2e Dobj: % .7e \n", iter,
-           alphap, *pobj, alphad, *dobj);
-    fflush(stdout);
+  if ( printlevel >= 2 ) {
+    printf( "Iter: %2d Ap: %.2e Pobj: % .7e Ad: %.2e Dobj: % .7e \n", iter,
+            alphap, *pobj, alphad, *dobj );
+    fflush( stdout );
   };
 
-  while ((relgap > parameters.objtol) || (relpinfeas > parameters.axtol) ||
-         (reldinfeas > parameters.atytol)) {
+  while ( ( relgap > parameters.objtol ) || ( relpinfeas > parameters.axtol ) ||
+          ( reldinfeas > parameters.atytol ) ) {
     /*
      * Call the user exit routine, and let the user stop the process
      * if he wants to.
      */
-    if (user_exit(n, k, C, a, *dobj, *pobj, constant_offset, constraints, X, y,
-                  Z, parameters) == 1) {
-      return (0);
+    if ( user_exit( n, k, C, a, *dobj, *pobj, constant_offset, constraints, X,
+                    y, Z, parameters ) == 1 ) {
+      return ( 0 );
     }
 
-    bestarray[iter % BASIZE] = bestmeas;
+    bestarray[ iter % BASIZE ] = bestmeas;
 
     /*
      * Compute the stepfrac to be used for this iteration.
      */
 
-    if (iter > 1) {
-      if (alphap > alphad)
+    if ( iter > 1 ) {
+      if ( alphap > alphad )
         minalpha = alphad;
       else
         minalpha = alphap;
@@ -414,19 +417,19 @@ struct paramstruc parameters;
     };
 
     mystepfrac = parameters.minstepfrac +
-                 minalpha * (parameters.maxstepfrac - parameters.minstepfrac);
-    if (printlevel >= 3) printf("mystepfrac is %e \n", mystepfrac);
+                 minalpha * ( parameters.maxstepfrac - parameters.minstepfrac );
+    if ( printlevel >= 3 ) printf( "mystepfrac is %e \n", mystepfrac );
 
     /*
      *  Print out information on primal/dual feasibility.
      */
 
-    if (printlevel >= 2) {
-      printf("Relative primal infeasibility is %.7e \n", relpinfeas);
-      printf("Relative dual infeasibility: %.7e \n", reldinfeas);
-      printf("Relative duality gap is %.7e \n", relgap);
-      printf("XZ relative duality gap is %.7e \n",
-             trace_prod(X, Z) / (1 + fabs(*dobj)));
+    if ( printlevel >= 2 ) {
+      printf( "Relative primal infeasibility is %.7e \n", relpinfeas );
+      printf( "Relative dual infeasibility: %.7e \n", reldinfeas );
+      printf( "Relative duality gap is %.7e \n", relgap );
+      printf( "XZ relative duality gap is %.7e \n",
+              trace_prod( X, Z ) / ( 1 + fabs( *dobj ) ) );
     };
 
     /*
@@ -434,81 +437,84 @@ struct paramstruc parameters;
      * then we're done!
      */
 
-    if ((ispfeasprob == 1) && (relpinfeas < parameters.axtol)) {
-      if (printlevel >= 3) printf("Got primal feasibility, so stopping.\n");
+    if ( ( ispfeasprob == 1 ) && ( relpinfeas < parameters.axtol ) ) {
+      if ( printlevel >= 3 ) printf( "Got primal feasibility, so stopping.\n" );
 
-      for (i = 1; i <= k; i++) y[i] = 0.0;
+      for ( i = 1; i <= k; i++ )
+        y[ i ] = 0.0;
 
-      alphad = parameters.atytol / (sqrt(n * 1.0) * 200);
-      make_i(work1);
-      if (alphad * trace_prod(X, work1) > parameters.objtol)
-        alphad = 0.005 * parameters.objtol / trace_prod(X, work1);
-      zero_mat(work2);
-      addscaledmat(work2, alphad, work1, Z);
+      alphad = parameters.atytol / ( sqrt( n * 1.0 ) * 200 );
+      make_i( work1 );
+      if ( alphad * trace_prod( X, work1 ) > parameters.objtol )
+        alphad = 0.005 * parameters.objtol / trace_prod( X, work1 );
+      zero_mat( work2 );
+      addscaledmat( work2, alphad, work1, Z );
 
-      relpinfeas = pinfeas(k, constraints, X, a, workvec1);
-      if (relpinfeas < bestrelpinfeas) bestrelpinfeas = relpinfeas;
-      reldinfeas = dinfeas(k, C, constraints, y, Z, work2);
-      if (reldinfeas < bestreldinfeas) bestreldinfeas = reldinfeas;
+      relpinfeas = pinfeas( k, constraints, X, a, workvec1 );
+      if ( relpinfeas < bestrelpinfeas ) bestrelpinfeas = relpinfeas;
+      reldinfeas = dinfeas( k, C, constraints, y, Z, work2 );
+      if ( reldinfeas < bestreldinfeas ) bestreldinfeas = reldinfeas;
 
-      *pobj = calc_pobj(C, X, constant_offset);
-      *dobj = calc_dobj(k, a, y, constant_offset);
+      *pobj = calc_pobj( C, X, constant_offset );
+      *dobj = calc_dobj( k, a, y, constant_offset );
 
-      if (parameters.usexzgap == 0) {
+      if ( parameters.usexzgap == 0 ) {
         gap = *dobj - *pobj;
-        if (gap < 0.0) gap = 0.0;
-        relgap = gap / (1.0 + fabs(*dobj) + fabs(*pobj));
+        if ( gap < 0.0 ) gap = 0.0;
+        relgap = gap / ( 1.0 + fabs( *dobj ) + fabs( *pobj ) );
       } else {
-        gap = trace_prod(X, Z);
-        if (gap < 0.0) gap = 0.0;
-        relgap = gap / (1.0 + fabs(*dobj) + fabs(*pobj));
+        gap = trace_prod( X, Z );
+        if ( gap < 0.0 ) gap = 0.0;
+        relgap = gap / ( 1.0 + fabs( *dobj ) + fabs( *pobj ) );
       };
 
       bestmeas = relpinfeas / parameters.axtol;
 
-      store_packed(X, bestx);
-      store_packed(Z, bestz);
-      for (i = 1; i <= k; i++) besty[i] = y[i];
+      store_packed( X, bestx );
+      store_packed( Z, bestz );
+      for ( i = 1; i <= k; i++ )
+        besty[ i ] = y[ i ];
 
       retcode = 0;
       goto RETURNBEST;
     };
 
-    if ((isdfeasprob == 1) && (reldinfeas < parameters.atytol)) {
-      if (printlevel >= 3) printf("Got dual feasibility, so stopping.\n");
+    if ( ( isdfeasprob == 1 ) && ( reldinfeas < parameters.atytol ) ) {
+      if ( printlevel >= 3 ) printf( "Got dual feasibility, so stopping.\n" );
 
-      make_i(work1);
-      zero_mat(work2);
-      op_a(k, constraints, work1, workvec1);
-      alphap = parameters.atytol / (200.0 * norm2(k, workvec1 + 1));
-      if (alphap * trace_prod(work1, Z) > parameters.objtol)
-        alphap = 0.005 * parameters.objtol / trace_prod(work1, Z);
-      addscaledmat(work2, alphap, work1, X);
+      make_i( work1 );
+      zero_mat( work2 );
+      op_a( k, constraints, work1, workvec1 );
+      alphap = parameters.atytol / ( 200.0 * norm2( k, workvec1 + 1 ) );
+      if ( alphap * trace_prod( work1, Z ) > parameters.objtol )
+        alphap = 0.005 * parameters.objtol / trace_prod( work1, Z );
+      addscaledmat( work2, alphap, work1, X );
 
-      relpinfeas = pinfeas(k, constraints, X, a, workvec1);
-      if (relpinfeas < bestrelpinfeas) bestrelpinfeas = relpinfeas;
-      reldinfeas = dinfeas(k, C, constraints, y, Z, work2);
-      if (reldinfeas < bestreldinfeas) bestreldinfeas = reldinfeas;
+      relpinfeas = pinfeas( k, constraints, X, a, workvec1 );
+      if ( relpinfeas < bestrelpinfeas ) bestrelpinfeas = relpinfeas;
+      reldinfeas = dinfeas( k, C, constraints, y, Z, work2 );
+      if ( reldinfeas < bestreldinfeas ) bestreldinfeas = reldinfeas;
 
-      *pobj = calc_pobj(C, X, constant_offset);
-      *dobj = calc_dobj(k, a, y, constant_offset);
+      *pobj = calc_pobj( C, X, constant_offset );
+      *dobj = calc_dobj( k, a, y, constant_offset );
 
-      if (parameters.usexzgap == 0) {
+      if ( parameters.usexzgap == 0 ) {
         gap = *dobj - *pobj;
-        if (gap < 0.0) gap = 0.0;
-        relgap = gap / (1.0 + fabs(*dobj) + fabs(*pobj));
+        if ( gap < 0.0 ) gap = 0.0;
+        relgap = gap / ( 1.0 + fabs( *dobj ) + fabs( *pobj ) );
       } else {
-        gap = trace_prod(X, Z);
-        if (gap < 0.0) gap = 0.0;
-        relgap = gap / (1.0 + fabs(*dobj) + fabs(*pobj));
+        gap = trace_prod( X, Z );
+        if ( gap < 0.0 ) gap = 0.0;
+        relgap = gap / ( 1.0 + fabs( *dobj ) + fabs( *pobj ) );
       };
 
       bestmeas = reldinfeas / parameters.atytol;
 
-      store_packed(X, bestx);
-      store_packed(Z, bestz);
-      for (i = 1; i <= k; i++) besty[i] = y[i];
-      if (printlevel >= 3) printf("New best solution, %e \n", bestmeas);
+      store_packed( X, bestx );
+      store_packed( Z, bestz );
+      for ( i = 1; i <= k; i++ )
+        besty[ i ] = y[ i ];
+      if ( printlevel >= 3 ) printf( "New best solution, %e \n", bestmeas );
 
       retcode = 0;
       goto RETURNBEST;
@@ -518,30 +524,31 @@ struct paramstruc parameters;
      *  Check for primal or dual infeasibility.
      */
 
-    op_at(k, y, constraints, work1);
-    addscaledmat(work1, -1.0, Z, work1);
+    op_at( k, y, constraints, work1 );
+    addscaledmat( work1, -1.0, Z, work1 );
 
-    pinfeasmeas = -(*dobj) / Fnorm(work1);
-    if (printlevel >= 2) printf("-a'*y/||A'(y)-Z|| is %e \n", pinfeasmeas);
+    pinfeasmeas = -( *dobj ) / Fnorm( work1 );
+    if ( printlevel >= 2 ) printf( "-a'*y/||A'(y)-Z|| is %e \n", pinfeasmeas );
 
-    if ((probpfeas == 0) && (pinfeasmeas > parameters.pinftol)) {
-      if (printlevel >= 1) printf("Declaring primal infeasibility.\n");
-      for (i = 1; i <= k; i++) y[i] = -y[i] / (*dobj);
-      zero_mat(work1);
-      addscaledmat(work1, -1.0 / (*dobj), Z, work1);
-      copy_mat(work1, Z);
+    if ( ( probpfeas == 0 ) && ( pinfeasmeas > parameters.pinftol ) ) {
+      if ( printlevel >= 1 ) printf( "Declaring primal infeasibility.\n" );
+      for ( i = 1; i <= k; i++ )
+        y[ i ] = -y[ i ] / ( *dobj );
+      zero_mat( work1 );
+      addscaledmat( work1, -1.0 / ( *dobj ), Z, work1 );
+      copy_mat( work1, Z );
       retcode = 1;
       goto RETURNCERT;
     };
 
-    op_a(k, constraints, X, workvec1);
-    dinfeasmeas = trace_prod(C, X) / norm2(k, workvec1 + 1);
-    if (printlevel >= 2) printf("<C,X>/||A(X)||=%e\n", dinfeasmeas);
-    if ((probdfeas == 0) && (dinfeasmeas > parameters.dinftol)) {
-      if (printlevel >= 1) printf("Declaring dual infeasibility.\n");
-      zero_mat(work1);
-      addscaledmat(work1, 1.0 / trace_prod(C, X), X, work1);
-      copy_mat(work1, X);
+    op_a( k, constraints, X, workvec1 );
+    dinfeasmeas = trace_prod( C, X ) / norm2( k, workvec1 + 1 );
+    if ( printlevel >= 2 ) printf( "<C,X>/||A(X)||=%e\n", dinfeasmeas );
+    if ( ( probdfeas == 0 ) && ( dinfeasmeas > parameters.dinftol ) ) {
+      if ( printlevel >= 1 ) printf( "Declaring dual infeasibility.\n" );
+      zero_mat( work1 );
+      addscaledmat( work1, 1.0 / trace_prod( C, X ), X, work1 );
+      copy_mat( work1, X );
       retcode = 2;
       goto RETURNCERT;
     };
@@ -550,49 +557,52 @@ struct paramstruc parameters;
      * Print out the norm(X) for debugging purposes.
      */
 
-    if (printlevel >= 3) {
-      nrmx = Fnorm(X);
-      printf("Fnorm of X is %e \n", nrmx);
+    if ( printlevel >= 3 ) {
+      nrmx = Fnorm( X );
+      printf( "Fnorm of X is %e \n", nrmx );
     };
 
-/*
-  Now, compute the system matrix.
-*/
+      /*
+        Now, compute the system matrix.
+      */
 
 #ifdef USEGETTIME
-    gettimeofday(&tp, NULL);
-    t1 = (double)tp.tv_sec + (1.0e-6) * tp.tv_usec;
+    gettimeofday( &tp, NULL );
+    t1 = (double) tp.tv_sec + ( 1.0e-6 ) * tp.tv_usec;
 #endif
 
-    op_o(k, constraints, byblocks, Zi, X, O, work1, work2);
+    op_o( k, constraints, byblocks, Zi, X, O, work1, work2 );
 
 #ifdef USEGETTIME
-    gettimeofday(&tp, NULL);
-    t2 = (double)tp.tv_sec + (1.0e-6) * tp.tv_usec;
+    gettimeofday( &tp, NULL );
+    t2      = (double) tp.tv_sec + ( 1.0e-6 ) * tp.tv_usec;
     opotime = opotime + t2 - t1;
 #endif
 
     /*
      * Print out the actual density of Z and X.
      */
-    if ((iter == 5) && (printlevel >= 3)) {
-      printf("Actual density of O %e\n", actnnz(k, ldam, O) / (1.0 * k * k));
-      for (j = 1; j <= X.nblocks; j++) {
-        if (X.blocks[j].blockcategory == MATRIX) {
-          printf("density X block %d, %e \n", j,
-                 actnnz(X.blocks[j].blocksize, X.blocks[j].blocksize,
-                        X.blocks[j].data.mat) /
-                     (1.0 * X.blocks[j].blocksize * X.blocks[j].blocksize));
+    if ( ( iter == 5 ) && ( printlevel >= 3 ) ) {
+      printf( "Actual density of O %e\n",
+              actnnz( k, ldam, O ) / ( 1.0 * k * k ) );
+      for ( j = 1; j <= X.nblocks; j++ ) {
+        if ( X.blocks[ j ].blockcategory == MATRIX ) {
+          printf(
+              "density X block %d, %e \n", j,
+              actnnz( X.blocks[ j ].blocksize, X.blocks[ j ].blocksize,
+                      X.blocks[ j ].data.mat ) /
+                  ( 1.0 * X.blocks[ j ].blocksize * X.blocks[ j ].blocksize ) );
 
-          printf("density Z block %d, %e \n", j,
-                 actnnz(Z.blocks[j].blocksize, Z.blocks[j].blocksize,
-                        Z.blocks[j].data.mat) /
-                     (1.0 * Z.blocks[j].blocksize * Z.blocks[j].blocksize));
+          printf(
+              "density Z block %d, %e \n", j,
+              actnnz( Z.blocks[ j ].blocksize, Z.blocks[ j ].blocksize,
+                      Z.blocks[ j ].data.mat ) /
+                  ( 1.0 * Z.blocks[ j ].blocksize * Z.blocks[ j ].blocksize ) );
 
-          printf("bandwidth Z block %d, %d/%d \n", j,
-                 bandwidth(Z.blocks[j].blocksize, Z.blocks[j].blocksize,
-                           Z.blocks[j].data.mat),
-                 Z.blocks[j].blocksize);
+          printf( "bandwidth Z block %d, %d/%d \n", j,
+                  bandwidth( Z.blocks[ j ].blocksize, Z.blocks[ j ].blocksize,
+                             Z.blocks[ j ].data.mat ),
+                  Z.blocks[ j ].blocksize );
         };
       };
     };
@@ -601,16 +611,18 @@ struct paramstruc parameters;
       Save a copy of O in the lower diagonal for later use.
     */
 
-    for (i = 1; i <= k - 1; i++)
-      for (j = i; j <= k; j++) O[ijtok(j, i, ldam)] = O[ijtok(i, j, ldam)];
+    for ( i = 1; i <= k - 1; i++ )
+      for ( j = i; j <= k; j++ )
+        O[ ijtok( j, i, ldam ) ] = O[ ijtok( i, j, ldam ) ];
 
-    for (i = 1; i <= k; i++) diagO[i] = O[ijtok(i, i, ldam)];
+    for ( i = 1; i <= k; i++ )
+      diagO[ i ] = O[ ijtok( i, i, ldam ) ];
 
     mindiag = 1.0e30;
 
-    for (i = 1; i <= k; i++) {
-      if (diagO[i] < mindiag) {
-        mindiag = diagO[i];
+    for ( i = 1; i <= k; i++ ) {
+      if ( diagO[ i ] < mindiag ) {
+        mindiag = diagO[ i ];
       };
     };
     /*
@@ -620,11 +632,11 @@ struct paramstruc parameters;
 
     diagnrm = 0.0;
 
-    for (i = 1; i <= k; i++) {
-      ent = diagO[i];
+    for ( i = 1; i <= k; i++ ) {
+      ent     = diagO[ i ];
       diagnrm = diagnrm + ent * ent;
     };
-    diagnrm = sqrt(diagnrm);
+    diagnrm = sqrt( diagnrm );
 
   RETRYFACTOR:
 
@@ -632,74 +644,79 @@ struct paramstruc parameters;
       Now, let's make sure that O isn't singular.
     */
 
-    diagadd = 1.0e-17 * diagfact * diagnrm / sqrt(k * 1.0);
+    diagadd = 1.0e-17 * diagfact * diagnrm / sqrt( k * 1.0 );
 
-    while ((diagadd + mindiag) <= 0.0) {
+    while ( ( diagadd + mindiag ) <= 0.0 ) {
       retries++;
-      if (diagfact == 0.0) {
+      if ( diagfact == 0.0 ) {
         diagfact = 0.1;
-        diagadd = 1.0e-17 * diagfact * diagnrm / sqrt(k * 1.0);
+        diagadd  = 1.0e-17 * diagfact * diagnrm / sqrt( k * 1.0 );
       } else {
         diagfact = diagfact * 10.0;
-        diagadd = diagadd * 10.0;
+        diagadd  = diagadd * 10.0;
       };
     };
 
-    if (printlevel >= 3)
-      printf("diagnrm is %e, adding diagadd %e \n", diagnrm, diagadd);
+    if ( printlevel >= 3 )
+      printf( "diagnrm is %e, adding diagadd %e \n", diagnrm, diagadd );
 
-    for (i = 1; i <= k; i++) O[ijtok(i, i, ldam)] += diagadd;
+    for ( i = 1; i <= k; i++ )
+      O[ ijtok( i, i, ldam ) ] += diagadd;
 
     /*
      * Scale the O matrix.
      */
 
-    for (i = 1; i <= k; i++) workvec8[i] = 1.0 / sqrt(O[ijtok(i, i, ldam)]);
+    for ( i = 1; i <= k; i++ )
+      workvec8[ i ] = 1.0 / sqrt( O[ ijtok( i, i, ldam ) ] );
 
-    for (i = 1; i <= k; i++) {
-      if (workvec8[i] > 1.0e30) workvec8[i] = 1.0e30;
+    for ( i = 1; i <= k; i++ ) {
+      if ( workvec8[ i ] > 1.0e30 ) workvec8[ i ] = 1.0e30;
     };
 
-#pragma omp parallel for schedule(dynamic, 64) default(none) shared( \
-    O, ldam, k, workvec8) private(i, j)
-    for (j = 1; j <= k; j++)
-      for (i = 1; i <= j; i++)
-        O[ijtok(i, j, ldam)] =
-            O[ijtok(i, j, ldam)] * (workvec8[i] * workvec8[j]);
+#pragma omp parallel for schedule( dynamic, 64 ) default( none )               \
+    shared( O, ldam, k, workvec8 ) private( i, j )
+    for ( j = 1; j <= k; j++ )
+      for ( i = 1; i <= j; i++ )
+        O[ ijtok( i, j, ldam ) ] =
+            O[ ijtok( i, j, ldam ) ] * ( workvec8[ i ] * workvec8[ j ] );
 
-/*
-  Next, compute the cholesky factorization of the system matrix.
-*/
+        /*
+          Next, compute the cholesky factorization of the system matrix.
+        */
 
 #ifdef USEGETTIME
-    gettimeofday(&tp, NULL);
-    t1 = (double)tp.tv_sec + (1.0e-6) * tp.tv_usec;
+    gettimeofday( &tp, NULL );
+    t1 = (double) tp.tv_sec + ( 1.0e-6 ) * tp.tv_usec;
 #endif
 
-    MY_DPOTRF("U", &m, O, &ldam, &info);
+    MY_DPOTRF( "U", &m, O, &ldam, &info );
 
 #ifdef USEGETTIME
-    gettimeofday(&tp, NULL);
-    t2 = (double)tp.tv_sec + (1.0e-6) * tp.tv_usec;
+    gettimeofday( &tp, NULL );
+    t2         = (double) tp.tv_sec + ( 1.0e-6 ) * tp.tv_usec;
     factortime = factortime + t2 - t1;
 #endif
 
-    if (info != 0) {
-      if (printlevel >= 3)
-        printf("Factorization of the system matrix failed!\n");
+    if ( info != 0 ) {
+      if ( printlevel >= 3 )
+        printf( "Factorization of the system matrix failed!\n" );
 
-      if (retries < 15) {
-        if (retries == 0) diagfact = 0.1;
-        retries = retries + 1;
+      if ( retries < 15 ) {
+        if ( retries == 0 ) diagfact = 0.1;
+        retries  = retries + 1;
         diagfact = diagfact * 10.0;
-#pragma omp parallel for schedule(dynamic, 64) private(i, j) shared(O, k, ldam)
-        for (i = 1; i <= k - 1; i++)
-          for (j = i; j <= k; j++) O[ijtok(i, j, ldam)] = O[ijtok(j, i, ldam)];
-        for (i = 1; i <= k; i++) O[ijtok(i, i, ldam)] = diagO[i];
+#pragma omp parallel for schedule( dynamic, 64 ) private( i, j )               \
+    shared( O, k, ldam )
+        for ( i = 1; i <= k - 1; i++ )
+          for ( j = i; j <= k; j++ )
+            O[ ijtok( i, j, ldam ) ] = O[ ijtok( j, i, ldam ) ];
+        for ( i = 1; i <= k; i++ )
+          O[ ijtok( i, i, ldam ) ] = diagO[ i ];
         goto RETRYFACTOR;
       } else {
-        if (printlevel >= 1)
-          printf("Factorization of the system matrix failed, giving up. \n");
+        if ( printlevel >= 1 )
+          printf( "Factorization of the system matrix failed, giving up. \n" );
 
         /*
          * Tighten up the solution as much as possible.
@@ -714,7 +731,8 @@ struct paramstruc parameters;
       Compute the rhs vector.
     */
 
-    for (i = 1; i <= k; i++) rhs[i] = -a[i];
+    for ( i = 1; i <= k; i++ )
+      rhs[ i ] = -a[ i ];
 
     /*
      * Add in the corrections for Fd.
@@ -731,40 +749,42 @@ struct paramstruc parameters;
       of old work2 usage.
     */
 
-    op_at(k, y, constraints, work1);
+    op_at( k, y, constraints, work1 );
 
-    addscaledmat(Z, 1.0, C, work2);
+    addscaledmat( Z, 1.0, C, work2 );
 
-    if ((bestmeas > 1.0e3) && (parameters.perturbobj > 0)) {
-      if (printlevel >= 3) printf("Perturbing C.\n");
-      make_i(work3);
-      addscaledmat(work2, -perturbfac, work3, work2);
+    if ( ( bestmeas > 1.0e3 ) && ( parameters.perturbobj > 0 ) ) {
+      if ( printlevel >= 3 ) printf( "Perturbing C.\n" );
+      make_i( work3 );
+      addscaledmat( work2, -perturbfac, work3, work2 );
     };
 
-    if ((bestmeas < 1.0e3) && (parameters.perturbobj > 0)) {
-      if (printlevel >= 3) printf("Perturbing C.\n");
-      make_i(work3);
-      addscaledmat(work2, -perturbfac * pow(bestmeas / 1000.0, 1.5), work3,
-                   work2);
+    if ( ( bestmeas < 1.0e3 ) && ( parameters.perturbobj > 0 ) ) {
+      if ( printlevel >= 3 ) printf( "Perturbing C.\n" );
+      make_i( work3 );
+      addscaledmat( work2, -perturbfac * pow( bestmeas / 1000.0, 1.5 ), work3,
+                    work2 );
     };
 
-    addscaledmat(work2, -1.0, work1, work2);
+    addscaledmat( work2, -1.0, work1, work2 );
 
     scale1 = 1.0;
     scale2 = 0.0;
 
-    mat_multspb(scale1, scale2, Zi, work2, work3, fill);
-    mat_multspc(scale1, scale2, work3, X, dX, fill);
+    mat_multspb( scale1, scale2, Zi, work2, work3, fill );
+    mat_multspc( scale1, scale2, work3, X, dX, fill );
 
-    op_a(k, constraints, dX, workvec1);
+    op_a( k, constraints, dX, workvec1 );
 
-    for (i = 1; i <= k; i++) rhs[i] = rhs[i] + workvec1[i];
+    for ( i = 1; i <= k; i++ )
+      rhs[ i ] = rhs[ i ] + workvec1[ i ];
 
-    for (i = 1; i <= k; i++) workvec1[i] = rhs[i];
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = rhs[ i ];
 
-    if (printlevel >= 3) {
-      printf("Fnorm of Fd is %e \n", Fnorm(work2));
-      printf("Norm of rhs is %e \n", norm2(m, rhs + 1));
+    if ( printlevel >= 3 ) {
+      printf( "Fnorm of Fd is %e \n", Fnorm( work2 ) );
+      printf( "Norm of rhs is %e \n", norm2( m, rhs + 1 ) );
     };
 
     /*
@@ -775,14 +795,16 @@ struct paramstruc parameters;
      * First, scale
      */
 
-    for (i = 1; i <= k; i++) workvec1[i] = workvec1[i] * workvec8[i];
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = workvec1[ i ] * workvec8[ i ];
 
-    info = solvesys(k, ldam, O, workvec1);
+    info = solvesys( k, ldam, O, workvec1 );
 
-    for (i = 1; i <= k; i++) workvec1[i] = workvec1[i] * workvec8[i];
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = workvec1[ i ] * workvec8[ i ];
 
-    if (info != 0) {
-      if (printlevel >= 1) printf("Solving for dy failed! \n");
+    if ( info != 0 ) {
+      if ( printlevel >= 1 ) printf( "Solving for dy failed! \n" );
       retcode = 8;
       goto RETURNBEST;
     };
@@ -791,76 +813,87 @@ struct paramstruc parameters;
      * Do iterative refinement.
      */
 
-    if ((iter > 1) && (relerr2 > parameters.axtol) &&
-        (parameters.fastmode == 0)) {
-      op_at(k, workvec1, constraints, work1);
-      mat_multspa(1.0, 0.0, work1, X, dX, fill);
-      mat_multspc(1.0, 0.0, Zi, dX, work1, fill);
-      op_a(k, constraints, work1, workvec2);
-      for (i = 1; i <= k; i++) workvec2[i] = rhs[i] - workvec2[i];
+    if ( ( iter > 1 ) && ( relerr2 > parameters.axtol ) &&
+         ( parameters.fastmode == 0 ) ) {
+      op_at( k, workvec1, constraints, work1 );
+      mat_multspa( 1.0, 0.0, work1, X, dX, fill );
+      mat_multspc( 1.0, 0.0, Zi, dX, work1, fill );
+      op_a( k, constraints, work1, workvec2 );
+      for ( i = 1; i <= k; i++ )
+        workvec2[ i ] = rhs[ i ] - workvec2[ i ];
 
-      relerr = norm2(k, workvec2 + 1) / (1.0 + norm2(k, rhs + 1));
+      relerr  = norm2( k, workvec2 + 1 ) / ( 1.0 + norm2( k, rhs + 1 ) );
       besterr = relerr;
-      for (i = 1; i <= k; i++) workvec4[i] = workvec1[i];
+      for ( i = 1; i <= k; i++ )
+        workvec4[ i ] = workvec1[ i ];
 
-      if (printlevel >= 3) {
-        printf("refinement: Before relative error in Ody=r is %e \n", besterr);
-        fflush(stdout);
+      if ( printlevel >= 3 ) {
+        printf( "refinement: Before relative error in Ody=r is %e \n",
+                besterr );
+        fflush( stdout );
       };
 
-      refinements = 0;
+      refinements           = 0;
       lastimproverefinement = 0;
 
-      while ((refinements < 20) && (refinements - lastimproverefinement < 3) &&
-             (besterr > 1.0e-14)) {
+      while ( ( refinements < 20 ) &&
+              ( refinements - lastimproverefinement < 3 ) &&
+              ( besterr > 1.0e-14 ) ) {
         refinements++;
 
-        for (i = 1; i <= k; i++) workvec3[i] = workvec2[i] * workvec8[i];
+        for ( i = 1; i <= k; i++ )
+          workvec3[ i ] = workvec2[ i ] * workvec8[ i ];
 
-        info = solvesys(k, ldam, O, workvec3);
+        info = solvesys( k, ldam, O, workvec3 );
 
-        for (i = 1; i <= k; i++) workvec3[i] = workvec3[i] * workvec8[i];
+        for ( i = 1; i <= k; i++ )
+          workvec3[ i ] = workvec3[ i ] * workvec8[ i ];
 
-        for (i = 1; i <= k; i++) workvec1[i] = workvec1[i] + workvec3[i];
+        for ( i = 1; i <= k; i++ )
+          workvec1[ i ] = workvec1[ i ] + workvec3[ i ];
 
-        op_at(k, workvec1, constraints, work1);
-        mat_multspa(1.0, 0.0, work1, X, dX, fill);
-        mat_multspc(1.0, 0.0, Zi, dX, work1, fill);
-        op_a(k, constraints, work1, workvec2);
-        for (i = 1; i <= k; i++) workvec2[i] = rhs[i] - workvec2[i];
+        op_at( k, workvec1, constraints, work1 );
+        mat_multspa( 1.0, 0.0, work1, X, dX, fill );
+        mat_multspc( 1.0, 0.0, Zi, dX, work1, fill );
+        op_a( k, constraints, work1, workvec2 );
+        for ( i = 1; i <= k; i++ )
+          workvec2[ i ] = rhs[ i ] - workvec2[ i ];
 
-        relerr = norm2(k, workvec2 + 1) / (1.0 + norm2(k, rhs + 1));
-        if (relerr < besterr) {
+        relerr = norm2( k, workvec2 + 1 ) / ( 1.0 + norm2( k, rhs + 1 ) );
+        if ( relerr < besterr ) {
           lastimproverefinement = refinements;
-          besterr = relerr;
-          for (i = 1; i <= k; i++) workvec4[i] = workvec1[i];
+          besterr               = relerr;
+          for ( i = 1; i <= k; i++ )
+            workvec4[ i ] = workvec1[ i ];
         };
-        if (printlevel >= 4) {
-          printf("refinement: During relative error in Ody=r is %e \n",
-                 besterr);
-          fflush(stdout);
+        if ( printlevel >= 4 ) {
+          printf( "refinement: During relative error in Ody=r is %e \n",
+                  besterr );
+          fflush( stdout );
         };
       };
 
-      if (printlevel >= 3)
-        printf("refinement: After relative error in Ody=r is %e, %d \n",
-               besterr, lastimproverefinement);
-      for (i = 1; i <= k; i++) workvec1[i] = workvec4[i];
+      if ( printlevel >= 3 )
+        printf( "refinement: After relative error in Ody=r is %e, %d \n",
+                besterr, lastimproverefinement );
+      for ( i = 1; i <= k; i++ )
+        workvec1[ i ] = workvec4[ i ];
     };
 
     /*
      * Extract dy.
      */
 
-    for (i = 1; i <= k; i++) dy[i] = workvec1[i];
+    for ( i = 1; i <= k; i++ )
+      dy[ i ] = workvec1[ i ];
 
-    if (printlevel >= 3) printf("Norm of dy is %e \n", norm2(k, dy + 1));
+    if ( printlevel >= 3 ) printf( "Norm of dy is %e \n", norm2( k, dy + 1 ) );
 
     /*
       Compute dZ
     */
 
-    op_at(k, dy, constraints, dZ);
+    op_at( k, dy, constraints, dZ );
 
     /*
      * Note:  At this point, dZ only has A'(dy), not -Fd
@@ -872,24 +905,24 @@ struct paramstruc parameters;
     scale1 = 1.0;
     scale2 = 0.0;
 
-    mat_multspb(scale1, scale2, Zi, dZ, work1, fill);
+    mat_multspb( scale1, scale2, Zi, dZ, work1, fill );
 
-    if (printlevel >= 4) printf("Fnorm of work1 is %e \n", Fnorm(work1));
+    if ( printlevel >= 4 ) printf( "Fnorm of work1 is %e \n", Fnorm( work1 ) );
 
     /*
      * Now, update dZ to include -Fd
      */
 
-    if (printlevel >= 3) {
-      printf("Before Fd, Fnorm of dZ is %e \n", Fnorm(dZ));
-      fflush(stdout);
+    if ( printlevel >= 3 ) {
+      printf( "Before Fd, Fnorm of dZ is %e \n", Fnorm( dZ ) );
+      fflush( stdout );
     };
 
-    addscaledmat(dZ, -1.0, work2, dZ);
+    addscaledmat( dZ, -1.0, work2, dZ );
 
-    if (printlevel >= 3) {
-      printf("After Fd, Fnorm of dZ is %e \n", Fnorm(dZ));
-      fflush(stdout);
+    if ( printlevel >= 3 ) {
+      printf( "After Fd, Fnorm of dZ is %e \n", Fnorm( dZ ) );
+      fflush( stdout );
     };
 
     /*
@@ -904,49 +937,50 @@ struct paramstruc parameters;
       put the result in dX.
 
     */
-    make_i(work2);
+    make_i( work2 );
 
-    addscaledmat(work2, -1.0, work3, work2);
+    addscaledmat( work2, -1.0, work3, work2 );
 
-    addscaledmat(work2, 1.0, work1, work2);
+    addscaledmat( work2, 1.0, work1, work2 );
 
     scale1 = -1.0;
     scale2 = 0.0;
-    mat_mult(scale1, scale2, work2, X, dX);
+    mat_mult( scale1, scale2, work2, X, dX );
 
-    sym_mat(dX);
+    sym_mat( dX );
 
-    if (printlevel >= 3) {
-      printf("Fnorm of dX is %e \n", Fnorm(dX));
-      printf("Fnorm of dZ is %e \n", Fnorm(dZ));
-      fflush(stdout);
+    if ( printlevel >= 3 ) {
+      printf( "Fnorm of dX is %e \n", Fnorm( dX ) );
+      printf( "Fnorm of dZ is %e \n", Fnorm( dZ ) );
+      fflush( stdout );
     };
 
     /*
      * Next, determine mu.
      */
 
-    if (relpinfeas < parameters.axtol)
-      alphap1 = linesearch(n, dX, work1, work2, work3, cholxinv, workvec4,
-                           workvec5, workvec6, mystepfrac, 1.0, printlevel);
+    if ( relpinfeas < parameters.axtol )
+      alphap1 = linesearch( n, dX, work1, work2, work3, cholxinv, workvec4,
+                            workvec5, workvec6, mystepfrac, 1.0, printlevel );
     else
-      alphap1 = linesearch(n, dX, work1, work2, work3, cholxinv, workvec4,
-                           workvec5, workvec6, mystepfrac, 1.0, printlevel);
+      alphap1 = linesearch( n, dX, work1, work2, work3, cholxinv, workvec4,
+                            workvec5, workvec6, mystepfrac, 1.0, printlevel );
 
-    if (reldinfeas < parameters.atytol)
-      alphad1 = linesearch(n, dZ, work1, work2, work3, cholzinv, workvec4,
-                           workvec5, workvec6, mystepfrac, 1.0, printlevel);
+    if ( reldinfeas < parameters.atytol )
+      alphad1 = linesearch( n, dZ, work1, work2, work3, cholzinv, workvec4,
+                            workvec5, workvec6, mystepfrac, 1.0, printlevel );
     else
-      alphad1 = linesearch(n, dZ, work1, work2, work3, cholzinv, workvec4,
-                           workvec5, workvec6, mystepfrac, 1.0, printlevel);
+      alphad1 = linesearch( n, dZ, work1, work2, work3, cholzinv, workvec4,
+                            workvec5, workvec6, mystepfrac, 1.0, printlevel );
 
     oldmu = mu;
 
     /* Here, work1 holds X+alphap1*dX, work2=Z+alphad1*dZ */
 
-    addscaledmat(X, alphap1, dX, work1);
-    addscaledmat(Z, alphad1, dZ, work2);
-    for (i = 1; i <= k; i++) workvec1[i] = y[i] + alphad1 * dy[i];
+    addscaledmat( X, alphap1, dX, work1 );
+    addscaledmat( Z, alphad1, dZ, work2 );
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = y[ i ] + alphad1 * dy[ i ];
 
     /*
      * Check to see whether this affine solution is the best yet.
@@ -954,139 +988,147 @@ struct paramstruc parameters;
      * we're close to done.
      */
 
-    if ((bestmeas < 1.0e4) && (parameters.affine == 0)) {
+    if ( ( bestmeas < 1.0e4 ) && ( parameters.affine == 0 ) ) {
       /*
        * Verify that the new X and Z are Cholesky factorizable.
        */
 
-      copy_mat(work1, work3);
-      ret = chol(work3);
-      while (ret != 0) {
-        if (printlevel >= 3)
-          printf("Affine eigsearch missed: adjusting alphap1\n");
+      copy_mat( work1, work3 );
+      ret = chol( work3 );
+      while ( ret != 0 ) {
+        if ( printlevel >= 3 )
+          printf( "Affine eigsearch missed: adjusting alphap1\n" );
         alphap1 = alphap1 * 0.9;
-        addscaledmat(X, alphap1, dX, work1);
-        copy_mat(work1, work3);
-        ret = chol(work3);
+        addscaledmat( X, alphap1, dX, work1 );
+        copy_mat( work1, work3 );
+        ret = chol( work3 );
       };
 
-      copy_mat(work2, work3);
-      ret = chol(work3);
-      while (ret != 0) {
-        if (printlevel >= 3)
-          printf("Affine eigsearch missed: adjusting alphad1\n");
+      copy_mat( work2, work3 );
+      ret = chol( work3 );
+      while ( ret != 0 ) {
+        if ( printlevel >= 3 )
+          printf( "Affine eigsearch missed: adjusting alphad1\n" );
         alphad1 = alphad1 * 0.9;
-        addscaledmat(Z, alphad1, dZ, work2);
-        for (i = 1; i <= k; i++) workvec1[i] = y[i] + alphad1 * dy[i];
-        copy_mat(work2, work3);
-        ret = chol(work3);
+        addscaledmat( Z, alphad1, dZ, work2 );
+        for ( i = 1; i <= k; i++ )
+          workvec1[ i ] = y[ i ] + alphad1 * dy[ i ];
+        copy_mat( work2, work3 );
+        ret = chol( work3 );
       };
 
       /*
        * Now, check the quality of this solution.
        */
 
-      affpobj = calc_pobj(C, work1, constant_offset);
-      affdobj = calc_dobj(k, a, workvec1, constant_offset);
+      affpobj = calc_pobj( C, work1, constant_offset );
+      affdobj = calc_dobj( k, a, workvec1, constant_offset );
 
       /*
        * run user exit to check if the affine solution is good enough
        */
-      if (user_exit(n, k, C, a, affdobj, affpobj, constant_offset, constraints,
-                    work1, workvec1, work2, parameters) == 1) {
+      if ( user_exit( n, k, C, a, affdobj, affpobj, constant_offset,
+                      constraints, work1, workvec1, work2, parameters ) == 1 ) {
         *dobj = affdobj;
         *pobj = affpobj;
-        copy_mat(work1, X);
-        copy_mat(work2, Z);
-        for (i = 1; i <= k; i++) y[i] = workvec1[i];
-        if (printlevel >= 3) printf("Affine step good enough, exiting\n");
-        return (0);
+        copy_mat( work1, X );
+        copy_mat( work2, Z );
+        for ( i = 1; i <= k; i++ )
+          y[ i ] = workvec1[ i ];
+        if ( printlevel >= 3 ) printf( "Affine step good enough, exiting\n" );
+        return ( 0 );
       };
 
-      if (parameters.usexzgap == 0) {
+      if ( parameters.usexzgap == 0 ) {
         affgap = affdobj - affpobj;
-        if (affgap < 0) affgap = 0.0;
-        affrelgap = affgap / (1.0 + fabs(affpobj) + fabs(affdobj));
+        if ( affgap < 0 ) affgap = 0.0;
+        affrelgap = affgap / ( 1.0 + fabs( affpobj ) + fabs( affdobj ) );
       } else {
-        affgap = trace_prod(work1, work2);
-        if (affgap < 0) affgap = 0.0;
-        affrelgap = affgap / (1.0 + fabs(affpobj) + fabs(affdobj));
+        affgap = trace_prod( work1, work2 );
+        if ( affgap < 0 ) affgap = 0.0;
+        affrelgap = affgap / ( 1.0 + fabs( affpobj ) + fabs( affdobj ) );
       };
 
-      affreldinfeas = dinfeas(k, C, constraints, workvec1, work2, work3);
-      affrelpinfeas = pinfeas(k, constraints, work1, a, workvec4);
+      affreldinfeas = dinfeas( k, C, constraints, workvec1, work2, work3 );
+      affrelpinfeas = pinfeas( k, constraints, work1, a, workvec4 );
 
-      if (printlevel >= 3) {
-        printf("affpobj is %e \n", affpobj);
-        printf("affdobj is %e \n", affdobj);
-        printf("affrelgap is %e \n", affrelgap);
-        printf("affrelpinfeas is %e \n", affrelpinfeas);
-        printf("affreldinfeas is %e \n", affreldinfeas);
+      if ( printlevel >= 3 ) {
+        printf( "affpobj is %e \n", affpobj );
+        printf( "affdobj is %e \n", affdobj );
+        printf( "affrelgap is %e \n", affrelgap );
+        printf( "affrelpinfeas is %e \n", affrelpinfeas );
+        printf( "affreldinfeas is %e \n", affreldinfeas );
       };
 
-      if ((affrelgap / parameters.objtol < bestmeas) &&
-          (affrelpinfeas / parameters.axtol < bestmeas) &&
-          (affreldinfeas / parameters.atytol < bestmeas)) {
+      if ( ( affrelgap / parameters.objtol < bestmeas ) &&
+           ( affrelpinfeas / parameters.axtol < bestmeas ) &&
+           ( affreldinfeas / parameters.atytol < bestmeas ) ) {
         lastimprove = iter;
 
         bestmeas = affrelgap / parameters.objtol;
-        if (affrelpinfeas / parameters.axtol > bestmeas)
+        if ( affrelpinfeas / parameters.axtol > bestmeas )
           bestmeas = affrelpinfeas / parameters.axtol;
-        if (affreldinfeas / parameters.atytol > bestmeas)
+        if ( affreldinfeas / parameters.atytol > bestmeas )
           bestmeas = affreldinfeas / parameters.atytol;
 
-        store_packed(work1, bestx);
-        store_packed(work2, bestz);
-        for (i = 1; i <= k; i++) besty[i] = y[i] + alphad1 * dy[i];
-        if (printlevel >= 3)
-          printf("Affine step: New best solution, %e \n", bestmeas);
+        store_packed( work1, bestx );
+        store_packed( work2, bestz );
+        for ( i = 1; i <= k; i++ )
+          besty[ i ] = y[ i ] + alphad1 * dy[ i ];
+        if ( printlevel >= 3 )
+          printf( "Affine step: New best solution, %e \n", bestmeas );
       };
 
-      if ((ispfeasprob == 1) && (affrelpinfeas / parameters.axtol < bestmeas)) {
+      if ( ( ispfeasprob == 1 ) &&
+           ( affrelpinfeas / parameters.axtol < bestmeas ) ) {
         lastimprove = iter;
 
         bestmeas = affrelpinfeas / parameters.axtol;
 
-        store_packed(work1, bestx);
-        for (i = 1; i <= k; i++) besty[i] = 0.0;
-        zero_mat(work3);
-        addscaledmat(work3, 1.0e-50, work1, work3);
-        store_packed(work3, bestz);
+        store_packed( work1, bestx );
+        for ( i = 1; i <= k; i++ )
+          besty[ i ] = 0.0;
+        zero_mat( work3 );
+        addscaledmat( work3, 1.0e-50, work1, work3 );
+        store_packed( work3, bestz );
 
-        if (printlevel >= 3)
-          printf("Affine step: New best solution, %e \n", bestmeas);
+        if ( printlevel >= 3 )
+          printf( "Affine step: New best solution, %e \n", bestmeas );
       };
 
-      if ((isdfeasprob == 1) &&
-          (affreldinfeas / parameters.atytol < bestmeas)) {
+      if ( ( isdfeasprob == 1 ) &&
+           ( affreldinfeas / parameters.atytol < bestmeas ) ) {
         lastimprove = iter;
 
         bestmeas = affreldinfeas / parameters.atytol;
 
-        zero_mat(work3);
-        make_i(work1);
-        addscaledmat(work3, 1.0e-40, work1, work3);
-        store_packed(work3, bestx);
-        store_packed(work2, bestz);
-        for (i = 1; i <= k; i++) besty[i] = workvec1[i];
-        if (printlevel >= 3)
-          printf("Affine step: New best solution, %e \n", bestmeas);
+        zero_mat( work3 );
+        make_i( work1 );
+        addscaledmat( work3, 1.0e-40, work1, work3 );
+        store_packed( work3, bestx );
+        store_packed( work2, bestz );
+        for ( i = 1; i <= k; i++ )
+          besty[ i ] = workvec1[ i ];
+        if ( printlevel >= 3 )
+          printf( "Affine step: New best solution, %e \n", bestmeas );
       };
 
-      if (bestmeas < 1.0) {
-        if (printlevel >= 3) printf("Finishing with a final affine step.\n");
+      if ( bestmeas < 1.0 ) {
+        if ( printlevel >= 3 )
+          printf( "Finishing with a final affine step.\n" );
         iter = iter + 1;
-        if (printlevel >= 2)
-          printf("Iter: %2d Ap: %.2e Pobj: % .7e Ad: %.2e Dobj: % .7e \n", iter,
-                 alphap1, affpobj, alphad1, affdobj);
-        if (printlevel >= 2) printf("Total Iterations: %d \n", iter);
+        if ( printlevel >= 2 )
+          printf( "Iter: %2d Ap: %.2e Pobj: % .7e Ad: %.2e Dobj: % .7e \n",
+                  iter, alphap1, affpobj, alphad1, affdobj );
+        if ( printlevel >= 2 ) printf( "Total Iterations: %d \n", iter );
 
-        store_unpacked(bestx, X);
-        store_unpacked(bestz, Z);
-        for (i = 1; i <= k; i++) y[i] = besty[i];
-        *pobj = calc_pobj(C, X, constant_offset);
-        *dobj = calc_dobj(k, a, y, constant_offset);
-        return (0);
+        store_unpacked( bestx, X );
+        store_unpacked( bestz, Z );
+        for ( i = 1; i <= k; i++ )
+          y[ i ] = besty[ i ];
+        *pobj = calc_pobj( C, X, constant_offset );
+        *dobj = calc_dobj( k, a, y, constant_offset );
+        return ( 0 );
       };
     };
 
@@ -1094,13 +1136,13 @@ struct paramstruc parameters;
      * Compute muplus and prepare for the corrector step.
      */
 
-    muplus = trace_prod(work1, work2) / (n);
-    muk = trace_prod(X, Z) / (n);
+    muplus = trace_prod( work1, work2 ) / ( n );
+    muk    = trace_prod( X, Z ) / ( n );
 
-    if (muk < 0.0) muk = fabs(muk);
-    if (muplus < 0.0) muplus = muk / 2;
+    if ( muk < 0.0 ) muk = fabs( muk );
+    if ( muplus < 0.0 ) muplus = muk / 2;
 
-    gamma = (muplus / muk);
+    gamma = ( muplus / muk );
 
     /*
      * Pick the new mu as follows:
@@ -1114,12 +1156,12 @@ struct paramstruc parameters;
      * Also, make sure that mu is no larger than the old mu.
      */
 
-    if ((relpinfeas < 0.1 * parameters.axtol) && (alphad > 0.2) &&
-        (reldinfeas < 0.1 * parameters.atytol) && (alphap > 0.2) &&
-        (mu > 1.0e-6) && (gamma < 1.0) && (alphap + alphad > 1.0)) {
-      mu = muk * pow(gamma, alphap + alphad);
+    if ( ( relpinfeas < 0.1 * parameters.axtol ) && ( alphad > 0.2 ) &&
+         ( reldinfeas < 0.1 * parameters.atytol ) && ( alphap > 0.2 ) &&
+         ( mu > 1.0e-6 ) && ( gamma < 1.0 ) && ( alphap + alphad > 1.0 ) ) {
+      mu = muk * pow( gamma, alphap + alphad );
     } else {
-      if (muplus < 0.9 * muk)
+      if ( muplus < 0.9 * muk )
         mu = muplus;
       else
         mu = muk * 0.9;
@@ -1130,43 +1172,44 @@ struct paramstruc parameters;
      * make sure that mu is <=muk/2.
      */
 
-    if ((relpinfeas < 0.9 * parameters.axtol) &&
-        (reldinfeas < 0.9 * parameters.atytol) && (mu > muk / 2))
+    if ( ( relpinfeas < 0.9 * parameters.axtol ) &&
+         ( reldinfeas < 0.9 * parameters.atytol ) && ( mu > muk / 2 ) )
       mu = muk / 2;
 
     /*
      * If we want a primal-dual affine step, then set mu=0.0.
      */
 
-    if (parameters.affine == 1) {
+    if ( parameters.affine == 1 ) {
       mu = 0.0;
-      if (printlevel >= 3)
-        printf("Taking an affine step because parameters.affine=1\n");
+      if ( printlevel >= 3 )
+        printf( "Taking an affine step because parameters.affine=1\n" );
     };
 
     /*
      * Printout some info on mu.
      */
 
-    if (printlevel >= 2) {
-      printf("muk is %e \n", muk);
-      printf("muplus is %e \n", muplus);
-      printf("New mu is %e \n", mu);
-      printf("mu*n = target duality gap is %e \n", mu * n);
-      fflush(stdout);
+    if ( printlevel >= 2 ) {
+      printf( "muk is %e \n", muk );
+      printf( "muplus is %e \n", muplus );
+      printf( "New mu is %e \n", mu );
+      printf( "mu*n = target duality gap is %e \n", mu * n );
+      fflush( stdout );
     };
 
     /*
      * Take a moment to figure out how well we're doing on feasibility.
      */
 
-    addscaledmat(X, 1.0, dX, work1);
-    op_a(k, constraints, work1, workvec1);
-    for (i = 1; i <= k; i++) workvec1[i] = workvec1[i] - a[i];
-    relerr1 = norm2(k, workvec1 + 1) / (1.0 + norma);
-    if (printlevel >= 3) {
-      printf("refinement: Relative error in A(X+dX)=a (Fphat) is %e \n",
-             relerr1);
+    addscaledmat( X, 1.0, dX, work1 );
+    op_a( k, constraints, work1, workvec1 );
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = workvec1[ i ] - a[ i ];
+    relerr1 = norm2( k, workvec1 + 1 ) / ( 1.0 + norma );
+    if ( printlevel >= 3 ) {
+      printf( "refinement: Relative error in A(X+dX)=a (Fphat) is %e \n",
+              relerr1 );
     };
 
     /*
@@ -1181,9 +1224,10 @@ struct paramstruc parameters;
       Update Fphat=a-A(X+dX)
     */
 
-    addscaledmat(dX, 1.0, X, work1);
-    op_a(k, constraints, work1, Fp);
-    for (i = 1; i <= k; i++) Fp[i] = a[i] - Fp[i];
+    addscaledmat( dX, 1.0, X, work1 );
+    op_a( k, constraints, work1, Fp );
+    for ( i = 1; i <= k; i++ )
+      Fp[ i ] = a[ i ] - Fp[ i ];
 
     /*
       The RHS is now A(Zi*Fdhat*X)+A(Zi*(-dZ*dX+mu*I))-Fphat
@@ -1192,45 +1236,49 @@ struct paramstruc parameters;
 
     */
 
-    make_i(work1);
+    make_i( work1 );
     scale1 = 0.0;
     scale2 = mu;
-    mat_mult(scale1, scale2, work2, work2, work1);
+    mat_mult( scale1, scale2, work2, work2, work1 );
 
     scale1 = -1.0;
     scale2 = 1.0;
-    mat_multspa(scale1, scale2, dZ, dX, work1, fill);
+    mat_multspa( scale1, scale2, dZ, dX, work1, fill );
 
     scale1 = 1.0;
     scale2 = 0.0;
-    mat_multspc(scale1, scale2, Zi, work1, work2, fill);
+    mat_multspc( scale1, scale2, Zi, work1, work2, fill );
 
     /*
       Next, compute op_a of work2, and put the result in rhs.
     */
 
-    op_a(k, constraints, work2, rhs);
+    op_a( k, constraints, work2, rhs );
 
     /*
      * Finally, subtract off Fphat.
      */
 
-    for (i = 1; i <= k; i++) rhs[i] = rhs[i] - Fp[i];
+    for ( i = 1; i <= k; i++ )
+      rhs[ i ] = rhs[ i ] - Fp[ i ];
 
-    for (i = 1; i <= k; i++) workvec1[i] = rhs[i];
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = rhs[ i ];
 
     /*
       Solve for dy1.
     */
 
-    for (i = 1; i <= k; i++) workvec1[i] = workvec1[i] * workvec8[i];
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = workvec1[ i ] * workvec8[ i ];
 
-    info = solvesys(k, ldam, O, workvec1);
+    info = solvesys( k, ldam, O, workvec1 );
 
-    for (i = 1; i <= k; i++) workvec1[i] = workvec1[i] * workvec8[i];
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = workvec1[ i ] * workvec8[ i ];
 
-    if (info != 0) {
-      if (printlevel >= 1) printf("Solving for dy1 failed! \n");
+    if ( info != 0 ) {
+      if ( printlevel >= 1 ) printf( "Solving for dy1 failed! \n" );
       retcode = 8;
       goto RETURNBEST;
     };
@@ -1239,70 +1287,80 @@ struct paramstruc parameters;
      * Do iterative refinement.
      */
 
-    if ((iter > 1) && (relerr2 > 0.01 * parameters.axtol) &&
-        (parameters.fastmode == 0)) {
-      op_at(k, workvec1, constraints, work1);
-      mat_multspa(1.0, 0.0, work1, X, work2, fill);
-      mat_multspc(1.0, 0.0, Zi, work2, work3, fill);
-      op_a(k, constraints, work3, workvec2);
-      for (i = 1; i <= k; i++) workvec2[i] = rhs[i] - workvec2[i];
+    if ( ( iter > 1 ) && ( relerr2 > 0.01 * parameters.axtol ) &&
+         ( parameters.fastmode == 0 ) ) {
+      op_at( k, workvec1, constraints, work1 );
+      mat_multspa( 1.0, 0.0, work1, X, work2, fill );
+      mat_multspc( 1.0, 0.0, Zi, work2, work3, fill );
+      op_a( k, constraints, work3, workvec2 );
+      for ( i = 1; i <= k; i++ )
+        workvec2[ i ] = rhs[ i ] - workvec2[ i ];
 
-      relerr = norm2(k, workvec2 + 1) / (1.0 + norm2(k, rhs + 1));
+      relerr  = norm2( k, workvec2 + 1 ) / ( 1.0 + norm2( k, rhs + 1 ) );
       besterr = relerr;
-      for (i = 1; i <= k; i++) workvec4[i] = workvec1[i];
+      for ( i = 1; i <= k; i++ )
+        workvec4[ i ] = workvec1[ i ];
 
-      if (printlevel >= 3) {
-        printf("refinement: Before relative error in Odyhat=r is %e \n",
-               besterr);
+      if ( printlevel >= 3 ) {
+        printf( "refinement: Before relative error in Odyhat=r is %e \n",
+                besterr );
       };
 
-      refinements = 0;
+      refinements           = 0;
       lastimproverefinement = 0;
 
-      while ((refinements < 20) && (refinements - lastimproverefinement < 3) &&
-             (besterr > 1.0e-14)) {
+      while ( ( refinements < 20 ) &&
+              ( refinements - lastimproverefinement < 3 ) &&
+              ( besterr > 1.0e-14 ) ) {
         refinements++;
 
-        for (i = 1; i <= k; i++) workvec3[i] = workvec2[i] * workvec8[i];
+        for ( i = 1; i <= k; i++ )
+          workvec3[ i ] = workvec2[ i ] * workvec8[ i ];
 
-        info = solvesys(k, ldam, O, workvec3);
+        info = solvesys( k, ldam, O, workvec3 );
 
-        for (i = 1; i <= k; i++) workvec3[i] = workvec3[i] * workvec8[i];
+        for ( i = 1; i <= k; i++ )
+          workvec3[ i ] = workvec3[ i ] * workvec8[ i ];
 
-        for (i = 1; i <= k; i++) workvec1[i] = workvec1[i] + workvec3[i];
+        for ( i = 1; i <= k; i++ )
+          workvec1[ i ] = workvec1[ i ] + workvec3[ i ];
 
-        op_at(k, workvec1, constraints, work1);
-        mat_multspa(1.0, 0.0, work1, X, work2, fill);
-        mat_multspc(1.0, 0.0, Zi, work2, work3, fill);
-        op_a(k, constraints, work3, workvec2);
-        for (i = 1; i <= k; i++) workvec2[i] = rhs[i] - workvec2[i];
+        op_at( k, workvec1, constraints, work1 );
+        mat_multspa( 1.0, 0.0, work1, X, work2, fill );
+        mat_multspc( 1.0, 0.0, Zi, work2, work3, fill );
+        op_a( k, constraints, work3, workvec2 );
+        for ( i = 1; i <= k; i++ )
+          workvec2[ i ] = rhs[ i ] - workvec2[ i ];
 
-        relerr = norm2(k, workvec2 + 1) / (1.0 + norm2(k, rhs + 1));
-        if (relerr < besterr) {
+        relerr = norm2( k, workvec2 + 1 ) / ( 1.0 + norm2( k, rhs + 1 ) );
+        if ( relerr < besterr ) {
           lastimproverefinement = refinements;
-          besterr = relerr;
-          for (i = 1; i <= k; i++) workvec4[i] = workvec1[i];
+          besterr               = relerr;
+          for ( i = 1; i <= k; i++ )
+            workvec4[ i ] = workvec1[ i ];
         };
-        if (printlevel >= 4) {
-          printf("refinement: During relative error in Ody=r is %e \n",
-                 besterr);
-          fflush(stdout);
+        if ( printlevel >= 4 ) {
+          printf( "refinement: During relative error in Ody=r is %e \n",
+                  besterr );
+          fflush( stdout );
         };
       };
 
-      if (printlevel >= 3) {
-        printf("refinement: After relative error in Odyhat=r is %e,%d \n",
-               besterr, lastimproverefinement);
+      if ( printlevel >= 3 ) {
+        printf( "refinement: After relative error in Odyhat=r is %e,%d \n",
+                besterr, lastimproverefinement );
       };
 
-      for (i = 1; i <= k; i++) workvec1[i] = workvec4[i];
+      for ( i = 1; i <= k; i++ )
+        workvec1[ i ] = workvec4[ i ];
     };
 
     /*
      * retrieve dy1.
      */
 
-    for (i = 1; i <= k; i++) dy1[i] = workvec1[i];
+    for ( i = 1; i <= k; i++ )
+      dy1[ i ] = workvec1[ i ];
 
     /*
       Compute dZ1=A'(dy1).
@@ -1310,7 +1368,7 @@ struct paramstruc parameters;
       dZ1 is stored in work3.
     */
 
-    op_at(k, dy1, constraints, work3);
+    op_at( k, dy1, constraints, work3 );
 
     /*
       Compute dX1=-Zi*dZ1*X-Zi*dZ*dX+mu*zi;
@@ -1319,81 +1377,85 @@ struct paramstruc parameters;
       for storage sake, dX1 is stored in work2.
     */
 
-    make_i(work1);
+    make_i( work1 );
     scale1 = -1.0;
     scale2 = mu;
-    mat_multspa(scale1, scale2, dZ, dX, work1, fill);
+    mat_multspa( scale1, scale2, dZ, dX, work1, fill );
     scale1 = -1.0;
     scale2 = 1.0;
-    mat_multspa(scale1, scale2, work3, X, work1, fill);
+    mat_multspa( scale1, scale2, work3, X, work1, fill );
     scale1 = 1.0;
     scale2 = 0.0;
-    mat_mult(scale1, scale2, Zi, work1, work2);
-    sym_mat(work2);
+    mat_mult( scale1, scale2, Zi, work1, work2 );
+    sym_mat( work2 );
 
-    addscaledmat(X, 1.0, dX, work1);
-    op_a(k, constraints, work1, workvec1);
-    for (i = 1; i <= k; i++) workvec1[i] = workvec1[i] - a[i];
-    relerr2 = norm2(k, workvec1 + 1) / (1.0 + norma);
+    addscaledmat( X, 1.0, dX, work1 );
+    op_a( k, constraints, work1, workvec1 );
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = workvec1[ i ] - a[ i ];
+    relerr2 = norm2( k, workvec1 + 1 ) / ( 1.0 + norma );
 
-    if (printlevel >= 3) {
-      printf("refinement: Before dX+dX1 Relative error in A(X+dX)=a is %e \n",
-             relerr2);
-      if (relerr1 < relerr2)
-        printf("refinement: worse\n");
+    if ( printlevel >= 3 ) {
+      printf( "refinement: Before dX+dX1 Relative error in A(X+dX)=a is %e \n",
+              relerr2 );
+      if ( relerr1 < relerr2 )
+        printf( "refinement: worse\n" );
       else
-        printf("refinement: better\n");
+        printf( "refinement: better\n" );
     };
     /*
       Update the predictor step.
     */
 
-    if (printlevel >= 3) {
-      printf("Fnorm of dX1 is %e\n", Fnorm(work2));
-      printf("Fnorm of dZ1 is %e\n", Fnorm(work3));
+    if ( printlevel >= 3 ) {
+      printf( "Fnorm of dX1 is %e\n", Fnorm( work2 ) );
+      printf( "Fnorm of dZ1 is %e\n", Fnorm( work3 ) );
     };
-    add_mat(work2, dX);
-    add_mat(work3, dZ);
-    for (i = 1; i <= k; i++) dy[i] = dy1[i] + dy[i];
+    add_mat( work2, dX );
+    add_mat( work3, dZ );
+    for ( i = 1; i <= k; i++ )
+      dy[ i ] = dy1[ i ] + dy[ i ];
 
     /*
      * Check A(X+dX)=a.
      */
-    addscaledmat(X, 1.0, dX, work1);
-    op_a(k, constraints, work1, workvec1);
-    for (i = 1; i <= k; i++) workvec1[i] = workvec1[i] - a[i];
-    relerr2 = norm2(k, workvec1 + 1) / (1.0 + norma);
+    addscaledmat( X, 1.0, dX, work1 );
+    op_a( k, constraints, work1, workvec1 );
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = workvec1[ i ] - a[ i ];
+    relerr2 = norm2( k, workvec1 + 1 ) / ( 1.0 + norma );
 
-    if (printlevel >= 3) {
+    if ( printlevel >= 3 ) {
       printf(
           "refinement: Before adjust dX Relative error in A(X+dX)=a is %e \n",
-          relerr2);
-      if (relerr1 < relerr2)
-        printf("refinement: worse\n");
+          relerr2 );
+      if ( relerr1 < relerr2 )
+        printf( "refinement: worse\n" );
       else
-        printf("refinement: better\n");
+        printf( "refinement: better\n" );
     };
 
-    if (printlevel >= 3) {
-      printf("Fnorm of dX is %e \n", Fnorm(dX));
-      printf("Fnorm of dZ is %e \n", Fnorm(dZ));
+    if ( printlevel >= 3 ) {
+      printf( "Fnorm of dX is %e \n", Fnorm( dX ) );
+      printf( "Fnorm of dZ is %e \n", Fnorm( dZ ) );
     };
 
     /*
      * Take a moment to figure out how well we're doing on feasibility.
      */
 
-    addscaledmat(X, 1.0, dX, work1);
-    op_a(k, constraints, work1, workvec1);
-    for (i = 1; i <= k; i++) workvec1[i] = workvec1[i] - a[i];
-    relerr2 = norm2(k, workvec1 + 1) / (1.0 + norma);
+    addscaledmat( X, 1.0, dX, work1 );
+    op_a( k, constraints, work1, workvec1 );
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = workvec1[ i ] - a[ i ];
+    relerr2 = norm2( k, workvec1 + 1 ) / ( 1.0 + norma );
 
-    if (printlevel >= 3) {
-      printf("refinement: After adjust error in A(X+dX)=a is %e \n", relerr2);
-      if (relerr1 < relerr2)
-        printf("refinement: worse\n");
+    if ( printlevel >= 3 ) {
+      printf( "refinement: After adjust error in A(X+dX)=a is %e \n", relerr2 );
+      if ( relerr1 < relerr2 )
+        printf( "refinement: worse\n" );
       else
-        printf("refinement: better\n");
+        printf( "refinement: better\n" );
     };
 
     /*
@@ -1401,29 +1463,30 @@ struct paramstruc parameters;
       Find maximum possible step sizes.
     */
 
-    alphap = linesearch(n, dX, work1, work2, work3, cholxinv, workvec4,
-                        workvec5, workvec6, mystepfrac, 1.0, printlevel);
+    alphap = linesearch( n, dX, work1, work2, work3, cholxinv, workvec4,
+                         workvec5, workvec6, mystepfrac, 1.0, printlevel );
 
     /*
      * Compute the objective value of the new solution.
      */
 
-    newpobj = calc_pobj(C, work1, constant_offset);
+    newpobj = calc_pobj( C, work1, constant_offset );
 
-    alphad = linesearch(n, dZ, work1, work2, work3, cholzinv, workvec4,
-                        workvec5, workvec6, mystepfrac, 1.0, printlevel);
+    alphad = linesearch( n, dZ, work1, work2, work3, cholzinv, workvec4,
+                         workvec5, workvec6, mystepfrac, 1.0, printlevel );
 
-    if (printlevel >= 3) {
-      printf("After linesearches, alphap=%e alphad=%e \n", alphap, alphad);
+    if ( printlevel >= 3 ) {
+      printf( "After linesearches, alphap=%e alphad=%e \n", alphap, alphad );
     };
 
-    for (i = 1; i <= k; i++) workvec1[i] = y[i] + alphad * dy[i];
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = y[ i ] + alphad * dy[ i ];
 
     /*
      * Calculate the prospective new dual objective.
      */
 
-    newdobj = calc_dobj(k, a, workvec1, constant_offset);
+    newdobj = calc_dobj( k, a, workvec1, constant_offset );
 
     /*
      * Check on the feasibility of the new solutions.  If they're
@@ -1431,8 +1494,8 @@ struct paramstruc parameters;
      * step.
      */
 
-    addscaledmat(X, alphap, dX, work1);
-    newrelpinfeas = pinfeas(k, constraints, work1, a, workvec1);
+    addscaledmat( X, alphap, dX, work1 );
+    newrelpinfeas = pinfeas( k, constraints, work1, a, workvec1 );
 
     /*
      * For the primal infeasibility, check the relative gap and the
@@ -1442,61 +1505,63 @@ struct paramstruc parameters;
 
     limrelpinfeas = bestrelpinfeas * 100;
 
-    if ((limrelpinfeas > relgap) && (relgap > 0)) limrelpinfeas = relgap;
+    if ( ( limrelpinfeas > relgap ) && ( relgap > 0 ) ) limrelpinfeas = relgap;
 
     /*
      * In the early stages, don't worry about limrelpinfeas.
      */
 
-    if ((iter < 10) || (relpinfeas > 0.01) ||
-        (dinfeasmeas > 1.0e-3 * parameters.dinftol))
+    if ( ( iter < 10 ) || ( relpinfeas > 0.01 ) ||
+         ( dinfeasmeas > 1.0e-3 * parameters.dinftol ) )
       limrelpinfeas = relpinfeas * 1000;
 
     /*
      * Don't ever ask for more than the required tolerance.
      */
 
-    if (parameters.axtol > limrelpinfeas) limrelpinfeas = parameters.axtol;
+    if ( parameters.axtol > limrelpinfeas ) limrelpinfeas = parameters.axtol;
 
     /*
      * If we're trying to prove dual infeasibility than don't limit
      * the step.
      */
 
-    if ((probdfeas == 0) && (dinfeasmeas > 1.0e4)) limrelpinfeas = 1.0e30;
+    if ( ( probdfeas == 0 ) && ( dinfeasmeas > 1.0e4 ) ) limrelpinfeas = 1.0e30;
 
     /*
      * Now, make sure that the step keeps us feasible enough.
      */
 
-    if (printlevel >= 3) {
-      printf("newrelpinfeas is %e\n", newrelpinfeas);
-      printf("limrelpinfeas is %e\n", limrelpinfeas);
+    if ( printlevel >= 3 ) {
+      printf( "newrelpinfeas is %e\n", newrelpinfeas );
+      printf( "limrelpinfeas is %e\n", limrelpinfeas );
     };
 
     i = 1;
-    while (newrelpinfeas > limrelpinfeas) {
+    while ( newrelpinfeas > limrelpinfeas ) {
       alphap = 0.80 * alphap;
-      addscaledmat(X, alphap, dX, work1);
-      newrelpinfeas = pinfeas(k, constraints, work1, a, workvec1);
-      newpobj = calc_pobj(C, work1, constant_offset);
-      i = i + 1;
+      addscaledmat( X, alphap, dX, work1 );
+      newrelpinfeas = pinfeas( k, constraints, work1, a, workvec1 );
+      newpobj       = calc_pobj( C, work1, constant_offset );
+      i             = i + 1;
 
-      if (i > 20) {
-        if (printlevel >= 3) printf("Stuck at edge of primal feasibility.\n");
+      if ( i > 20 ) {
+        if ( printlevel >= 3 )
+          printf( "Stuck at edge of primal feasibility.\n" );
 
-        if (retries < 15) {
-          if (retries == 0) diagfact = 0.1;
-          retries = retries + 1;
+        if ( retries < 15 ) {
+          if ( retries == 0 ) diagfact = 0.1;
+          retries  = retries + 1;
           diagfact = diagfact * 10.0;
-          for (i = 1; i <= k - 1; i++)
-            for (j = i; j <= k; j++)
-              O[ijtok(i, j, ldam)] = O[ijtok(j, i, ldam)];
-          for (i = 1; i <= k; i++) O[ijtok(i, i, ldam)] = diagO[i];
+          for ( i = 1; i <= k - 1; i++ )
+            for ( j = i; j <= k; j++ )
+              O[ ijtok( i, j, ldam ) ] = O[ ijtok( j, i, ldam ) ];
+          for ( i = 1; i <= k; i++ )
+            O[ ijtok( i, i, ldam ) ] = diagO[ i ];
           goto RETRYFACTOR;
         } else {
-          if (printlevel >= 1)
-            printf("Stuck at edge of primal feasibility, giving up. \n");
+          if ( printlevel >= 1 )
+            printf( "Stuck at edge of primal feasibility, giving up. \n" );
 
           /*
            * Tighten up the solution as much as possible.
@@ -1512,15 +1577,16 @@ struct paramstruc parameters;
       Now make sure that we aren't stepping outside of dual feasibility.
     */
 
-    addscaledmat(Z, alphad, dZ, work1);
+    addscaledmat( Z, alphad, dZ, work1 );
 
-    for (i = 1; i <= k; i++) workvec1[i] = y[i] + alphad * dy[i];
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = y[ i ] + alphad * dy[ i ];
 
-    newreldinfeas = dinfeas(k, C, constraints, workvec1, work1, work2);
+    newreldinfeas = dinfeas( k, C, constraints, workvec1, work1, work2 );
 
     limreldinfeas = bestreldinfeas * 100;
 
-    if ((limreldinfeas > relgap) && (relgap > 0)) limreldinfeas = relgap;
+    if ( ( limreldinfeas > relgap ) && ( relgap > 0 ) ) limreldinfeas = relgap;
 
     /*
      * In the early stages, don't worry about limreldinfeas.
@@ -1528,46 +1594,48 @@ struct paramstruc parameters;
      * infeasibility.
      */
 
-    if ((iter < 10) || (reldinfeas > 0.01) ||
-        (pinfeasmeas > 1.0e-3 * parameters.pinftol))
+    if ( ( iter < 10 ) || ( reldinfeas > 0.01 ) ||
+         ( pinfeasmeas > 1.0e-3 * parameters.pinftol ) )
       limreldinfeas = reldinfeas * 1000;
 
     /*
      * Don't ever ask for more than the required tolerance.
      */
 
-    if (parameters.atytol > limreldinfeas) limreldinfeas = parameters.atytol;
+    if ( parameters.atytol > limreldinfeas ) limreldinfeas = parameters.atytol;
 
-    if (printlevel >= 3) {
-      printf("newreldinfeas is %e\n", newreldinfeas);
-      printf("limreldinfeas is %e\n", limreldinfeas);
+    if ( printlevel >= 3 ) {
+      printf( "newreldinfeas is %e\n", newreldinfeas );
+      printf( "limreldinfeas is %e\n", limreldinfeas );
     };
 
     i = 1;
-    while (newreldinfeas > limreldinfeas) {
+    while ( newreldinfeas > limreldinfeas ) {
       alphad = 0.80 * alphad;
-      addscaledmat(Z, alphad, dZ, work1);
+      addscaledmat( Z, alphad, dZ, work1 );
 
-      for (j = 1; j <= k; j++) workvec1[j] = y[j] + alphad * dy[j];
+      for ( j = 1; j <= k; j++ )
+        workvec1[ j ] = y[ j ] + alphad * dy[ j ];
 
-      newreldinfeas = dinfeas(k, C, constraints, workvec1, work1, work2);
-      newdobj = calc_dobj(k, a, workvec1, constant_offset);
-      i = i + 1;
-      if (i > 15) {
-        if (printlevel >= 3) printf("Stuck at edge of dual feasibility.\n");
+      newreldinfeas = dinfeas( k, C, constraints, workvec1, work1, work2 );
+      newdobj       = calc_dobj( k, a, workvec1, constant_offset );
+      i             = i + 1;
+      if ( i > 15 ) {
+        if ( printlevel >= 3 ) printf( "Stuck at edge of dual feasibility.\n" );
 
-        if (retries < 15) {
-          if (retries == 0) diagfact = 0.1;
-          retries = retries + 1;
+        if ( retries < 15 ) {
+          if ( retries == 0 ) diagfact = 0.1;
+          retries  = retries + 1;
           diagfact = diagfact * 10.0;
-          for (i = 1; i <= k - 1; i++)
-            for (j = i; j <= k; j++)
-              O[ijtok(i, j, ldam)] = O[ijtok(j, i, ldam)];
-          for (i = 1; i <= k; i++) O[ijtok(i, i, ldam)] = diagO[i];
+          for ( i = 1; i <= k - 1; i++ )
+            for ( j = i; j <= k; j++ )
+              O[ ijtok( i, j, ldam ) ] = O[ ijtok( j, i, ldam ) ];
+          for ( i = 1; i <= k; i++ )
+            O[ ijtok( i, i, ldam ) ] = diagO[ i ];
           goto RETRYFACTOR;
         } else {
-          if (printlevel >= 1)
-            printf("Stuck at edge of dual feasibility, giving up. \n");
+          if ( printlevel >= 1 )
+            printf( "Stuck at edge of dual feasibility, giving up. \n" );
 
           /*
            * Tighten up the solution as much as possible.
@@ -1579,28 +1647,32 @@ struct paramstruc parameters;
       };
     };
 
-    if (printlevel >= 3) {
-      printf("After feas check, alphap=%e alphad=%e \n", alphap, alphad);
+    if ( printlevel >= 3 ) {
+      printf( "After feas check, alphap=%e alphad=%e \n", alphap, alphad );
     };
 
     /*
      * Give up if step lengths are way too small.
      */
 
-    if ((alphap <= parameters.minstepp) || (alphad <= parameters.minstepd)) {
-      if (printlevel >= 2) printf("line search failure in corrector step.\n");
+    if ( ( alphap <= parameters.minstepp ) ||
+         ( alphad <= parameters.minstepd ) ) {
+      if ( printlevel >= 2 )
+        printf( "line search failure in corrector step.\n" );
 
-      if (retries < 15) {
-        if (retries == 0) diagfact = 0.1;
-        retries = retries + 1;
+      if ( retries < 15 ) {
+        if ( retries == 0 ) diagfact = 0.1;
+        retries  = retries + 1;
         diagfact = diagfact * 10.0;
-        for (i = 1; i <= k - 1; i++)
-          for (j = i; j <= k; j++) O[ijtok(i, j, ldam)] = O[ijtok(j, i, ldam)];
-        for (i = 1; i <= k; i++) O[ijtok(i, i, ldam)] = diagO[i];
+        for ( i = 1; i <= k - 1; i++ )
+          for ( j = i; j <= k; j++ )
+            O[ ijtok( i, j, ldam ) ] = O[ ijtok( j, i, ldam ) ];
+        for ( i = 1; i <= k; i++ )
+          O[ ijtok( i, i, ldam ) ] = diagO[ i ];
         goto RETRYFACTOR;
       } else {
-        if (printlevel >= 1)
-          printf("Too many line search failures, giving up. \n");
+        if ( printlevel >= 1 )
+          printf( "Too many line search failures, giving up. \n" );
 
         /*
          * Tighten up the solution as much as possible.
@@ -1615,82 +1687,84 @@ struct paramstruc parameters;
      * In case alphap changed, recompute these.
      */
 
-    addscaledmat(X, alphap, dX, work1);
-    newpobj = calc_pobj(C, work1, constant_offset);
-    newrelpinfeas = pinfeas(k, constraints, work1, a, workvec1);
+    addscaledmat( X, alphap, dX, work1 );
+    newpobj       = calc_pobj( C, work1, constant_offset );
+    newrelpinfeas = pinfeas( k, constraints, work1, a, workvec1 );
 
-    addscaledmat(Z, alphad, dZ, work1);
-    for (i = 1; i <= k; i++) workvec1[i] = y[i] + alphad * dy[i];
-    newdobj = calc_dobj(k, a, workvec1, constant_offset);
+    addscaledmat( Z, alphad, dZ, work1 );
+    for ( i = 1; i <= k; i++ )
+      workvec1[ i ] = y[ i ] + alphad * dy[ i ];
+    newdobj = calc_dobj( k, a, workvec1, constant_offset );
 
-    newreldinfeas = dinfeas(k, C, constraints, workvec1, work1, work2);
+    newreldinfeas = dinfeas( k, C, constraints, workvec1, work1, work2 );
 
     /*
      * Update cholzinv.
      */
 
-    copy_mat(work1, work2);
-    ret = chol(work2);
+    copy_mat( work1, work2 );
+    ret = chol( work2 );
 
-    while (ret != 0) {
+    while ( ret != 0 ) {
       alphad = alphad * 0.90;
-      addscaledmat(Z, alphad, dZ, work1);
-      for (i = 1; i <= k; i++) workvec1[i] = y[i] + alphad * dy[i];
-      copy_mat(work1, work2);
-      ret = chol(work2);
-      if (printlevel >= 2) printf("eigsearch missed! Adjusting alphad\n");
+      addscaledmat( Z, alphad, dZ, work1 );
+      for ( i = 1; i <= k; i++ )
+        workvec1[ i ] = y[ i ] + alphad * dy[ i ];
+      copy_mat( work1, work2 );
+      ret = chol( work2 );
+      if ( printlevel >= 2 ) printf( "eigsearch missed! Adjusting alphad\n" );
     };
 
-    chol_inv(work2, work3);
-    store_packed(work3, cholzinv);
+    chol_inv( work2, work3 );
+    store_packed( work3, cholzinv );
 
     /*
       Compute Zi.
     */
 
-    copy_mat(work3, work1);
-    trans(work1);
+    copy_mat( work3, work1 );
+    trans( work1 );
     scale1 = 1.0;
     scale2 = 0.0;
-    mat_mult(scale1, scale2, work3, work1, Zi);
-    if (printlevel >= 4) printf("Fnorm of Zi is %e \n", Fnorm(Zi));
+    mat_mult( scale1, scale2, work3, work1, Zi );
+    if ( printlevel >= 4 ) printf( "Fnorm of Zi is %e \n", Fnorm( Zi ) );
 
     /*
      * Confirm that X is in fact factorable.  If not, reduce
      * alpha until it is.
      */
 
-    addscaledmat(X, alphap, dX, work1);
-    copy_mat(work1, work2);
-    ret = chol(work2);
+    addscaledmat( X, alphap, dX, work1 );
+    copy_mat( work1, work2 );
+    ret = chol( work2 );
 
-    while (ret != 0) {
-      if (printlevel >= 2) printf("eigsearch missed! Adjusting alphap\n");
+    while ( ret != 0 ) {
+      if ( printlevel >= 2 ) printf( "eigsearch missed! Adjusting alphap\n" );
       alphap = alphap * 0.90;
-      addscaledmat(X, alphap, dX, work1);
-      copy_mat(work1, work2);
-      ret = chol(work2);
+      addscaledmat( X, alphap, dX, work1 );
+      copy_mat( work1, work2 );
+      ret = chol( work2 );
     };
 
-    chol_inv(work2, work3);
-    store_packed(work3, cholxinv);
+    chol_inv( work2, work3 );
+    store_packed( work3, cholxinv );
 
     /*
      * do a line search for feasibility.
      */
 
-    if (relpinfeas > 1.0) {
+    if ( relpinfeas > 1.0 ) {
       newalphap = alphap;
-      for (i = 1; i <= 9; i++) {
-        addscaledmat(X, (i * 1.0) * alphap / 10.0, dX, work1);
-        if (pinfeas(k, constraints, work1, a, workvec1) < newrelpinfeas) {
-          newalphap = i * 1.0 * alphap / 10.0;
-          newrelpinfeas = pinfeas(k, constraints, work1, a, workvec1);
+      for ( i = 1; i <= 9; i++ ) {
+        addscaledmat( X, ( i * 1.0 ) * alphap / 10.0, dX, work1 );
+        if ( pinfeas( k, constraints, work1, a, workvec1 ) < newrelpinfeas ) {
+          newalphap     = i * 1.0 * alphap / 10.0;
+          newrelpinfeas = pinfeas( k, constraints, work1, a, workvec1 );
         };
       };
-      if (newalphap < alphap) {
-        if (printlevel >= 2)
-          printf("Feasibility Adjusting alphap to %e \n", newalphap);
+      if ( newalphap < alphap ) {
+        if ( printlevel >= 2 )
+          printf( "Feasibility Adjusting alphap to %e \n", newalphap );
         alphap = newalphap;
       };
     };
@@ -1699,50 +1773,51 @@ struct paramstruc parameters;
      *Take the step.
      */
 
-    addscaledmat(X, alphap, dX, X);
-    addscaledmat(Z, alphad, dZ, Z);
+    addscaledmat( X, alphap, dX, X );
+    addscaledmat( Z, alphad, dZ, Z );
 
-    for (i = 1; i <= k; i++) y[i] = y[i] + alphad * dy[i];
+    for ( i = 1; i <= k; i++ )
+      y[ i ] = y[ i ] + alphad * dy[ i ];
 
     /*
      *  Update the objectives.
      */
 
-    newdobj = calc_dobj(k, a, y, constant_offset);
-    newpobj = calc_pobj(C, X, constant_offset);
+    newdobj = calc_dobj( k, a, y, constant_offset );
+    newpobj = calc_pobj( C, X, constant_offset );
 
     /*
       Recompute the objective function values.
     */
 
-    *pobj = calc_pobj(C, X, constant_offset);
-    *dobj = calc_dobj(k, a, y, constant_offset);
-    if (parameters.usexzgap == 0) {
+    *pobj = calc_pobj( C, X, constant_offset );
+    *dobj = calc_dobj( k, a, y, constant_offset );
+    if ( parameters.usexzgap == 0 ) {
       gap = *dobj - *pobj;
-      if (gap < 0.0) gap = 0.0;
-      relgap = gap / (1.0 + fabs(*dobj) + fabs(*pobj));
+      if ( gap < 0.0 ) gap = 0.0;
+      relgap = gap / ( 1.0 + fabs( *dobj ) + fabs( *pobj ) );
     } else {
-      gap = trace_prod(X, Z);
-      if (gap < 0.0) gap = 0.0;
-      relgap = gap / (1.0 + fabs(*dobj) + fabs(*pobj));
+      gap = trace_prod( X, Z );
+      if ( gap < 0.0 ) gap = 0.0;
+      relgap = gap / ( 1.0 + fabs( *dobj ) + fabs( *pobj ) );
     };
 
-    if (printlevel >= 2) {
-      printf("pobj is %e \n", *pobj);
-      printf("dobj is %e \n", *dobj);
-      printf("gap is %e \n", gap);
-      printf("relgap is %e \n", relgap);
+    if ( printlevel >= 2 ) {
+      printf( "pobj is %e \n", *pobj );
+      printf( "dobj is %e \n", *dobj );
+      printf( "gap is %e \n", gap );
+      printf( "relgap is %e \n", relgap );
     };
 
-    relpinfeas = pinfeas(k, constraints, X, a, workvec1);
-    reldinfeas = dinfeas(k, C, constraints, y, Z, work2);
+    relpinfeas = pinfeas( k, constraints, X, a, workvec1 );
+    reldinfeas = dinfeas( k, C, constraints, y, Z, work2 );
 
-    if (relpinfeas < parameters.axtol) probpfeas = 1;
+    if ( relpinfeas < parameters.axtol ) probpfeas = 1;
 
-    if (reldinfeas < parameters.atytol) probdfeas = 1;
+    if ( reldinfeas < parameters.atytol ) probdfeas = 1;
 
     oldmaxrelinfeas = maxrelinfeas;
-    if (relpinfeas > reldinfeas) {
+    if ( relpinfeas > reldinfeas ) {
       maxrelinfeas = relpinfeas;
     } else {
       maxrelinfeas = reldinfeas;
@@ -1756,7 +1831,7 @@ struct paramstruc parameters;
      *
      */
 
-    if ((gap) != (gap)) {
+    if ( ( gap ) != ( gap ) ) {
       retcode = 12;
       goto RETURNBEST;
     };
@@ -1766,7 +1841,7 @@ struct paramstruc parameters;
      *  we just test for extremely large values.
      */
 
-    if ((gap > 1.0e100) || (gap < -1.0e100)) {
+    if ( ( gap > 1.0e100 ) || ( gap < -1.0e100 ) ) {
       retcode = 12;
       goto RETURNBEST;
     };
@@ -1776,50 +1851,56 @@ struct paramstruc parameters;
      *  update our best solution.
      */
 
-    if ((relgap / parameters.objtol < bestmeas) &&
-        (relpinfeas / parameters.axtol < bestmeas) && (ispfeasprob == 0) &&
-        (isdfeasprob == 0) && (reldinfeas / parameters.atytol < bestmeas)) {
+    if ( ( relgap / parameters.objtol < bestmeas ) &&
+         ( relpinfeas / parameters.axtol < bestmeas ) && ( ispfeasprob == 0 ) &&
+         ( isdfeasprob == 0 ) &&
+         ( reldinfeas / parameters.atytol < bestmeas ) ) {
       lastimprove = iter;
 
       bestmeas = relgap / parameters.objtol;
-      if (relpinfeas / parameters.axtol > bestmeas)
+      if ( relpinfeas / parameters.axtol > bestmeas )
         bestmeas = relpinfeas / parameters.axtol;
-      if (reldinfeas / parameters.atytol > bestmeas)
+      if ( reldinfeas / parameters.atytol > bestmeas )
         bestmeas = reldinfeas / parameters.atytol;
 
-      store_packed(X, bestx);
-      store_packed(Z, bestz);
-      for (i = 1; i <= k; i++) besty[i] = y[i];
-      if (printlevel >= 3) printf("New best solution, %e \n", bestmeas);
+      store_packed( X, bestx );
+      store_packed( Z, bestz );
+      for ( i = 1; i <= k; i++ )
+        besty[ i ] = y[ i ];
+      if ( printlevel >= 3 ) printf( "New best solution, %e \n", bestmeas );
     };
 
-    if ((ispfeasprob == 1) && (relpinfeas / parameters.axtol < bestmeas)) {
+    if ( ( ispfeasprob == 1 ) &&
+         ( relpinfeas / parameters.axtol < bestmeas ) ) {
       lastimprove = iter;
 
       bestmeas = relpinfeas / parameters.axtol;
 
-      store_packed(X, bestx);
-      for (i = 1; i <= k; i++) besty[i] = 0.0;
-      make_i(work2);
-      zero_mat(work3);
-      addscaledmat(work3, 0.005 * parameters.objtol / trace_prod(X, work2),
-                   work2, work3);
-      store_packed(work3, bestz);
-      if (printlevel >= 3) printf("New best solution, %e \n", bestmeas);
+      store_packed( X, bestx );
+      for ( i = 1; i <= k; i++ )
+        besty[ i ] = 0.0;
+      make_i( work2 );
+      zero_mat( work3 );
+      addscaledmat( work3, 0.005 * parameters.objtol / trace_prod( X, work2 ),
+                    work2, work3 );
+      store_packed( work3, bestz );
+      if ( printlevel >= 3 ) printf( "New best solution, %e \n", bestmeas );
     };
 
-    if ((isdfeasprob == 1) && (reldinfeas / parameters.atytol < bestmeas)) {
+    if ( ( isdfeasprob == 1 ) &&
+         ( reldinfeas / parameters.atytol < bestmeas ) ) {
       lastimprove = iter;
 
       bestmeas = reldinfeas / parameters.atytol;
 
-      zero_mat(work3);
-      make_i(work1);
-      addscaledmat(work3, 1.0e-40, work1, work3);
-      store_packed(work3, bestx);
-      store_packed(Z, bestz);
-      for (i = 1; i <= k; i++) besty[i] = y[i];
-      if (printlevel >= 3) printf("New best solution, %e \n", bestmeas);
+      zero_mat( work3 );
+      make_i( work1 );
+      addscaledmat( work3, 1.0e-40, work1, work3 );
+      store_packed( work3, bestx );
+      store_packed( Z, bestz );
+      for ( i = 1; i <= k; i++ )
+        besty[ i ] = y[ i ];
+      if ( printlevel >= 3 ) printf( "New best solution, %e \n", bestmeas );
     };
 
     /*
@@ -1827,8 +1908,9 @@ struct paramstruc parameters;
      *  give up, because we're not making progress.
      */
 
-    if ((iter > 60) && (bestmeas > 0.5 * bestarray[((iter - 20) % BASIZE)])) {
-      if (printlevel >= 1) printf("Lack of progress.  Giving up!\n");
+    if ( ( iter > 60 ) &&
+         ( bestmeas > 0.5 * bestarray[ ( ( iter - 20 ) % BASIZE ) ] ) ) {
+      if ( printlevel >= 1 ) printf( "Lack of progress.  Giving up!\n" );
       retcode = 7;
       goto RETURNBEST;
     };
@@ -1838,18 +1920,18 @@ struct paramstruc parameters;
     */
 
     iter++;
-    if (printlevel >= 2) {
-      printf("Iter: %2d Ap: %.2e Pobj: % .7e Ad: %.2e Dobj: % .7e \n", iter,
-             alphap, *pobj, alphad, *dobj);
-      fflush(stdout);
+    if ( printlevel >= 2 ) {
+      printf( "Iter: %2d Ap: %.2e Pobj: % .7e Ad: %.2e Dobj: % .7e \n", iter,
+              alphap, *pobj, alphad, *dobj );
+      fflush( stdout );
     };
 
     /*
      *  If iter gets above maxiter, then exit.
      */
 
-    if (iter >= parameters.maxiter) {
-      if (printlevel >= 1) printf("Maximum iterations reached. \n");
+    if ( iter >= parameters.maxiter ) {
+      if ( printlevel >= 1 ) printf( "Maximum iterations reached. \n" );
       retcode = 4;
       goto RETURNBEST;
     };
@@ -1863,56 +1945,58 @@ struct paramstruc parameters;
 
 RETURNBEST:
 
-  store_unpacked(bestx, X);
-  store_unpacked(bestz, Z);
-  for (i = 1; i <= k; i++) y[i] = besty[i];
+  store_unpacked( bestx, X );
+  store_unpacked( bestz, Z );
+  for ( i = 1; i <= k; i++ )
+    y[ i ] = besty[ i ];
 
-  if (parameters.usexzgap == 0) {
-    *pobj = calc_pobj(C, X, constant_offset);
-    *dobj = calc_dobj(k, a, y, constant_offset);
-    gap = *dobj - *pobj;
+  if ( parameters.usexzgap == 0 ) {
+    *pobj = calc_pobj( C, X, constant_offset );
+    *dobj = calc_dobj( k, a, y, constant_offset );
+    gap   = *dobj - *pobj;
   } else {
-    *pobj = calc_pobj(C, X, constant_offset);
-    *dobj = calc_dobj(k, a, y, constant_offset);
-    gap = trace_prod(X, Z);
+    *pobj = calc_pobj( C, X, constant_offset );
+    *dobj = calc_dobj( k, a, y, constant_offset );
+    gap   = trace_prod( X, Z );
   };
 
-  if ((gap < 0.0) && (parameters.usexzgap == 0) && (parameters.tweakgap == 1) &&
-      (ispfeasprob == 0) && (isdfeasprob == 0)) {
-    tweakgap(n, k, a, constraints, gap, Z, dZ, y, dy, work1, work2, work3, dX,
-             workvec1, workvec2, workvec3, workvec4, printlevel);
+  if ( ( gap < 0.0 ) && ( parameters.usexzgap == 0 ) &&
+       ( parameters.tweakgap == 1 ) && ( ispfeasprob == 0 ) &&
+       ( isdfeasprob == 0 ) ) {
+    tweakgap( n, k, a, constraints, gap, Z, dZ, y, dy, work1, work2, work3, dX,
+              workvec1, workvec2, workvec3, workvec4, printlevel );
   };
 
   /*
     Recompute the objective function values.
   */
 
-  *pobj = calc_pobj(C, X, constant_offset);
-  *dobj = calc_dobj(k, a, y, constant_offset);
+  *pobj = calc_pobj( C, X, constant_offset );
+  *dobj = calc_dobj( k, a, y, constant_offset );
 
-  if (parameters.usexzgap == 0) {
+  if ( parameters.usexzgap == 0 ) {
     gap = *dobj - *pobj;
-    if (gap < 0.0) gap = 0.0;
-    relgap = gap / (1.0 + fabs(*dobj) + fabs(*pobj));
+    if ( gap < 0.0 ) gap = 0.0;
+    relgap = gap / ( 1.0 + fabs( *dobj ) + fabs( *pobj ) );
   } else {
-    gap = trace_prod(X, Z);
-    if (gap < 0.0) gap = 0.0;
-    relgap = gap / (1.0 + fabs(*dobj) + fabs(*pobj));
+    gap = trace_prod( X, Z );
+    if ( gap < 0.0 ) gap = 0.0;
+    relgap = gap / ( 1.0 + fabs( *dobj ) + fabs( *pobj ) );
   };
 
   /*
    * Recheck the primal and dual infeasibilities and gap.
    */
 
-  relpinfeas = pinfeas(k, constraints, X, a, workvec1);
-  reldinfeas = dinfeas(k, C, constraints, y, Z, work1);
+  relpinfeas = pinfeas( k, constraints, X, a, workvec1 );
+  reldinfeas = dinfeas( k, C, constraints, y, Z, work1 );
 
-  if (relpinfeas < parameters.axtol) probpfeas = 1;
+  if ( relpinfeas < parameters.axtol ) probpfeas = 1;
 
-  if (reldinfeas < parameters.atytol) probdfeas = 1;
+  if ( reldinfeas < parameters.atytol ) probdfeas = 1;
 
-  if ((relgap < parameters.objtol) && (relpinfeas < parameters.axtol) &&
-      (reldinfeas < parameters.atytol)) {
+  if ( ( relgap < parameters.objtol ) && ( relpinfeas < parameters.axtol ) &&
+       ( reldinfeas < parameters.atytol ) ) {
     /*
      * Our best solution actually did satisfy the conditions, so we've
      * succeeded in solving the problem!
@@ -1925,32 +2009,32 @@ RETURNBEST:
    * Check for a good solution with slightly reduced accuracy.
    */
 
-  if ((ispfeasprob == 0) && (isdfeasprob == 0)) {
+  if ( ( ispfeasprob == 0 ) && ( isdfeasprob == 0 ) ) {
     bestmeas = relgap / parameters.objtol;
-    if ((relpinfeas / parameters.axtol) > bestmeas)
+    if ( ( relpinfeas / parameters.axtol ) > bestmeas )
       bestmeas = relpinfeas / parameters.axtol;
-    if ((reldinfeas / parameters.atytol) > bestmeas)
+    if ( ( reldinfeas / parameters.atytol ) > bestmeas )
       bestmeas = reldinfeas / parameters.atytol;
 
-    if ((bestmeas > 1.0) && (bestmeas < 1000.0)) retcode = 3;
+    if ( ( bestmeas > 1.0 ) && ( bestmeas < 1000.0 ) ) retcode = 3;
   };
 
-  if (ispfeasprob == 1) {
+  if ( ispfeasprob == 1 ) {
     bestmeas = relpinfeas / parameters.axtol;
 
-    if ((bestmeas > 1.0) && (bestmeas < 1000.0)) retcode = 3;
+    if ( ( bestmeas > 1.0 ) && ( bestmeas < 1000.0 ) ) retcode = 3;
   };
 
-  if (isdfeasprob == 1) {
+  if ( isdfeasprob == 1 ) {
     bestmeas = reldinfeas / parameters.atytol;
 
-    if ((bestmeas > 1.0) && (bestmeas < 1000.0)) retcode = 3;
+    if ( ( bestmeas > 1.0 ) && ( bestmeas < 1000.0 ) ) retcode = 3;
   };
 
-/*
- * Come here if we have an infeasible problem and are returning the
- * certificate of infeasibility.
- */
+  /*
+   * Come here if we have an infeasible problem and are returning the
+   * certificate of infeasibility.
+   */
 
 RETURNCERT:
 
@@ -1958,10 +2042,10 @@ RETURNCERT:
    * Print out the total number of iterations.
    */
 
-  if (printlevel >= 2) printf("Total Iterations: %d \n", iter);
+  if ( printlevel >= 2 ) printf( "Total Iterations: %d \n", iter );
   /*
    * Now, go ahead and return.
    */
 
-  return (retcode);
+  return ( retcode );
 }

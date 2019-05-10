@@ -20,37 +20,37 @@
 
 #include "util.h"
 
-void *malloc_d(const size_t n) {
+void *malloc_d( const size_t n ) {
   void *re;
 
-  re = malloc(n);
-  if (re == NULL) {
-    PRINT_VALUE("dynamic memory allocation failed");
-    fprintf(stderr, "\ndynamic memory allocation failed\n");
-    exit(EXIT_FAILURE);
+  re = malloc( n );
+  if ( re == NULL ) {
+    PRINT_VALUE( "dynamic memory allocation failed" );
+    fprintf( stderr, "\ndynamic memory allocation failed\n" );
+    exit( EXIT_FAILURE );
   }
 
   return re;
 }
 
-void *realloc_d(void *start, const size_t n) {
-  void *re = realloc(start, n);
-  if (re == NULL) {
-    PRINT_VALUE("dynamic memory allocation failed");
-    fprintf(stderr, "\ndynamic memory allocation failed\n");
-    exit(EXIT_FAILURE);
+void *realloc_d( void *start, const size_t n ) {
+  void *re = realloc( start, n );
+  if ( re == NULL ) {
+    PRINT_VALUE( "dynamic memory allocation failed" );
+    fprintf( stderr, "\ndynamic memory allocation failed\n" );
+    exit( EXIT_FAILURE );
   }
 
   return re;
 }
 
-void *calloc_d(size_t num, size_t size) {
-  void *re = calloc(num, size);
+void *calloc_d( size_t num, size_t size ) {
+  void *re = calloc( num, size );
 
-  if (re == NULL) {
-    PRINT_VALUE("dynamic memory allocation failed");
-    fprintf(stderr, "\ndynamic memory allocation failed\n");
-    exit(EXIT_FAILURE);
+  if ( re == NULL ) {
+    PRINT_VALUE( "dynamic memory allocation failed" );
+    fprintf( stderr, "\ndynamic memory allocation failed\n" );
+    exit( EXIT_FAILURE );
   }
 
   return re;

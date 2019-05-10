@@ -24,7 +24,7 @@ extern "C" {
  * @param j
  * @param n size of one element in Z
  */
-void swap(indice_t *Z, const int i, const int j, const int n);
+void swap( indice_t *Z, const int i, const int j, const int n );
 
 /**
  * sort tht elements in [ left, right ] array Z by ascending order
@@ -35,8 +35,9 @@ void swap(indice_t *Z, const int i, const int j, const int n);
  * @param right
  * @param comp comparat funtion
  */
-void qsortM(indice_t *, const int n, const int left, const int right,
-            int (*comp)(const indice_t *, const indice_t *, const int));
+void qsortKElem( indice_t *, const int K, const int left, const int right,
+                 int ( *comp )( const indice_t *, const indice_t *,
+                                const int ) );
 
 /**
  *
@@ -50,8 +51,8 @@ void qsortM(indice_t *, const int n, const int left, const int right,
  * @param right
  * @param comp the comparable function
  */
-void qsortT(coef_t *, indice_t *, const int n, const int left, const int right,
-            int (*comp)(const indice_t *, const indice_t *, const int));
+void qsortT( coef_t *, indice_t *, const int n, const int left, const int right,
+             int ( *comp )( const indice_t *, const indice_t *, const int ) );
 
 /**
  * sort arrary vars by ascending order
@@ -59,7 +60,7 @@ void qsortT(coef_t *, indice_t *, const int n, const int left, const int right,
  * @param vars
  * @param n
  */
-void sortVar(indice_t *const vars, const int n);
+void sortVar( indice_t *const vars, const int n );
 
 /**
  *
@@ -73,8 +74,9 @@ void sortVar(indice_t *const vars, const int n);
  -1 if key1< key2 by alphabeta order
  0 otherwise
 */
-int compareM(const int var1Num, const indice_t *key1, const indice_t *varMap1,
-             const int var2Num, const indice_t *key2, const indice_t *varMap2);
+int compareM( const int var1Num, const indice_t *key1, const indice_t *varMap1,
+              const int var2Num, const indice_t *key2,
+              const indice_t *varMap2 );
 
 #ifdef __cplusplus
 }
