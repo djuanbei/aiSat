@@ -28,7 +28,8 @@
 
 namespace aiSat {
 namespace psd {
-
+using std::stringstream;
+using std::endl;
 ArrangeMatrix::ArrangeMatrix( const int rLength ) {
   rowLength = rLength;
   multCF    = 1;

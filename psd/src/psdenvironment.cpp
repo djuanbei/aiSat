@@ -190,19 +190,16 @@ int PSDEnvironment::addSupport( const vector<Power> &indices_vec ) {
   vector<Power>::const_iterator it = indices_vec.begin();
   for ( ; it != indices_vec.end(); it++ ) {
     for ( i = 0; i < varNum; i++ ) {
-      if ( ( *it ).indices[ i ] > 0 ) varOccur[ i ] = 1;
+      if ( it->indices[ i ] > 0 ) varOccur[ i ] = 1;
     }
   }
 
   vector<indice_t> vars( varNum );
 
   int exactVarNum = 0;
-
-  j = 0;
   for ( i = 0; i < varNum; i++ ) {
     if ( varOccur[ i ] > 0 ) {
-      exactVarNum++;
-      vars[ j++ ] = i;
+      vars[ exactVarNum++ ] = i;
     }
   }
 
@@ -215,14 +212,12 @@ int PSDEnvironment::addSupport( const vector<Power> &indices_vec ) {
 
   indice_t *indices = new indice_t[ exactVarNum * length ];
 
-  it = indices_vec.begin();
-  j  = 0;
-  for ( ; it != indices_vec.end(); it++ ) {
+  for( j=0; j<(int)indices_vec.size( ); j++ ){
     for ( i = 0; i < exactVarNum; i++ ) {
-      indices[ j * exactVarNum + i ] = ( *it ).indices[ vars[ i ] ];
+      indices[ j * exactVarNum + i ] = indices_vec[j].indices[ vars[ i ] ];
     }
-    j++;
   }
+
 
   int supportId = SUPPORT_TABLE.addSOSsupByIndice( varId, indices, length );
 
@@ -284,7 +279,7 @@ int PSDEnvironment::addSupport( const vector<int> &vars,
   int length = 0;
 
   for ( it = degVec.begin(); it != degVec.end(); it++ ) {
-    if ( 0 == *it )
+    if ( 0 == (*it) )
       length++;
     else
       length += nchoosek( varNum + ( *it ) - 1, varNum - 1 );
@@ -296,7 +291,7 @@ int PSDEnvironment::addSupport( const vector<int> &vars,
   int tempLen = 0;
 
   for ( it = degVec.begin(); it != degVec.end(); it++ ) {
-    if ( 0 == *it ) {
+    if ( 0 == (*it) ) {
       for ( i = 0; i < varNum; i++ )
         indices[ length * varNum + i ] = 0;
       length++;

@@ -50,7 +50,7 @@ class SOSChecker;
 
 namespace poly {
 
-template <typename C, typename T> class Subpoly;
+//template <typename C, typename T> class Subpoly;
 
 static size_t POLY_ID = 0;
 
@@ -59,7 +59,7 @@ using namespace std;
 template <typename C = double, typename T = int> class Poly {
   friend class aiSat::psd::ConvexGenerator;
   friend class aiSat::psd::SOSChecker;
-  friend class Subpoly<C, T>;
+  //  friend class Subpoly<C, T>;
 
 public:
   struct Term {
@@ -149,13 +149,26 @@ public:
     coef    = other.coef;
     update();
   }
+  Poly ( const poly_t & other, int num, vector<int> & loc ){
+    isInit  = true;
+    id      = POLY_ID++;
+    varId   = other.varId;
+    varNum  = other.varNum;
+    for(int i=0; i< num; i++ ){
+      indices.insert(indices.end( ), other.indices.begin( )+i* loc[ i]*varNum, other.indices.begin( )+i* loc[ i]*varNum+varNum );
+      coef.push_back( other.coef[ loc[ i]]);
+    }
+    
+  }
 
   int getSize() const { return (int) coef.size(); }
 
   int getId() const { return id; }
   int getVarId() const { return varId; }
   int getVarNum() const { return varNum; }
-
+  vector<indice_t> & getIndices( ){
+    return indices;
+  }
   /**
    * @brief get the corresponding degree of k-th term i variate degree
    *

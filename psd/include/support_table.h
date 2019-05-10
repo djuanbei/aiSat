@@ -32,7 +32,7 @@
 #ifndef SUPPORT_TABLE_INC
 #define SUPPORT_TABLE_INC
 
-#include "bimap.h"
+
 #include "config.h"
 #include "psdtype.h"
 #include "sparse.h"
@@ -63,24 +63,24 @@ class Supporttable {
 private:
   // int value_capacity;
   // int value_size;
-  Bimap *loc;
+  //  Bitmap *loc;
 
-  vector<int> sosLength;
-  vector<int> gLength;
+  //  vector<int> sosLength;
+  //  vector<int> gLength;
 
-  vector<ArrangeMatrix **> arrangeM;
+  // vector<ArrangeMatrix **> arrangeM;
 
   /*-----------------------------------------------------------------------------
    *  monomial of p
    *-----------------------------------------------------------------------------*/
-  vector<indice_t *> SOSsup;
+  //  vector<indice_t *> SOSsup;
 
   /*-----------------------------------------------------------------------------
    * p=sum_i g_i^2
    * monomial of g
    *-----------------------------------------------------------------------------*/
 
-  vector<indice_t *> Gsup;
+  //  vector<indice_t *> Gsup;
 
   vector<Support *> values;
 
@@ -94,7 +94,7 @@ public:
   Supporttable();
   ~Supporttable();
 
-  int findSupByPoly( const Subpoly_t &subpoly );
+  int findSupByPoly( const Poly_t &poly );
 
   int addSOSup( const int deg, const int varId, const int consNum,
                 int *consIds );
@@ -112,7 +112,7 @@ public:
 
   void setGsup( const int id, const int len, indice_t *value );
 
-  int addconvexsosSup( Subpoly_t &poly );
+  int addconvexsosSup( Poly_t &poly );
 
   int getsosSLength( const int id );
 

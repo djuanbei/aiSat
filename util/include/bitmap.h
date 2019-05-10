@@ -1,6 +1,6 @@
 
 /**
- * @file   bimap.h
+ * @file   bitmap.h
  * @author Liyun Dai <dlyun2009@gmail.com>
  * @date   Sun Feb  8 12:21:47 2015
  *
@@ -16,26 +16,26 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-struct bimap {
+  struct bitmap {
   int  capacity;
   int  size;
   int *values; // values[ 2*k ]=value; values[ 2*k+1 ]= key
   int *keys;   // keys[ 2*i ]=key; keys[ 2*i+1 ]=value
 };
 
-typedef struct bimap Bimap;
+typedef struct bitmap Bitmap;
 
-Bimap *createBimap( void );
+Bitmap *createBitmap( void );
 
-int addBimapElem( Bimap *, int value );
+int addBitmapElem( Bitmap *, int value );
 
-int findBimapByKey( Bimap *, const int key );
+int findBitmapByKey( Bitmap *, const int key );
 
-int findBimapByValue( Bimap *, const int value );
+int findBitmapByValue( Bitmap *, const int value );
 
-void deleteBimap( Bimap * );
+void deleteBitmap( Bitmap * );
 
-void clearBimap( Bimap * );
+void clearBitmap( Bitmap * );
 
 #ifdef __cplusplus
 }

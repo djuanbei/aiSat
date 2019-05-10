@@ -57,7 +57,7 @@ private:
   Params        para;
   const Poly_t &p;
 
-  bool polyIsSOS( Subpoly_t &subpoly, PointList *ans, const int verbose = 0 );
+  bool polyIsSOS( Poly_t &poly, PointList *ans, const int verbose = 0 );
 
   /**
    *
@@ -73,19 +73,18 @@ private:
   bool sosrepresent( PointList *sosList, double *X, const int blockSize,
                      const int sosMid );
 
-  int overConvexChecking( const Subpoly_t &subpoly, const indice_t *indices,
-                          const vector<int> &loc, const int size,
+  int overConvexChecking( const Poly_t &poly, const indice_t *indices,
                           const map<Monomial, Monomialvalue> &monMap,
                           PointList *                         ans );
 
-  void sosPresent( Subpoly_t &subpoly, const PointList *sosList );
+  void sosPresent( Poly_t &subpoly, const PointList *sosList );
 
-  int exactConvHull( const Subpoly_t &subpoly, indice_t *candidateSet,
+  int exactConvHull( const Poly_t &subpoly, indice_t *candidateSet,
                      int &candidateLength, const indice_t *genSet,
                      const int genLength, indice_t **SOSM, int &sosLength,
                      PointList *ans );
 
-  Constraintmatrix *createConstraintMatrix( const Subpoly_t &subpoly,
+  Constraintmatrix *createConstraintMatrix( const Poly_t &subpoly,
                                             const int sosId, double **b,
                                             const indice_t *SOSM,
                                             const int       sosLength,

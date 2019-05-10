@@ -13,10 +13,23 @@
 #define SPARSE_INC
 
 #include "config.h"
-#include "psdtype.h"
-
+//#include "psdtype.h"
+#include<vector>
+#include<string>
 namespace aiSat {
 namespace psd {
+using std::vector;
+using std::string;
+
+typedef float coef_t;
+
+struct sparseRowCol {
+  uint32_t row : 16;
+  uint32_t col : 16;
+};
+
+typedef struct sparseRowCol SparseRowCol;
+
 
 struct SparseSOSblock {
   vector<coef_t> value;

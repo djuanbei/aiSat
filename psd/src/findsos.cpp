@@ -20,7 +20,7 @@
 #include "selfassert.h"
 #include "sort.h"
 #include "sosproblem.h"
-#include "subpoly.hpp"
+//#include "subpoly.hpp"
 #include "util.h"
 
 #include "pointlist.h"
@@ -108,8 +108,8 @@ bool SOSChecker::sosrepresent( PointList *sosList, double *X,
   return true;
 }
 
-void SOSChecker::sosPresent( Subpoly_t &subpoly, const PointList *sosList ) {
-  cout << subpoly << "=" << endl;
+void SOSChecker::sosPresent( Poly_t &poly, const PointList *sosList ) {
+  cout << poly << "=" << endl;
 
   PointElem *temp = sosList->head;
 
@@ -141,7 +141,7 @@ void SOSChecker::sosPresent( Subpoly_t &subpoly, const PointList *sosList ) {
   }
 }
 
-int SOSChecker::exactConvHull( const Subpoly_t &subpoly, indice_t *candidateSet,
+int SOSChecker::exactConvHull( const Poly_t &poly, indice_t *candidateSet,
                                int &candidateLength, const indice_t *genSet,
                                const int genLength, indice_t **SOSM,
                                int &sosLength, PointList *ans ) {
@@ -149,10 +149,10 @@ int SOSChecker::exactConvHull( const Subpoly_t &subpoly, indice_t *candidateSet,
   int                k;
   int                currCandLen = candidateLength;
   int                lastre      = -1;
-  int                size        = subpoly.size();
-  const vector<int> &loc         = subpoly.locs;
+  int                size        = poly.coef.size();
 
-  const indice_t *indices = &( subpoly.parent.indices[ 0 ] );
+
+  const indice_t *indices = &( poly.indices[ 0 ] );
 
   size_t           node_size = dim * sizeof( indice_t );
   vector<indice_t> key( dim );
@@ -313,7 +313,7 @@ int SOSChecker::exactConvHull( const Subpoly_t &subpoly, indice_t *candidateSet,
   /*-----------------------------------------------------------------------------
    *  necessary check
    *-----------------------------------------------------------------------------*/
-  if ( monMap.find( Monomial( indices + loc[ 0 ] * dim, dim ) ) ==
+  if ( monMap.find( Monomial( indices , dim ) ) ==
        monMap.end() ) {
     if ( NULL != ans ) cout << "Corollary 3" << endl;
     delete[] indiceValues;
@@ -321,14 +321,14 @@ int SOSChecker::exactConvHull( const Subpoly_t &subpoly, indice_t *candidateSet,
   }
 
   for ( i = 1; i < size; i += 1 ) {
-    if ( monMap.find( Monomial( indices + loc[ i ] * dim, dim ) ) ==
+    if ( monMap.find( Monomial( indices +  i  * dim, dim ) ) ==
          monMap.end() ) {
       if ( NULL != ans ) cout << "Corollary 3" << endl;
       delete[] indiceValues;
       return FAILURE;
     }
   }
-  int dummy = overConvexChecking( subpoly, indices, loc, size, monMap, ans );
+  int dummy = overConvexChecking( poly, indices,  monMap, ans );
   if ( SUCCESS == dummy ) {
     delete[] indiceValues;
     return SUCCESS;
@@ -367,15 +367,15 @@ int SOSChecker::exactConvHull( const Subpoly_t &subpoly, indice_t *candidateSet,
  *-----------------------------------------------------------------------------*/
 
 Constraintmatrix *SOSChecker::createConstraintMatrix(
-    const Subpoly_t &subpoly, const int sosId, double **b, const indice_t *SOSM,
+    const Poly_t &poly, const int sosId, double **b, const indice_t *SOSM,
     const int sosLength, const int gLength ) {
   int       i, k, tempI;
-  const int varNum = getVarTable<indice_t>().getVarNum( subpoly.parent.varId );
+  const int varNum = getVarTable<indice_t>().getVarNum( poly.varId );
   //	const int totalDegree=poly_getTotalDegree(poly);
-  int                   size    = subpoly.size();
-  const vector<int> &   loc     = subpoly.locs;
-  const indice_t *      indices = &( subpoly.parent.indices[ 0 ] );
-  const vector<coef_t> &coef    = subpoly.parent.coef;
+  int                   size    = poly.coef.size();
+
+  const indice_t *      indices = &( poly.indices[ 0 ] );
+  const vector<coef_t> &coef    = poly.coef;
 
   Sparseblock *blockptr;
 
@@ -386,13 +386,13 @@ Constraintmatrix *SOSChecker::createConstraintMatrix(
   b[ 0 ] = (double *) calloc_d( ( sosLength + 1 ), sizeof( double ) );
 
   for ( i = 0; i < size; i += 1 ) {
-    temploc = findIndex( indices + loc[ i ] * varNum, SOSM, sosLength, varNum );
+    temploc = findIndex( indices +  i * varNum, SOSM, sosLength, varNum );
 
     if ( temploc < 0 ) {
       return NULL;
     }
     /* b index start form 1 */
-    b[ 0 ][ temploc + 1 ] = coef[ loc[ i ] ];
+    b[ 0 ][ temploc + 1 ] = coef[ i ];
     /* printf(" %d %f",loc, poly->coef[i]);  */
   }
 
@@ -423,13 +423,12 @@ Constraintmatrix *SOSChecker::createConstraintMatrix(
   return re;
 }
 
-int SOSChecker::overConvexChecking( const Subpoly_t &  subpoly,
+int SOSChecker::overConvexChecking( const Poly_t &  poly,
                                     const indice_t *   indices,
-                                    const vector<int> &loc, const int size,
                                     const map<Monomial, Monomialvalue> &monMap,
                                     PointList *                         ans ) {
   int i, j, num, k;
-
+  int size=poly.coef.size( );
   vector<char> check( size, 0 );
   int          checkSize = size;
   vector<int>  choose( size );
@@ -450,24 +449,24 @@ int SOSChecker::overConvexChecking( const Subpoly_t &  subpoly,
       set[ 3 ] = 0u;
       fill( choose.begin(), choose.end(), 0 );
       Monomialvalue curr =
-          monMap.find( Monomial( indices + loc[ check[ i ] ] * dim, dim ) )
+          monMap.find( Monomial( indices + check[ i ] * dim, dim ) )
               ->second;
       num = 0;
       Monomialvalue::add( set, curr );
       checked[ check[ i ] ] = 1;
-      tempLoc[ num++ ]      = loc[ check[ i ] ];
+      tempLoc[ num++ ]      = check[ i ] ;
       choose[ i ]           = 1;
       int tempNum           = 0;
       while ( tempNum != num ) {
         tempNum = num;
         for ( j = 0; j < checkSize; j += 1 ) {
           Monomialvalue temp =
-              monMap.find( Monomial( indices + loc[ check[ j ] ] * dim, dim ) )
+              monMap.find( Monomial( indices +  check[ j  ] * dim, dim ) )
                   ->second;
           if ( Monomialvalue::conjunction( set, temp ) && !choose[ j ] ) {
             Monomialvalue::add( set, temp );
             checked[ check[ j ] ] = 1;
-            tempLoc[ num++ ]      = loc[ check[ j ] ];
+            tempLoc[ num++ ]      =  check[ j ] ;
             choose[ j ]           = 1;
           }
         }
@@ -477,7 +476,7 @@ int SOSChecker::overConvexChecking( const Subpoly_t &  subpoly,
         if ( NULL != ans ) {
           cout << "found a split poly" << endl;
         }
-        Subpoly_t tempSub( subpoly.parent, num, tempLoc );
+        Poly_t tempSub( poly, num, tempLoc );
         int       preAnsLength = 0;
         if ( NULL != ans ) preAnsLength = size_L( ans );
         if ( !polyIsSOS( tempSub, ans ) ) { /* necessary condition */
@@ -508,12 +507,12 @@ int SOSChecker::overConvexChecking( const Subpoly_t &  subpoly,
 
   if ( checkSize < size ) {
     for ( i = 0; i < checkSize; i += 1 ) {
-      tempLoc[ i ] = loc[ check[ i ] ];
+      tempLoc[ i ] =  check[ i ] ;
     }
     int preAnsLength = 0;
     if ( NULL != ans ) preAnsLength = size_L( ans );
 
-    Subpoly_t tempSub( subpoly.parent, checkSize, tempLoc );
+    Poly_t tempSub( poly, checkSize, tempLoc );
     if ( !polyIsSOS( tempSub, ans ) ) {
       if ( NULL != ans ) delListStart( ans, preAnsLength );
       return FAILURE;
@@ -548,13 +547,13 @@ int SOSChecker::overConvexChecking( const Subpoly_t &  subpoly,
  * false otherwise
  */
 
-bool SOSChecker::polyIsSOS( Subpoly_t &subpoly, PointList *ans,
+bool SOSChecker::polyIsSOS( Poly_t &poly, PointList *ans,
                             const int verbose ) {
   int             i, k, j, sosId, sosLength, gLength, genLength, tempLength = 0;
   bool            even;
   indice_t *      SOSM = NULL;
   indice_t *      GSUP = NULL;
-  ConvexGenerator generator( subpoly );
+  ConvexGenerator generator( poly );
   int             check = generator.easyCheck( ans );
 
   if ( CONVEX_POLY == check ) {
@@ -564,10 +563,10 @@ bool SOSChecker::polyIsSOS( Subpoly_t &subpoly, PointList *ans,
     return true;
   }
 
-  sosId                      = SUPPORT_TABLE.findSupByPoly( subpoly );
-  const indice_t *   indices = &( subpoly.parent.indices[ 0 ] );
-  const vector<int> &loc     = subpoly.locs;
-  int                size    = subpoly.size();
+  sosId                      = SUPPORT_TABLE.findSupByPoly( poly );
+  const indice_t *   indices = &( poly.indices[ 0 ] );
+
+  int                size    =poly.coef.size();
 
   if ( sosId > -1 ) {
     SOSM = SUPPORT_TABLE.getSOSsup( sosId, &sosLength );
@@ -575,21 +574,21 @@ bool SOSChecker::polyIsSOS( Subpoly_t &subpoly, PointList *ans,
   }
   if ( NULL == SOSM || NULL == GSUP ) {
     start          = clock();
-    sosId          = SUPPORT_TABLE.addconvexsosSup( subpoly );
+    sosId          = SUPPORT_TABLE.addconvexsosSup( poly );
     indice_t *temp = new indice_t[ size * dim ];
     j              = 0;
 
     for ( i = 0; i < size; i += 1 ) {
       even = true;
       for ( k = 0; k < dim; k += 1 ) {
-        if ( ( indices[ loc[ i ] * dim + k ] & 1 ) == 1 ) {
+        if ( ( indices[  i  * dim + k ] & 1 ) == 1 ) {
           even = false;
           break;
         }
       }
       if ( even ) {
         for ( k = 0; k < dim; k += 1 ) {
-          temp[ j * dim + k ] = indices[ loc[ i ] * dim + k ] / 2;
+          temp[ j * dim + k ] = indices[  i  * dim + k ] / 2;
         }
         j++;
       }
@@ -598,7 +597,7 @@ bool SOSChecker::polyIsSOS( Subpoly_t &subpoly, PointList *ans,
 
     indice_t *candidate = overConvexHull( temp, genLength, dim, &tempLength );
 
-    int dummy = exactConvHull( subpoly, candidate, tempLength, temp, genLength,
+    int dummy = exactConvHull( poly, candidate, tempLength, temp, genLength,
                                &SOSM, sosLength, ans );
 
     if ( SUCCESS == dummy ) {
@@ -642,7 +641,7 @@ bool SOSChecker::polyIsSOS( Subpoly_t &subpoly, PointList *ans,
    *-----------------------------------------------------------------------------*/
 
   constraints =
-      createConstraintMatrix( subpoly, sosId, b, SOSM, sosLength, gLength );
+      createConstraintMatrix( poly, sosId, b, SOSM, sosLength, gLength );
 
   if ( constraints != NULL ) {
     int bsize[ 1 ];
@@ -696,7 +695,7 @@ bool SOSChecker::checksos( bool print ) {
 
   dim = getVarTable<indice_t>().getVarNum( p.varId );
 
-  Subpoly_t subp( p );
+  Poly_t subp( p );
 
   PointList *ans = createList( delpoly );
 
@@ -721,7 +720,7 @@ bool SOSChecker::findSOS( vector<Poly_t> &polyvec ) {
 
   dim = getVarTable<indice_t>().getVarNum( p.varId );
 
-  Subpoly_t subp( p );
+  Poly_t subp( p );
 
   PointList *ans = createList( delpoly );
 

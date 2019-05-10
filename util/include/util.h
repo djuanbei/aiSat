@@ -16,7 +16,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-BOOL isSameLine( const indice_t points[], const int *loc, const int n,
+BOOL isSameLine( const indice_t points[], const int n,
                  const int dim );
 
 /**

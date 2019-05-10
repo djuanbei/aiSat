@@ -24,7 +24,7 @@ extern void qsortM( indice_t *, const int n, const int left, const int right,
                     int ( *comp )( const indice_t *, const indice_t *,
                                    const int ) );
 
-BOOL isSameLine( const indice_t points[], const int *loc, const int n,
+BOOL isSameLine( const indice_t points[],  const int n,
                  const int dim ) {
   if ( dim == 1 || n < 3 ) {
     return TRUE;
@@ -34,13 +34,13 @@ BOOL isSameLine( const indice_t points[], const int *loc, const int n,
   int base[ dim ];
   int current, next;
   for ( i = 0; i < dim; i += 1 ) {
-    base[ i ] = points[ loc[ 1 ] * dim + i ] - points[ loc[ 0 ] * dim + i ];
+    base[ i ] = points[   dim + i ] - points[    i ];
     if ( base[ i ] != 0 ) k = i;
   }
   for ( i = 2; i < n; i += 1 ) {
-    current = points[ loc[ i ] * dim + k ] - points[ loc[ 0 ] * dim + k ];
+    current = points[  i  * dim + k ] - points[  k ];
     for ( j = 1; j < dim - 1; j += 1 ) {
-      next = points[ loc[ i ] * dim + j ] - points[ loc[ 0 ] * dim + j ];
+      next = points[  i  * dim + j ] - points[ + j ];
       if ( current * base[ j ] != next * base[ k ] ) {
         return FALSE;
       }

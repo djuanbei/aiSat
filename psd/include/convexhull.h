@@ -33,13 +33,13 @@ int reduceByPlane( indice_t *candidateSet, const int length, const int dim,
 
 class ConvexGenerator {
 private:
-  const Subpoly_t &subpoly;
+  const Poly_t &poly;
 
   POLY_SOS_T checkThreeP( const int dim, PointList *ans );
 
 public:
-  ConvexGenerator( const Subpoly_t &subp )
-      : subpoly( subp ) {}
+  ConvexGenerator( const Poly_t &p )
+      : poly( p ) {}
 
   POLY_SOS_T easyCheck( PointList *ans );
 

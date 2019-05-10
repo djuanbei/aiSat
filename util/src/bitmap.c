@@ -9,14 +9,14 @@
  *
  */
 
-#include "bimap.h"
+#include "bitmap.h"
 #include "search.h"
 #include <string.h>
 
 #include "selfmemutil.h"
 
-Bimap *createBimap( void ) {
-  Bimap *re    = (Bimap *) malloc_d( sizeof( Bimap ) );
+Bitmap *createBitmap( void ) {
+  Bitmap *re    = (Bitmap *) malloc_d( sizeof( Bitmap ) );
   re->capacity = DEFAULT_CAP;
   re->values   = (int *) malloc_d( 2 * re->capacity * sizeof( int ) );
   re->keys     = (int *) malloc_d( 2 * re->capacity * sizeof( int ) );
@@ -28,7 +28,7 @@ static int compfun( const void *lhs, const void *rhs ) {
   return ( (int *) lhs )[ 0 ] - ( (int *) rhs )[ 0 ];
 }
 
-static void enlargeBimap( Bimap *map ) {
+static void enlargeBitmap( Bitmap *map ) {
   map->capacity = map->capacity * ENLARGE_RAT + 1;
   map->values =
       (int *) realloc_d( map->values, 2 * map->capacity * sizeof( int ) );
@@ -44,8 +44,8 @@ static void enlargeBimap( Bimap *map ) {
  *
  * @return
  */
-int addBimapElem( Bimap *map, int value ) {
-  if ( map->size + 2 >= map->capacity ) enlargeBimap( map );
+int addBitmapElem( Bitmap *map, int value ) {
+  if ( map->size + 2 >= map->capacity ) enlargeBitmap( map );
 
   if ( 0 == map->size ) {
     map->values[ 0 ] = value;
@@ -93,20 +93,20 @@ int addBimapElem( Bimap *map, int value ) {
  * otherwise, -1
  */
 
-int findBimapByKey( Bimap *map, const int key ) {
+int findBitmapByKey( Bitmap *map, const int key ) {
   int loc = bisearchLocBettwen( map->keys, &key, map->size, 2, compfun );
   if ( loc < 0 ) return -1;
   if ( map->keys[ 2 * loc ] != key ) return -1;
   return map->keys[ 2 * loc ];
 }
 
-int findBimapByValue( Bimap *map, const int value ) {
+int findBitmapByValue( Bitmap *map, const int value ) {
   int loc = bisearchLocBettwen( map->values, &value, map->size, 2, compfun );
   if ( loc < 0 || map->values[ 2 * loc ] != value ) return -1;
   return map->values[ 2 * loc + 1 ];
 }
 
-void deleteBimap( Bimap *map ) {
+void deleteBitmap( Bitmap *map ) {
   if ( NULL != map ) {
     free( map->values );
     free( map->keys );
@@ -114,4 +114,4 @@ void deleteBimap( Bimap *map ) {
     map = NULL;
   }
 }
-void clearBimap( Bimap *map ) { map->size = 0; }
+void clearBitmap( Bitmap *map ) { map->size = 0; }

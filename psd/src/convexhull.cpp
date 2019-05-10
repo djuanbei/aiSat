@@ -420,33 +420,33 @@ POLY_SOS_T ConvexGenerator::checkThreeP( const int dim, PointList *ans ) {
   int                     i;
   int                     VA, VB, VM;
   vector<indice_t>        key( dim );
-  const vector<coef_t> &  coefs   = subpoly.getParent().coef;
-  const vector<int> &     locs    = subpoly.locs;
-  const vector<indice_t> &indices = subpoly.getParent().indices;
+  const vector<coef_t> &  coefs   = poly.coef;
+  // const vector<int> &     locs    = subpoly.locs;
+  const vector<indice_t> &indices = poly.indices;
 
-  if ( isSameLine( &( subpoly.getParent().indices )[ 0 ], &( locs )[ 0 ], 3,
+  if ( isSameLine( &( poly.indices )[ 0 ], 3,
                    dim ) ) { /* on a same line */
-    if ( coefs[ locs[ 0 ] ] < 0 ) {
-      if ( coefs[ locs[ 1 ] ] < 0 || coefs[ locs[ 2 ] ] < 0 ) {
+    if ( coefs[  0  ] < 0 ) {
+      if ( coefs[  1  ] < 0 || coefs[  2] < 0 ) {
         return NOSOS;
       }
     } else {
-      if ( coefs[ locs[ 1 ] ] < 0 && coefs[ locs[ 2 ] ] < 0 ) {
+      if ( coefs[  1  ] < 0 && coefs[  2  ] < 0 ) {
         return NOSOS;
       }
     }
     i = 0;
     while (
-        ( indices[ locs[ 0 ] * dim + i ] == indices[ locs[ 1 ] * dim + i ] ) &&
-        ( indices[ locs[ 1 ] * dim + i ] == indices[ locs[ 2 ] * dim + i ] ) )
+        ( indices[ 0  * dim + i ] == indices[  1  * dim + i ] ) &&
+        ( indices[  1  * dim + i ] == indices[  2  * dim + i ] ) )
       i++;
 
     int AB =
-        abs( indices[ locs[ 0 ] * dim + i ] - indices[ locs[ 1 ] * dim + i ] );
+        abs( indices[  0  * dim + i ] - indices[  1  * dim + i ] );
     int BC =
-        abs( indices[ locs[ 1 ] * dim + i ] - indices[ locs[ 2 ] * dim + i ] );
+        abs( indices[  1  * dim + i ] - indices[  2  * dim + i ] );
     int AC =
-        abs( indices[ locs[ 0 ] * dim + i ] - indices[ locs[ 2 ] * dim + i ] );
+        abs( indices[  0  * dim + i ] - indices[  2  * dim + i ] );
 
     if ( AC > AB && AC > BC ) { /* A C are vertex  */
       VA = 0;
@@ -464,120 +464,120 @@ POLY_SOS_T ConvexGenerator::checkThreeP( const int dim, PointList *ans ) {
       VM = 0;
     }
 
-    if ( coefs[ locs[ VA ] ] < 0 || coefs[ locs[ VB ] ] < 0 ) {
+    if ( coefs[  VA  ] < 0 || coefs[  VB  ] < 0 ) {
       return NOSOS;
     }
     for ( i = 0; i < dim; i += 1 ) {
-      if ( indices[ locs[ VA ] * dim + i ] & 1 ) {
+      if ( indices[  VA  * dim + i ] & 1 ) {
         return NOSOS;
       }
     }
 
     for ( i = 0; i < dim; i += 1 ) {
-      if ( indices[ locs[ VB ] * dim + i ] & 1 ) {
+      if ( indices[  VB  * dim + i ] & 1 ) {
         return NOSOS;
       }
     }
 
-    if ( coefs[ locs[ VM ] ] < 0 ) {
-      if ( fabs( coefs[ locs[ VM ] ] ) >
-           coefs[ locs[ VA ] ] + coefs[ locs[ VB ] ] ) {
+    if ( coefs[  VM  ] < 0 ) {
+      if ( fabs( coefs[  VM  ] ) >
+           coefs[  VA  ] + coefs[  VB  ] ) {
         return NOSOS;
       }
     } else {
       for ( i = 0; i < dim; i += 1 ) {
-        if ( indices[ locs[ VM ] * dim + i ] & 1 ) {
+        if ( indices[  VM  * dim + i ] & 1 ) {
           break;
         }
       }
       if ( i == dim ) {
         if ( NULL != ans ) {
           Poly_t *p = new Poly_t();
-          p->changeVarId( subpoly.getParent().getVarId() );
+          p->changeVarId( poly.getVarId() );
 
           for ( i = 0; i < dim; i += 1 ) {
-            key[ i ] = indices[ locs[ 0 ] * dim + i ] / 2;
+            key[ i ] = indices[  i ] / 2;
           }
-          p->add_term( key, sqrtf( coefs[ locs[ 0 ] ] ) );
+          p->add_term( key, sqrtf( coefs[  0  ] ) );
 
           push_back_L( ans, p );
 
           Poly_t *p1 = new Poly_t();
-          p1->changeVarId( subpoly.getParent().getVarId() );
+          p1->changeVarId( poly.getVarId() );
 
           for ( i = 0; i < dim; i += 1 ) {
-            key[ i ] = indices[ locs[ 1 ] * dim + i ] / 2;
+            key[ i ] = indices[  dim + i ] / 2;
           }
-          p1->add_term( key, sqrtf( coefs[ locs[ 1 ] ] ) );
+          p1->add_term( key, sqrtf( coefs[  1  ] ) );
 
           push_back_L( ans, p1 );
 
           Poly_t *p2 = new Poly_t();
 
-          p2->changeVarId( subpoly.getParent().getVarId() );
+          p2->changeVarId( poly.getVarId() );
 
           for ( i = 0; i < dim; i += 1 ) {
-            key[ i ] = indices[ locs[ 2 ] * dim + i ] / 2;
+            key[ i ] = indices[  2  * dim + i ] / 2;
           }
-          p2->add_term( key, sqrtf( coefs[ locs[ 2 ] ] ) );
+          p2->add_term( key, sqrtf( coefs[ 2  ] ) );
 
           push_back_L( ans, p2 );
         }
 
         return EXACTLY_SOS;
-      } else if ( coefs[ locs[ VM ] ] >
-                  coefs[ locs[ VA ] ] + coefs[ locs[ VB ] ] ) {
+      } else if ( coefs[  VM  ] >
+                  coefs[  VA  ] + coefs[  VB  ] ) {
         return NOSOS;
       }
     }
     return UNHNOW;
   } else {
-    if ( coefs[ locs[ 0 ] ] < 0 || coefs[ locs[ 1 ] ] < 0 ||
-         coefs[ locs[ 2 ] ] < 0 )
+    if ( coefs[  0  ] < 0 || coefs[  1  ] < 0 ||
+         coefs[  2  ] < 0 )
       return NOSOS;
     for ( i = 0; i < dim; i += 1 ) {
-      if ( indices[ locs[ 0 ] * dim + i ] & 1 ) {
+      if ( indices[   i ] & 1 ) {
         return NOSOS;
       }
     }
     for ( i = 0; i < dim; i += 1 ) {
-      if ( indices[ locs[ 1 ] * dim + i ] & 1 ) {
+      if ( indices[  dim + i ] & 1 ) {
         return NOSOS;
       }
     }
     for ( i = 0; i < dim; i += 1 ) {
-      if ( indices[ locs[ 2 ] * dim + i ] & 1 ) {
+      if ( indices[  2 * dim + i ] & 1 ) {
         return NOSOS;
       }
     }
     if ( NULL != ans ) {
       Poly_t *p = new Poly_t();
-      p->changeVarId( subpoly.getParent().getVarId() );
+      p->changeVarId( poly.getVarId() );
 
       for ( i = 0; i < dim; i += 1 ) {
-        key[ i ] = indices[ locs[ 0 ] * dim + i ] / 2;
+        key[ i ] = indices[   i ] / 2;
       }
-      p->add_term( key, sqrtf( coefs[ locs[ i ] ] ) );
+      p->add_term( key, sqrtf( coefs[ i  ] ) );
 
       push_back_L( ans, p );
 
       Poly_t *p1 = new Poly_t();
-      p1->changeVarId( subpoly.getParent().getVarId() );
+      p1->changeVarId( poly.getVarId() );
 
       for ( i = 0; i < dim; i += 1 ) {
-        key[ i ] = indices[ locs[ 1 ] * dim + i ] / 2;
+        key[ i ] = indices[  dim + i ] / 2;
       }
-      p1->add_term( key, sqrtf( coefs[ locs[ i ] ] ) );
+      p1->add_term( key, sqrtf( coefs[  i  ] ) );
 
       push_back_L( ans, p1 );
 
       Poly_t *p2 = new Poly_t();
-      p2->changeVarId( subpoly.getParent().getVarId() );
+      p2->changeVarId(poly.getVarId() );
 
       for ( i = 0; i < dim; i += 1 ) {
-        key[ i ] = indices[ locs[ 2 ] * dim + i ] / 2;
+        key[ i ] = indices[  2  * dim + i ] / 2;
       }
-      p2->add_term( key, sqrtf( coefs[ locs[ i ] ] ) );
+      p2->add_term( key, sqrtf( coefs[  i  ] ) );
 
       push_back_L( ans, p2 );
     }
@@ -587,13 +587,12 @@ POLY_SOS_T ConvexGenerator::checkThreeP( const int dim, PointList *ans ) {
 }
 
 POLY_SOS_T ConvexGenerator::easyCheck( PointList *ans ) {
-  const int size = subpoly.size();
+ 
 
-  const vector<int> &     loc     = subpoly.locs;
-  const Poly_t &          poly    = subpoly.getParent();
+
   const vector<indice_t> &indices = poly.indices;
   const vector<coef_t> &  pcoefs  = poly.coef;
-
+  const int size = poly.coef.size();
   int dim = getVarTable<indice_t>().getVarNum( poly.getVarId() );
 
   vector<indice_t> key( dim );
@@ -610,8 +609,8 @@ POLY_SOS_T ConvexGenerator::easyCheck( PointList *ans ) {
   int      second = 0;
   double   planeSum;
 
-  int loc0 = subpoly[ 0 ];
-  int loc1 = subpoly[ 1 ];
+  int loc0 =0;
+  int loc1 =1;
 
   if ( size == 1 ) {
     if ( poly.getCF( loc0 ) < 0 ) {
@@ -673,12 +672,12 @@ POLY_SOS_T ConvexGenerator::easyCheck( PointList *ans ) {
   }
 
   for ( i = 0; i < size; i += 1 ) {
-    if ( pcoefs[ loc[ i ] ] < 0 ) {
+    if ( pcoefs[  i  ] < 0 ) {
       break;
     }
 
     for ( k = 0; k < dim; k += 1 ) {
-      if ( indices[ loc[ i ] * dim + k ] & 1 ) {
+      if ( indices[ i  * dim + k ] & 1 ) {
         break;
       }
     }
@@ -693,9 +692,9 @@ POLY_SOS_T ConvexGenerator::easyCheck( PointList *ans ) {
         p->changeVarId( poly.getVarId() );
 
         for ( k = 0; k < dim; k += 1 ) {
-          key[ k ] = indices[ loc[ i ] * dim + k ] / 2;
+          key[ k ] = indices[  i  * dim + k ] / 2;
         }
-        p->add_term( key, sqrtf( pcoefs[ loc[ i ] ] ) );
+        p->add_term( key, sqrtf( pcoefs[  i  ] ) );
 
         push_back_L( ans, p );
       }
@@ -721,7 +720,7 @@ POLY_SOS_T ConvexGenerator::easyCheck( PointList *ans ) {
     maxSum = 0;
 
     for ( k = 0; k < dim; k += 1 ) {
-      maxSum += coefs[ k ] * indices[ loc[ 0 ] * dim + k ];
+      maxSum += coefs[ k ] * indices[   k ];
     }
 
     maxPoint[ 0 ] = 1;
@@ -732,7 +731,7 @@ POLY_SOS_T ConvexGenerator::easyCheck( PointList *ans ) {
       tempSum = 0;
 
       for ( j = 0; j < dim; j += 1 ) {
-        tempSum += coefs[ j ] * indices[ loc[ k ] * dim + j ];
+        tempSum += coefs[ j ] * indices[  k  * dim + j ];
       }
       if ( tempSum > maxSum ) {
         maxSum = tempSum;
@@ -749,30 +748,30 @@ POLY_SOS_T ConvexGenerator::easyCheck( PointList *ans ) {
     }
     if ( number == 1 ) {
       convexSurf[ first ] = 1;
-      if ( pcoefs[ loc[ first ] ] < -1e-6 ) {
+      if ( pcoefs[  first  ] < -1e-6 ) {
         return NOSOS;
       }
       for ( j = 0; j < dim; j += 1 ) {
-        if ( indices[ loc[ first ] * dim + j ] & 1 ) {
+        if ( indices[  first  * dim + j ] & 1 ) {
           return NOSOS;
         }
       }
     } else if ( number == 2 ) {
       convexSurf[ first ] = 1;
-      if ( pcoefs[ loc[ first ] ] < -1e-6 ) {
+      if ( pcoefs[ first  ] < -1e-6 ) {
         return NOSOS;
       }
       for ( j = 0; j < dim; j += 1 ) {
-        if ( indices[ loc[ first ] * dim + j ] & 1 ) {
+        if ( indices[  first  * dim + j ] & 1 ) {
           return NOSOS;
         }
       }
       convexSurf[ second ] = 1;
-      if ( pcoefs[ loc[ second ] ] < -1e-6 ) {
+      if ( pcoefs[  second  ] < -1e-6 ) {
         return NOSOS;
       }
       for ( j = 0; j < dim; j += 1 ) {
-        if ( indices[ loc[ second ] * dim + j ] & 1 ) {
+        if ( indices[  second  * dim + j ] & 1 ) {
           return NOSOS;
         }
       }
@@ -781,7 +780,7 @@ POLY_SOS_T ConvexGenerator::easyCheck( PointList *ans ) {
       for ( k = 0; k < size; k += 1 ) {
         if ( 1 == maxPoint[ k ] ) {
           convexSurf[ k ] = 1;
-          planeSum += pcoefs[ loc[ k ] ];
+          planeSum += pcoefs[ k ];
         }
       }
       if ( planeSum < -1e-6 ) {
@@ -821,10 +820,10 @@ int ConvexGenerator::onSameSurf( const int *checkPoints, const int size,
   ASSERT( limit >= 1 && size >= limit,
           "candidate must greater or equal to limit" );
 
-  const vector<indice_t> &indices = subpoly.getParent().indices;
-  int dim = getVarTable<indice_t>().getVarNum( subpoly.getParent().getVarId() );
+  const vector<indice_t> &indices = poly.indices;
+  int dim = getVarTable<indice_t>().getVarNum( poly.getVarId() );
 
-  const vector<int> &loc = subpoly.locs;
+
   int                i, j, m, k, maxSum, tempSum;
   int                checkTime = dim * limit * size;
   int                number    = 0;
@@ -844,7 +843,7 @@ int ConvexGenerator::onSameSurf( const int *checkPoints, const int size,
   for ( i = 0; i < dim; i += 1 ) {
     for ( j = 0; j < size; j += 1 ) {
       A[ ijtok( j + 1, i + 1, size ) ] =
-          indices[ loc[ checkPoints[ j ] ] * dim + i ];
+          indices[  checkPoints[ j  ] * dim + i ];
     }
   }
   vector<double> VT( dim * dim );
@@ -902,7 +901,7 @@ int ConvexGenerator::onSameSurf( const int *checkPoints, const int size,
 
         for ( i = 0; i < dim; i += 1 ) {
           maxSum +=
-              coefsDen[ i ] * indices[ loc[ checkPoints[ 0 ] ] * dim + i ];
+              coefsDen[ i ] * indices[  checkPoints[ 0 ]  * dim + i ];
         }
         number        = 1;
         rePoints[ 0 ] = 1;
@@ -912,7 +911,7 @@ int ConvexGenerator::onSameSurf( const int *checkPoints, const int size,
 
           for ( j = 0; j < dim; j += 1 ) {
             tempSum +=
-                coefsDen[ j ] * indices[ loc[ checkPoints[ i ] ] * dim + j ];
+                coefsDen[ j ] * indices[  checkPoints[ i ]  * dim + j ];
           }
           if ( tempSum > maxSum ) {
             maxSum = tempSum;
@@ -977,14 +976,14 @@ int ConvexGenerator::onSameSurf( const int *checkPoints, const int size,
 
     for ( k = 0; k < dim; k += 1 ) {
       numBound *=
-          ( indices[ loc[ checkPoints[ choose[ 0 ] ] ] * dim + k ] + 1 );
+          ( indices[  checkPoints[ choose[ 0 ]  ] * dim + k ] + 1 );
     }
 
     for ( j = 0; j < limit; j += 1 ) {
       b[ j ] = 1;
       for ( k = 0; k < dim; k += 1 ) {
         a[ k * limit + j ] =
-            indices[ loc[ checkPoints[ choose[ j ] ] ] * dim + k ];
+            indices[  checkPoints[ choose[ j ]  ] * dim + k ];
       }
     }
 
@@ -1029,7 +1028,7 @@ int ConvexGenerator::onSameSurf( const int *checkPoints, const int size,
         tempSum = 0;
         for ( j = 0; j < dim; j += 1 ) {
           tempSum += coefsDen[ j ] *
-                     indices[ loc[ checkPoints[ choose[ k ] ] ] * dim + j ];
+                     indices[  checkPoints[ choose[ k ]  ] * dim + j ];
         }
         if ( tempSum != numBound ) {
           break;
@@ -1052,7 +1051,7 @@ int ConvexGenerator::onSameSurf( const int *checkPoints, const int size,
         tempSum = 0;
         for ( j = 0; j < dim; j += 1 ) {
           tempSum +=
-              coefsDen[ j ] * indices[ loc[ checkPoints[ k ] ] * dim + j ];
+              coefsDen[ j ] * indices[  checkPoints[ k  ] * dim + j ];
         }
         k++;
         if ( tempSum == numBound ) {
@@ -1073,7 +1072,7 @@ int ConvexGenerator::onSameSurf( const int *checkPoints, const int size,
             tempSum = 0;
             for ( j = 0; j < dim; j += 1 ) {
               tempSum +=
-                  coefsDen[ j ] * indices[ loc[ checkPoints[ k ] ] * dim + j ];
+                  coefsDen[ j ] * indices[  checkPoints[ k ] * dim + j ];
             }
             if ( tempSum < numBound ) {
               break;
@@ -1095,7 +1094,7 @@ int ConvexGenerator::onSameSurf( const int *checkPoints, const int size,
             tempSum = 0;
             for ( j = 0; j < dim; j += 1 ) {
               tempSum +=
-                  coefsDen[ j ] * indices[ loc[ checkPoints[ k ] ] * dim + j ];
+                  coefsDen[ j ] * indices[  checkPoints[ k ]  * dim + j ];
             }
             if ( tempSum > numBound ) {
               break;
