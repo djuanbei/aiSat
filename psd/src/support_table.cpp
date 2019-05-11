@@ -144,8 +144,8 @@ int Supporttable::addSOSup( const int deg, const int varId, const int consNum,
 
 int Supporttable::addSOSsupByIndice( const int varId, indice_t *indices,
                                      const int esize ) {
-  qsortKElem( indices, getVarTable<indice_t>().getVarNum( varId ), 0, esize - 1,
-              compare );
+  
+  qsortKElem( indices, getVarTable<indice_t>().getVarNum( varId ),  esize );
 
   int re = findSupElemByIndice( varId, indices, esize );
 

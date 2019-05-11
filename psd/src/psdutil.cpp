@@ -14,10 +14,41 @@
 #include "search.h"
 #include "support_table.h"
 #include "util.h"
+#include <algorithm>
+#define TYPE_H(n ) \
+  if ( K== ( n)){                 \
+    typedef   H<indice_t, n> H_t; \
+   H_t* temp=(H_t * ) indices; \
+   std::sort( temp, temp+size); return ;        \
+}
 
 namespace aiSat {
 
 namespace psd {
+
+void qsortKElem( indice_t *indices,  const size_t K,   size_t size){
+  if( K==1){
+    std::sort( indices, indices+size);
+    return;
+  }
+  TYPE_H( 2);
+  TYPE_H( 3);
+  TYPE_H( 4);
+  TYPE_H( 5);
+  TYPE_H( 6);
+  TYPE_H( 7);
+  TYPE_H( 8);
+  TYPE_H( 9);
+  TYPE_H( 10);
+  TYPE_H( 11);
+  TYPE_H( 12);
+  TYPE_H( 13);
+  TYPE_H( 14);
+  TYPE_H( 15);
+  ASSERT( false,"two many variables");
+}
+
+
 
 /**
  *@brief enumerate all monomials who belong to support whose id is supportId
@@ -213,8 +244,8 @@ bool criteria( const Support *S, indice_t *key ) {
  *@brief  For every monomial c of SOSM  W_c is  a  nchoosek(n+d/2,d/2) *
  * nchoosek(n+d/2,d/2) size symmetric matrix
  *  all element of W_c is one identity or zero. It means the location of c
- * occurs in Z^T * Z
- *  where Z=[1,x_1,...,x_n,x_1x_2,...,x_n^(d/2)]
+ * occurs in G^T * G
+ *  where G=[1,x_1,...,x_n,x_1x_2,...,x_n^(d/2)]
  *  n is the number of variable and d is the max total degree of SOSM.
  *  d is a even integer
  *
@@ -233,11 +264,11 @@ ArrangeMatrix **createArrangeM( const int supportId, indice_t const *SOSM,
   const int n   = getVarTable<indice_t>().getVarNum( sup->varId );
 
   indice_t  temp[ n + 1 ];
-  indice_t *Z = SUPPORT_TABLE.getGsup( supportId, blockSize );
-  if ( NULL == Z ) {
+  indice_t *G = SUPPORT_TABLE.getGsup( supportId, blockSize );
+  if ( NULL == G ) {
     sup->deg /= 2;
-    Z = getAllMonByTd( supportId, blockSize ); /* degree squared */
-    SUPPORT_TABLE.setGsup( supportId, *blockSize, Z );
+    G = getAllMonByTd( supportId, blockSize ); /* degree squared */
+    SUPPORT_TABLE.setGsup( supportId, *blockSize, G );
     sup->deg *= 2;
   }
 
@@ -252,14 +283,14 @@ ArrangeMatrix **createArrangeM( const int supportId, indice_t const *SOSM,
    *  |  a00 a10 a20  |
    *  |  a10 a11 a12  |
    *  |  a20 a21 a22  |
-   *  As (Z^T) Z is a symmetric matrix, we only need to compute the lower
+   *  As (Z^T)Z  is a symmetric matrix, we only need to compute the lower
    *triangle
    *  of it.
    *-----------------------------------------------------------------------------*/
   for ( i = 0; i < ( *blockSize ); i++ ) {
     for ( j = 0; j <= i; j += 1 ) {
       for ( k = 0; k < n; k += 1 ) {
-        temp[ k ] = Z[ i * n + k ] + Z[ j * n + k ]; /* monomial add */
+        temp[ k ] = G[ i * n + k ] + G[ j * n + k ]; /* monomial add */
       }
       index = findIndex( temp, SOSM, lengthSOS, n );
       ASSERT( index >= 0, "some thing wrong" );
@@ -267,7 +298,7 @@ ArrangeMatrix **createArrangeM( const int supportId, indice_t const *SOSM,
     }
   }
 
-  //	free(Z);
+
   SUPPORT_TABLE.setArrangeM( supportId, re, *blockSize );
   return re;
 }

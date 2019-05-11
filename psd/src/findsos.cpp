@@ -614,10 +614,12 @@ bool SOSChecker::polyIsSOS( Poly_t &poly, PointList *ans,
 
     GSUP = (indice_t *) realloc_d( candidate,
                                    tempLength * dim * sizeof( indice_t ) );
-    qsortKElem( GSUP, dim, 0, tempLength - 1, compare );
+
+    qsortKElem( GSUP, dim,  tempLength  );
+    
     gLength = tempLength;
 
-    qsortKElem( SOSM, dim, 0, sosLength - 1, compare );
+    qsortKElem( SOSM, dim,  sosLength );
     SUPPORT_TABLE.setGsup( sosId, gLength, GSUP );
     SUPPORT_TABLE.setSOSsup( sosId, sosLength, SOSM );
     delete[] temp;

@@ -11,6 +11,30 @@ namespace aiSat {
 
 namespace psd {
 
+template<typename T, size_t n>
+struct H{
+  T x[n];
+  bool  operator < (  const H<T, n> & other  ) const{
+    for(size_t i=0; i< n; i++){
+      if( x[ i]> other.x[ i]){
+        return false;
+      }else if( x[ i]< other.x[ i] ){
+        return true;
+      }
+    }
+    return false;
+  }
+};
+
+
+
+void qsortKElem( indice_t *, const  size_t K,   size_t size);
+
+
+
+
+
+
 bool criteria( const Support *coefM, indice_t *key );
 
 /**

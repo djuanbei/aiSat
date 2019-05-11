@@ -23,7 +23,7 @@ static int delRepeat( indice_t *indices, const int length, const int varNum ) {
   int  i, k;
   int  j      = 1;
   bool repeat = true;
-  qsortKElem( indices, varNum, 0, length - 1, compare );
+  qsortKElem( indices, varNum,  length );
 
   for ( i = 1; i < length; i++ ) {
     repeat = true;
@@ -195,7 +195,7 @@ int PSDEnvironment::addSupport( const vector<Power> &indices_vec ) {
   }
 
   vector<indice_t> vars( varNum );
-
+  
   int exactVarNum = 0;
   for ( i = 0; i < varNum; i++ ) {
     if ( varOccur[ i ] > 0 ) {
@@ -243,9 +243,9 @@ int PSDEnvironment::addSupport( const vector<Power> &indices_vec ) {
   GSUP = (indice_t *) realloc_d( Gsup,
                                  gLength * exactVarNum * sizeof( indice_t ) );
 
-  qsortKElem( GSUP, exactVarNum, 0, gLength - 1, compare );
+  qsortKElem( GSUP, exactVarNum,  gLength  );
 
-  qsortKElem( SOSM, exactVarNum, 0, sosLength - 1, compare );
+  qsortKElem( SOSM, exactVarNum, sosLength  );
 
   SUPPORT_TABLE.setGsup( supportId, gLength, GSUP );
   SUPPORT_TABLE.setSOSsup( supportId, sosLength, SOSM );
@@ -330,9 +330,9 @@ int PSDEnvironment::addSupport( const vector<int> &vars,
   } else {
     GSUP = Gsup;
   }
-  qsortKElem( GSUP, varNum, 0, gLength - 1, compare );
+  qsortKElem( GSUP, varNum,  gLength  );
 
-  qsortKElem( SOSM, varNum, 0, sosLength - 1, compare );
+  qsortKElem( SOSM, varNum,  sosLength  );
 
   SUPPORT_TABLE.setGsup( supportId, gLength, GSUP );
   SUPPORT_TABLE.setSOSsup( supportId, sosLength, SOSM );
